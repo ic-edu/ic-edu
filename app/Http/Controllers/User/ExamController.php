@@ -24,7 +24,7 @@ class ExamController extends Controller
             abort(403, 'Access denied');
         }
 
-        return view('exams.result', compact('attempt'));
+        return view('test-taker.exams.result', compact('attempt'));
     }
 
     public function start(Exam $exam)
@@ -35,7 +35,7 @@ class ExamController extends Controller
             ->first();
 
         if ($existingAttempt) {
-            return redirect()->route('exams.simulation', $existingAttempt->id);
+            return redirect()->route('test_taker.exams.simulation', $existingAttempt->id);
         }
 
         $newAttempt = ExamAttempt::create([
@@ -47,6 +47,6 @@ class ExamController extends Controller
             'answers' => []
         ]);
 
-        return redirect()->route('exams.simulation', $newAttempt->id);
+        return redirect()->route('test_taker.exams.simulation', $newAttempt->id);
     }
 }

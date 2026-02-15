@@ -50,7 +50,7 @@
                             </div>
 
                             <div class="bg-white px-6 py-4 mt-auto border-t border-gray-100">
-                                <form action="{{ route('exams.start', $exam->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true;">
+                                <form action="{{ route('test_taker.exams.start', $exam->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true;">
                                     @csrf
                                     <button type="submit" 
                                         class="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">

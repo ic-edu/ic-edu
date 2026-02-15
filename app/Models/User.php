@@ -52,4 +52,19 @@ class User extends Authenticatable implements FilamentUser
     {
         return str_ends_with($this->email, '@localhost');
     }
+
+    public function isExaminer()
+    {
+        return $this->role === 'examiner';
+    }
+
+    public function isTestTaker()
+    {
+        return $this->role === 'test_taker';
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 }
