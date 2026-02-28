@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\User\ExamController;
 use App\Livewire\ExamSimulator;
 use Illuminate\Support\Facades\Auth;
@@ -8,8 +9,22 @@ use Illuminate\Support\Facades\Route;
 
 // Landing Page Route
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('landing');
+})->name('landing');
+
+// Dashboard Route
+Route::get('/dashboard-user', function () {
+    return view('dashboard.user');
+})->name('dashboard-user');
+
+// Course Route 
+Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
+Route::get('/courses/{id}', [CourseController::class, 'detail'])->name('course.detail');
+
+//User Dashboard Route
+Route::get('/dashboard', function () {
+    return view('dashboard.user');
+})->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
