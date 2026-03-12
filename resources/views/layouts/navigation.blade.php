@@ -16,7 +16,7 @@
 
                     {{-- Navigation Examiner --}}
                     @if (Auth::user()->isExaminer())
-                        <x-nav-link :href="route('examiner.dashboard')" :active="request()->routeIs('examiner.exams.*')">
+                        <x-nav-link :href="route('examiner.exam-manage')" :active="request()->routeIs('examiner.exam-manage')">
                             {{ __('Exam Manage') }}
                         </x-nav-link>
                     @endif
@@ -93,7 +93,7 @@
 
             {{-- Examiner Navigation --}}
             @if (Auth::user()->isExaminer())
-                <x-responsive-nav-link :href="route('examiner.dashboard')" :active="request()->routeIs('examiner.exams.*')">
+                <x-responsive-nav-link :href="route('examiner.exam-manage')" :active="request()->routeIs('examiner.exam-manage')">
                     {{ __('Exam Manage') }}
                 </x-responsive-nav-link>
             @endif

@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('question_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('question_id')->constrained()->onDelete('cascade');
-            $table->string('option_text');
+
+            $table->foreignId('question_id')
+                ->constrained()
+                ->cascadeOnDelete();
+                
+            $table->longText('option_text');
             $table->boolean('is_correct')->default(false);
-            $table->softDeletes();
+
             $table->timestamps();
         });
     }

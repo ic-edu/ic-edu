@@ -13,12 +13,19 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('section_id')->constrained()->onDelete('cascade');
-            $table->enum('type', ['multiple_choice', 'essay', 'audio_record', 'short_answer'])->index();
-            $table->text('question_text')->nullable();
-            $table->string('media_path')->nullable();
-            $table->integer('order_position')->default(0);
-            $table->softDeletes();
+            $table->foreignId('question_group_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->string('type');
+            $table->longText('question_text')->nullable();
+
+            $table->string('image_path')->nullable();
+            $table->string('audio_path')->nullable();
+
+            $table->integer('points')->default(1);
+
+            $table->integer('order_position');
+
             $table->timestamps();
         });
     }

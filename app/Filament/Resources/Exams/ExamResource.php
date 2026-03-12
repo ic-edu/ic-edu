@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Exams;
 use App\Filament\Resources\Exams\Pages\CreateExam;
 use App\Filament\Resources\Exams\Pages\EditExam;
 use App\Filament\Resources\Exams\Pages\ListExams;
+use App\Filament\Resources\Exams\RelationManagers\SectionsRelationManager;
 use App\Filament\Resources\Exams\Schemas\ExamForm;
 use App\Filament\Resources\Exams\Tables\ExamsTable;
 use App\Models\Exam;
@@ -15,12 +16,14 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class ExamResource extends Resource
 {
     protected static ?string $model = Exam::class;
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|UnitEnum|null $navigationGroup = 'Master Data';
+
 
     public static function form(Schema $schema): Schema
     {
@@ -35,7 +38,7 @@ class ExamResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SectionsRelationManager::class, 
         ];
     }
 

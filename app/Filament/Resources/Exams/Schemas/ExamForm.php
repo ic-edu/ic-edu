@@ -2,46 +2,35 @@
 
 namespace App\Filament\Resources\Exams\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 
 class ExamForm
 {
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Section::make('Information')
-                    ->description('Detail about the exam.')
-                    ->schema([
-                        Select::make('exam_type_id')
-                            ->label('Exam Type')
-                            ->relationship('exam_type', 'name')
-                            ->required()
-                            ->preload()
-                            ->searchable(),
+        return $schema->components([ 
+            Select::make('exam_type_id')
+                ->label('Exam Type')
+                ->relationship('examType', 'name')
+                ->required()
+                ->searchable()
+                ->preload(),
 
-                        TextInput::make('title')
-                            ->label('Title')
-                            ->placeholder('Contoh: TOEIC Simulation Vol. 1')
-                            ->required()
-                            ->maxLength(255),
+            TextInput::make('title')
+                ->required()
+                ->maxLength(255),
 
-                        TextInput::make('duration_minutes')
-                            ->label('Duration (Minutes)')
-                            ->numeric()
-                            ->required()
-                            ->default(120)
-                            ->suffix('Minutes'),
+            TextInput::make('total_duration')
+                ->label('Total Duration (Minutes)')
+                ->numeric()
+                ->required(),
 
-                        Toggle::make('is_active')
-                            ->label('Active')
-                            ->helperText('If enabled, students can see and take this exam.')
-                            ->default(true),
-                    ])->columns(1),
-            ]);
+            Toggle::make('is_active')
+                ->required()
+                ->default(true),
+        ]);
     }
 }

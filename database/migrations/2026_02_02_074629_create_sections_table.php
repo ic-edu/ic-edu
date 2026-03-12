@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('exam_id')->constrained()->onDelete('cascade');
+            $table->foreignId('exam_id')->constrained()->cascadeOnDelete();
             $table->string('title');
-            $table->text('instructions')->nullable();
+            $table->integer('duration')->nullable();
+            $table->text('description')->nullable();
+            $table->integer('order_position');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -1,10 +1,11 @@
 <?php
 
+use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
-use App\Livewire\ExamSimulator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 
 // Landing Page Route
 Route::get('/', function () {
@@ -32,19 +33,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Route Examiner
 Route::middleware(['auth', 'role:examiner'])
     ->prefix('examiner')
-    ->name('examiner.')
     ->group(function () {
 
         // Dashboard Examiner
         Route::get('/dashboard', function () {
             return view('examiner.dashboard');
-        })->name('dashboard');
+        })->name('examiner.dashboard');
 
+        Route::livewire('/examiner/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
+        Route::livewire('/examiner/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
     });
 
 // Route Test-Examiner
 Route::middleware(['auth', 'role:test_taker'])
-    ->prefix('user') 
+    ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
 
@@ -54,10 +56,13 @@ Route::middleware(['auth', 'role:test_taker'])
         })->name('dashboard');
 
         // Simulator Routes
-        Route::get('/simulator', [ExamController::class, 'index'])->name('simulator.index');
-        Route::post('/simulation/{exam}/start', [ExamController::class, 'start'])->name('exams.start');
-        Route::get('/simulation/{attemptId}', ExamSimulator::class)->name('exams.simulation');
-        Route::get('/exam-result/{attempt}', [ExamController::class, 'result'])->name('exams.result');
+        Route::get('/simulation', [ExamController::class, 'index'])->name('simulator.index');
+        Route::livewire('/simulation/{exam}/detail', 'user.exam-detail')->name('simulator.detail');
+        Route::livewire('/simulation/{attempt}', 'user.exam')->name('simulator.exam');
     });
+
+Route::get('/download-template-soal', function () {
+    return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
+});
 
 require __DIR__ . '/auth.php';
