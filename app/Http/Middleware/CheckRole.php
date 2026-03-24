@@ -19,6 +19,11 @@ class CheckRole
             return redirect('login');
         }
 
+        // Admin has access to all roles' routes
+        if ($request->user()->isAdmin()) {
+            return $next($request);
+        }
+
         if ($request->user()->role !== $role) {
             abort(403, 'Access denied! You do not have the required role to access this page.');
         }
