@@ -116,10 +116,12 @@ class QuestionGroupsRelationManager extends RelationManager
                                     ->defaultItems(4)
                                     ->visible(fn(Get $get): bool => $get('type') === 'multiple_choice'),
                             ])
-                            ->itemLabel(fn(array $state): ?string => 'Question' . ($state['order_position'] ?? 'New'))
+                            ->itemLabel(fn(array $state): ?string => 'Question ' . ($state['order_position'] ?? 'New'))
                             ->addActionLabel('Add New Question in Group')
                             ->columnSpanFull()
-                            ->orderColumn('order_position'),
+                            ->orderColumn('order_position')
+                            ->collapsed()
+                            ->cloneable(),
                     ])
                     ->collapsible()
             ]);

@@ -6,6 +6,7 @@ use App\Filament\Resources\Exams\Pages\CreateExam;
 use App\Filament\Resources\Exams\Pages\EditExam;
 use App\Filament\Resources\Exams\Pages\ListExams;
 use App\Filament\Resources\Exams\RelationManagers\SectionsRelationManager;
+use App\Filament\Resources\Exams\RelationManagers\AttemptsRelationManager;
 use App\Filament\Resources\Exams\Schemas\ExamForm;
 use App\Filament\Resources\Exams\Tables\ExamsTable;
 use App\Models\Exam;
@@ -39,6 +40,7 @@ class ExamResource extends Resource
     {
         return [
             SectionsRelationManager::class, 
+            AttemptsRelationManager::class,
         ];
     }
 
