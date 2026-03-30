@@ -1,11 +1,17 @@
 /* ROOT TOKENS */
 :root {
-    --blue:    #2563eb;    --indigo:  #6366f1;   --surface: #ffffff;
-    --base:    #f0f4ff;    --border:  #e4eaf6;   --text:    #0f172a;
+    --primary: #1A456C;
+    --secondary: #6FAFB5;
+    /* Legacy fallback */
+    --blue:    var(--primary);    
+    --indigo:  var(--secondary);   
+    --surface: #ffffff;
+    --base:    #f8faff;    --border:  #e4eaf6;   --text:    #0f172a;
     --muted:   #64748b;    --sidebar: 72px;
 }
 
-body { background: #f8faff; margin: 0; font-family: 'Figtree', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+body { background: var(--base); margin: 0; font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif; }
+h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; }
 
 /* BASE LAYOUT */
 .dash-shell  { display: flex; min-height: 100vh; }

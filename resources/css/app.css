@@ -2,7 +2,8 @@
 @import './theme.css';
 
 @theme {
-    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 }
 
 @plugin "@tailwindcss/forms";

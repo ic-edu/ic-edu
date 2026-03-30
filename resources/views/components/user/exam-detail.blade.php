@@ -10,7 +10,7 @@ new #[Layout('layouts.test_taker')]
 class extends Component {
     public Exam $exam;
     public int $totalQuestions = 0;
-    public ?string $attemptStatus = null; // null = never attempted, 'ongoing', 'finished'
+    public ?string $attemptStatus = null;
 
     public function mount(Exam $exam)
     {
