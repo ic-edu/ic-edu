@@ -315,7 +315,7 @@
             ✓ undraw_tasting_cd81.svg           → Grammar
 
      🔧 BACKEND (route):
-        - route('course.index') → harus terdaftar di web.php
+        - route('#') → harus terdaftar di web.php
           dan CourseController(at)index harus sudah dibuat
      ════════════════════════════════════════════════════════════════════════ --}}
 <section class="course-section py-24 px-[5%] bg-[#f8faff]" id="courses">
@@ -429,9 +429,9 @@
 
         </div>
 
-        {{-- 🔧 BACKEND: route('course.index') harus terdaftar di web.php --}}
+        {{-- 🔧 BACKEND: route('#') harus terdaftar di web.php --}}
         <div class="text-center mt-10" data-reveal>
-            <a href="{{ route('course.index') }}"
+            <a href="#"
                class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white
                       bg-blue-600 shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">
                 View All Courses

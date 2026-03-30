@@ -8,7 +8,7 @@ class CourseController extends Controller
 {
     public function index()
     {
-        return view('course.index');
+        return view('#');
     }
     public function detail($id)
 {

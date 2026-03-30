@@ -27,7 +27,7 @@
                         You have completed <strong style="color:white;">{{ $finishedExams ?? 0 }} Exams</strong> and currently have <strong style="color:white;">{{ $inProgressExams ?? 0 }} simulations</strong> in progress. Let's conquer the next one!
                     </p>
                     <div class="hero-inner-actions">
-                        <a href="{{ route('course.index') }}" style="display:inline-flex;align-items:center;gap:8px;background:white;color:#2563eb;font-size:0.82rem;font-weight:700;padding:10px 20px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+                        <a href="#" style="display:inline-flex;align-items:center;gap:8px;background:white;color:#2563eb;font-size:0.82rem;font-weight:700;padding:10px 20px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
                             Browse Exams (Courses)
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                         </a>
@@ -89,7 +89,7 @@
         <div class="anim-in d3">
             <div class="sec-hd">
                 <span class="sec-title">Continue Simulation</span>
-                <a href="{{ route('course.index') }}" class="sec-link">View all exams →</a>
+                <a href="#" class="sec-link">View all exams →</a>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
                 @forelse($recentPendingExams ?? [] as $attempt)
@@ -203,7 +203,7 @@
         <div class="card card-pad anim-in d3">
             <p class="sec-title" style="margin-bottom:12px;">Quick Actions</p>
             <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="{{ route('course.index') }}" style="display:flex;align-items:center;gap:12px;background:#eff6ff;border:1.5px solid transparent;border-radius:14px;padding:12px 16px;cursor:pointer;width:100%;text-align:left;transition:all .2s;text-decoration:none;"
+                <a href="#" style="display:flex;align-items:center;gap:12px;background:#eff6ff;border:1.5px solid transparent;border-radius:14px;padding:12px 16px;cursor:pointer;width:100%;text-align:left;transition:all .2s;text-decoration:none;"
                    onmouseover="this.style.borderColor='#2563eb';this.style.background='white'"
                    onmouseout="this.style.borderColor='transparent';this.style.background='#eff6ff'">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
