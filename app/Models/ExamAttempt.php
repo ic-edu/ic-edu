@@ -5,26 +5,32 @@ namespace App\Models;
 use App\Models\Exam;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExamAttempt extends Model
 {
     use SoftDeletes;
-    use HasFactory;
     use HasUuids;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'exam_id',
+        'status',
+        'started_at',
+        'finished_at',
+        'total_score',
+        'current_question_id',
+    ];
+
+    protected $casts = [
+        'started_at' => 'datetime',
+        'finished_at' => 'datetime',
+        'total_score' => 'integer',
+    ];
 
     public $incrementing = false;
     protected $keyType = 'string';
-
-    protected $casts = [
-        'answers' => 'array',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime', 
-    ];
 
     public function user()
     {
@@ -34,5 +40,15 @@ class ExamAttempt extends Model
     public function exam()
     {
         return $this->belongsTo(Exam::class);
+    }
+
+    public function answers()
+    {
+        return $this->hasMany(AttemptAnswer::class);
+    }
+
+    public function currentQuestion()
+    {
+        return $this->belongsTo(Question::class, 'current_question_id');
     }
 }

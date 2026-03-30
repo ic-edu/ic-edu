@@ -15,15 +15,17 @@
                     </x-nav-link>
 
                     {{-- Navigation Examiner --}}
-                    @if (Auth::user()->isExaminer())
+                    {{-- @if (Auth::user()->isExaminer())
+                        <x-nav-link :href="route('examiner.exam-manage')" :active="request()->routeIs('examiner.exam-manage')"> --}}
+                    @if (Auth::user()?->isExaminer())
                         <x-nav-link :href="route('examiner.dashboard')" :active="request()->routeIs('examiner.exams.*')">
                             {{ __('Exam Manage') }}
                         </x-nav-link>
                     @endif
 
                     {{-- Navigation Test Taker --}}
-                    @if (Auth::user()->isTestTaker())
-                        <x-nav-link :href="route('test_taker.simulator.index')" :active="request()->routeIs('test_taker.simulator.*')">
+                    @if (Auth::user()?->isTestTaker())
+                        <x-nav-link :href="route('test_taker.exam.index')" :active="request()->routeIs('test_taker.exam.*')">
                             {{ __('Simulator') }}
                         </x-nav-link>
                     @endif
@@ -36,9 +38,9 @@
                     <x-slot name="trigger">
                         <button
                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>{{ Auth::user()?->name }}</div>
                             <span class="ml-2 text-xs bg-gray-100 px-2 py-1 rounded text-gray-400">
-                                {{ Auth::user()->role === 'examiner' ? 'Examiner' : 'User' }}
+                                {{ Auth::user()?->role === 'examiner' ? 'Examiner' : 'User' }}
                             </span>
 
                             <div class="ms-1">
@@ -92,15 +94,17 @@
             </x-responsive-nav-link>
 
             {{-- Examiner Navigation --}}
-            @if (Auth::user()->isExaminer())
+            {{-- @if (Auth::user()->isExaminer())
+                <x-responsive-nav-link :href="route('examiner.exam-manage')" :active="request()->routeIs('examiner.exam-manage')"> --}}
+            @if (Auth::user()?->isExaminer())
                 <x-responsive-nav-link :href="route('examiner.dashboard')" :active="request()->routeIs('examiner.exams.*')">
                     {{ __('Exam Manage') }}
                 </x-responsive-nav-link>
             @endif
 
             {{-- Test Taker Navigation --}}
-            @if (Auth::user()->isTestTaker())
-                <x-responsive-nav-link :href="route('test_taker.simulator.index')" :active="request()->routeIs('test_taker.simulator.*')">
+            @if (Auth::user()?->isTestTaker())
+                        <x-nav-link :href="route('test_taker.exam.index')" :active="request()->routeIs('test_taker.exam.*')">
                     {{ __('Simulator') }}
                 </x-responsive-nav-link>
             @endif
@@ -109,8 +113,8 @@
 
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

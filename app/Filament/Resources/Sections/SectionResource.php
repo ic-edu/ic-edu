@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Sections;
 use App\Filament\Resources\Sections\Pages\CreateSection;
 use App\Filament\Resources\Sections\Pages\EditSection;
 use App\Filament\Resources\Sections\Pages\ListSections;
+use App\Filament\Resources\Sections\RelationManagers\SubsectionsRelationManager;
 use App\Filament\Resources\Sections\Schemas\SectionForm;
 use App\Filament\Resources\Sections\Tables\SectionsTable;
 use App\Models\Section;
@@ -19,8 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class SectionResource extends Resource
 {
     protected static ?string $model = Section::class;
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
@@ -35,7 +36,7 @@ class SectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            SubsectionsRelationManager::class, 
         ];
     }
 
@@ -53,7 +54,6 @@ class SectionResource extends Resource
         return parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ])
-            ->with(['exam']);
+            ]);
     }
 }

@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('exams', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->foreignId('exam_type_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->integer('duration_minutes');
+            $table->integer('total_duration');
             $table->boolean('is_active')->default(true)->index();
             $table->softDeletes();
             $table->timestamps();

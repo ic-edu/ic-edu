@@ -2,16 +2,15 @@
 
 namespace App\Filament\Resources\Exams\Tables;
 
-use Filament\Tables\Table;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
 
 class ExamsTable
 {
@@ -19,33 +18,29 @@ class ExamsTable
     {
         return $table
             ->columns([
+                TextColumn::make('examType.name')
+                    ->label('Exam Type')
+                    ->sortable()
+                    ->searchable()
+                    ->badge()
+                    ->color('info'),
+
                 TextColumn::make('title')
                     ->label('Title')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
 
-                TextColumn::make('exam_type.name')
-                    ->label('Exam Type')
-                    ->badge()
-                    ->color('primary'),
-
-                TextColumn::make('duration_minutes')
+                TextColumn::make('total_duration')
                     ->label('Duration')
-                    ->suffix(' mnt'),
+                    ->numeric()
+                    ->suffix(' mins')
+                    ->sortable(),
 
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
-
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->label('Created At')
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('exam_type_id')
-                    ->label('Filter Exam Type')
-                    ->relationship('exam_type', 'name'),
+                TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),

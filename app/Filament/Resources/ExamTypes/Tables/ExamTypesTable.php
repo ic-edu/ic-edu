@@ -2,14 +2,14 @@
 
 namespace App\Filament\Resources\ExamTypes\Tables;
 
-use Filament\Tables\Table;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Table;
 
 class ExamTypesTable
 {
@@ -18,16 +18,11 @@ class ExamTypesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->searchable() 
-                    ->sortable(), 
-                    
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('description')
-                    ->limit(50), 
-
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->limit(50)
+                    ->searchable(),
             ])
             ->filters([
                 TrashedFilter::make(),

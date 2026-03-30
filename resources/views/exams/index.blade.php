@@ -20,7 +20,7 @@
                             <div class="p-6 flex-grow">
                                 <span
                                     class="px-2 py-1 text-xs font-semibold uppercase rounded-full bg-blue-100 text-blue-800">
-                                    {{ $exam->exam_type->name }}
+                                    {{ $exam->examType->name }}
                                 </span>
 
                                 <h3 class="mt-3 text-lg font-bold text-gray-900">
@@ -43,16 +43,14 @@
                                                 d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2">
                                             </path>
                                         </svg>
-                                        Total Questions: {{ $exam->sections->sum(fn($s) => $s->questions->count()) }}
-                                        Questions
+                                        Total Questions: xx Questions
                                     </div>
                                 </div>
                             </div>
 
                             <div class="bg-white px-6 py-4 mt-auto border-t border-gray-100">
-                                <form action="{{ route('test_taker.exams.start', $exam->id) }}" method="POST" onsubmit="this.querySelector('button').disabled=true;">
-                                    @csrf
-                                    <button type="submit" 
+                                <a href="{{ route('test_taker.simulator.detail', $exam->id) }}">
+                                    <button type="submit"
                                         class="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1">
 
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
@@ -61,9 +59,9 @@
                                                 d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.333-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                                         </svg>
 
-                                        <span>Start Exam</span>
+                                        <span>Detail Exam</span>
                                     </button>
-                                </form>
+                                </a>
                             </div>
                         </div>
                     @endforeach
