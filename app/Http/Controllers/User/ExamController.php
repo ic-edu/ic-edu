@@ -13,6 +13,6 @@ class ExamController extends Controller
             ->with('examType')
             ->latest()
             ->get();
-        return view('exams.index', compact('exams'));
+        return view('test_taker.exams.index', compact('exams'));
     }
 }

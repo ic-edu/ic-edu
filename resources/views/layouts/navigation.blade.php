@@ -25,7 +25,7 @@
 
                     {{-- Navigation Test Taker --}}
                     @if (Auth::user()?->isTestTaker())
-                        <x-nav-link :href="route('test_taker.simulator.index')" :active="request()->routeIs('test_taker.simulator.*')">
+                        <x-nav-link :href="route('test_taker.exam.index')" :active="request()->routeIs('test_taker.exam.*')">
                             {{ __('Simulator') }}
                         </x-nav-link>
                     @endif
@@ -104,7 +104,7 @@
 
             {{-- Test Taker Navigation --}}
             @if (Auth::user()?->isTestTaker())
-                <x-responsive-nav-link :href="route('test_taker.simulator.index')" :active="request()->routeIs('test_taker.simulator.*')">
+                        <x-nav-link :href="route('test_taker.exam.index')" :active="request()->routeIs('test_taker.exam.*')">
                     {{ __('Simulator') }}
                 </x-responsive-nav-link>
             @endif

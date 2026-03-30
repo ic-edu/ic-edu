@@ -4,6 +4,7 @@ use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\User\ExamController;
+use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -66,14 +67,12 @@ Route::middleware(['auth', 'role:test_taker'])
     ->group(function () {
 
         // Dashboard Test-Examiner
-        Route::get('/dashboard', function () {
-            return view('test_taker.dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
 
-        // Simulator Routes
-        Route::get('/simulation', [ExamController::class, 'index'])->name('simulator.index');
-        Route::livewire('/simulation/{exam}/detail', 'user.exam-detail')->name('simulator.detail');
-        Route::livewire('/simulation/{attempt}', 'user.exam')->name('simulator.exam');
+        // Exam Routes
+        Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
+        Route::livewire('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
+        Route::livewire('/exams/{attempt}', 'user.exam')->name('exam.attempt');
     });
 
 Route::get('/download-template-soal', function () {

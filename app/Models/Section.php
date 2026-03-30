@@ -18,6 +18,8 @@ class Section extends Model
         'order_position',
         'duration',
         'description',
+        'instruction_audio_path',
+        'instruction_image_path',
     ];
 
     protected $casts = [
