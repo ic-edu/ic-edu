@@ -1,0 +1,516 @@
+/* ============================================================
+   IC.EDU — THEME SYSTEM
+   resources/css/theme.css
+
+   HOW IT WORKS:
+   • Semua warna pakai CSS custom properties (variables)
+   • Light theme = default di :root
+   • Dark theme  = override di [data-theme="dark"]
+   • JavaScript toggle: document.documentElement.setAttribute('data-theme', 'dark')
+   • localStorage key: 'icedu_theme'
+   ============================================================ */
+
+/* ────────────────────────────────────────────────────
+   LIGHT THEME (default)
+──────────────────────────────────────────────────── */
+:root {
+    /* Background layers */
+    --bg-page: #f0f5ff;
+    --bg-surface: #ffffff;
+    --bg-subtle: #f8faff;
+    --bg-muted: #eef4ff;
+
+    /* Hero section */
+    --bg-hero-from: #eef4ff;
+    --bg-hero-mid: #e0eaff;
+    --bg-hero-to: #f0f5ff;
+
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-heading: #0f172a;
+
+    /* Border */
+    --border-default: #e2e8f0;
+    --border-subtle: #f1f5f9;
+
+    /* Brand */
+    --brand-blue: #2563eb;
+    --brand-indigo: #6366f1;
+    --brand-blue-light: #dbeafe;
+    --brand-blue-soft: #eff6ff;
+
+    /* Card / surface */
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --card-shadow: rgba(37, 99, 235, 0.07);
+    --card-hover-shadow: rgba(37, 99, 235, 0.14);
+
+    /* Navbar */
+    --navbar-scrolled-bg: rgba(255, 255, 255, 0.95);
+    --navbar-scrolled-border: #e2e8f0;
+    --navbar-text: #334155;
+    --navbar-text-hover: #2563eb;
+
+    /* Marquee strip */
+    --marquee-bg: #eff6ff;
+    --marquee-border: #bfdbfe;
+    --marquee-text: #2563eb;
+
+    /* Testimonial */
+    --testi-bg: #ffffff;
+    --testi-border: #e8edf4;
+    --testi-section-bg: #f8faff;
+
+    /* Doodle / decorative */
+    --doodle-color: #2563eb;
+
+    /* Topic pills */
+    --pill-bg: #f1f5f9;
+    --pill-text: #475569;
+
+    /* How-it-works section */
+    --how-bg-from: #f0f7ff;
+    --how-bg-to: #e8f0fe;
+    --how-card-bg: #ffffff;
+    --how-card-border: #bfdbfe;
+
+    /* Why-cards section */
+    --why-card-bg: #f8faff;
+    --why-card-bg-hover: #ffffff;
+    --why-card-border: #e2e8f0;
+
+    /* Toggle button */
+    --toggle-bg: #f1f5f9;
+    --toggle-icon: #64748b;
+    --toggle-hover-bg: #e2e8f0;
+
+    /* Transition */
+    --theme-transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ────────────────────────────────────────────────────
+   DARK THEME
+──────────────────────────────────────────────────── */
+[data-theme="dark"] {
+    /* Background layers */
+    --bg-page: #0d1117;
+    --bg-surface: #161b27;
+    --bg-subtle: #1a2235;
+    --bg-muted: #1e2a3d;
+
+    /* Hero section */
+    --bg-hero-from: #0d1117;
+    --bg-hero-mid: #111827;
+    --bg-hero-to: #0f1724;
+
+    /* Text */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-heading: #f8fafc;
+
+    /* Border */
+    --border-default: #1e293b;
+    --border-subtle: #1e2a3d;
+
+    /* Brand — tetap sama, sudah kontras di dark */
+    --brand-blue: #3b82f6;
+    --brand-indigo: #818cf8;
+    --brand-blue-light: #1e3a5f;
+    --brand-blue-soft: #172554;
+
+    /* Card / surface */
+    --card-bg: #161b27;
+    --card-border: #1e293b;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: rgba(59, 130, 246, 0.2);
+
+    /* Navbar */
+    --navbar-scrolled-bg: rgba(15, 23, 42, 0.95);
+    --navbar-scrolled-border: #1e293b;
+    --navbar-text: #cbd5e1;
+    --navbar-text-hover: #60a5fa;
+
+    /* Marquee strip */
+    --marquee-bg: #172554;
+    --marquee-border: #1e3a5f;
+    --marquee-text: #60a5fa;
+
+    /* Testimonial */
+    --testi-bg: #161b27;
+    --testi-border: #1e293b;
+    --testi-section-bg: #0f1724;
+
+    /* Doodle / decorative */
+    --doodle-color: #3b82f6;
+
+    /* Topic pills */
+    --pill-bg: #1e293b;
+    --pill-text: #94a3b8;
+
+    /* How-it-works section */
+    --how-bg-from: #0d1117;
+    --how-bg-to: #111827;
+    --how-card-bg: #161b27;
+    --how-card-border: #1e3a5f;
+
+    /* Why-cards section */
+    --why-card-bg: #161b27;
+    --why-card-bg-hover: #1a2235;
+    --why-card-border: #1e293b;
+
+    /* Toggle button */
+    --toggle-bg: #1e293b;
+    --toggle-icon: #94a3b8;
+    --toggle-hover-bg: #334155;
+
+    /* Color scheme untuk scroll bar & form elements */
+    color-scheme: dark;
+}
+
+/* ────────────────────────────────────────────────────
+   GLOBAL TRANSITIONS — smooth theme switch
+──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    transition: var(--theme-transition);
+}
+
+/* Kecualikan elemen yang tidak butuh transisi tema */
+img,
+video,
+svg,
+canvas,
+[data-no-transition] {
+    transition: none !important;
+}
+
+/* ────────────────────────────────────────────────────
+   BASE OVERRIDES — apply variables ke element dasar
+──────────────────────────────────────────────────── */
+body {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary);
+}
+
+/* ── Heading ── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-heading);
+}
+
+/* ── Paragraf muted ── */
+[data-theme="dark"] .text-slate-500 {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .text-slate-400 {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-slate-700 {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-slate-800 {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] .text-slate-900 {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] .text-slate-600 {
+    color: var(--text-secondary) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   NAVBAR
+──────────────────────────────────────────────────── */
+#navbar {
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Navbar scrolled state di dark mode */
+[data-theme="dark"] #navbar.scrolled-nav {
+    background-color: var(--navbar-scrolled-bg) !important;
+    border-color: var(--navbar-scrolled-border) !important;
+}
+
+/* Pastikan override Tailwind backdrop-blur tetap jalan */
+[data-theme="dark"] .bg-white\/95 {
+    background-color: var(--navbar-scrolled-bg) !important;
+}
+
+/* Nav links */
+[data-theme="dark"] .nav-link {
+    color: var(--navbar-text) !important;
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: var(--navbar-text-hover) !important;
+}
+
+/* Sign in button */
+[data-theme="dark"] #btn-signin {
+    color: var(--text-primary);
+    border-color: var(--border-default);
+}
+
+[data-theme="dark"] #btn-signin:hover {
+    border-color: var(--brand-blue);
+    color: var(--brand-blue);
+}
+
+/* Dropdown panel */
+[data-theme="dark"] #tests-dropdown {
+    background-color: rgba(22, 27, 39, 0.98) !important;
+    border-color: var(--border-default) !important;
+}
+
+[data-theme="dark"] #tests-dropdown .text-slate-800 {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] #tests-dropdown .text-slate-500 {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] #tests-dropdown .text-slate-400 {
+    color: var(--text-muted) !important;
+}
+
+/* Caret arrow di dropdown */
+[data-theme="dark"] #tests-dropdown>div:first-child {
+    background-color: #1a2235 !important;
+    border-color: var(--border-default) !important;
+}
+
+/* Test doc card */
+[data-theme="dark"] .test-doc {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+[data-theme="dark"] .test-doc-back {
+    background: #1a2235 !important;
+    border-color: #2d3748 !important;
+}
+
+[data-theme="dark"] .test-doc-label {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] .test-doc-line {
+    background: #2d3748 !important;
+}
+
+[data-theme="dark"] .test-doc-dot {
+    background: #2d3748 !important;
+}
+
+[data-theme="dark"] .test-card:hover .test-doc-label {
+    color: inherit !important;
+}
+
+[data-theme="dark"] .test-card:hover>div {
+    background-color: #1e293b !important;
+}
+
+/* ────────────────────────────────────────────────────
+   HERO SECTION
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .hero-section {
+    background: linear-gradient(145deg,
+            var(--bg-hero-from) 0%,
+            var(--bg-hero-mid) 40%,
+            var(--bg-hero-to) 100%) !important;
+}
+
+/* Did you know card */
+[data-theme="dark"] .did-you-know-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* Topic pills */
+[data-theme="dark"] .topic-pill {
+    background-color: var(--pill-bg) !important;
+    color: var(--pill-text) !important;
+}
+
+[data-theme="dark"] .topic-pill:hover {
+    background-color: var(--brand-blue) !important;
+    color: #ffffff !important;
+}
+
+/* ────────────────────────────────────────────────────
+   WHY IC.EDU CARDS
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .why-card {
+    background-color: var(--why-card-bg) !important;
+    border-color: var(--why-card-border) !important;
+}
+
+[data-theme="dark"] .why-card:hover {
+    background-color: var(--why-card-bg-hover) !important;
+    border-color: var(--brand-blue) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   MARQUEE STRIP
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .marquee-strip {
+    background-color: var(--marquee-bg) !important;
+    border-color: var(--marquee-border) !important;
+}
+
+[data-theme="dark"] .marquee-strip .marquee-item {
+    color: var(--marquee-text) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   COURSE CARDS
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .course-section {
+    background-color: var(--bg-subtle) !important;
+}
+
+[data-theme="dark"] .course-card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+[data-theme="dark"] .course-card:hover {
+    border-color: var(--brand-blue) !important;
+    box-shadow: 0 20px 60px var(--card-hover-shadow) !important;
+}
+
+[data-theme="dark"] .course-card .border-t {
+    border-color: var(--border-default) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   FEATURE SPLIT & COMMUNITY SPLIT
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .bg-white {
+    background-color: var(--bg-surface) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   HOW IT WORKS SECTION
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .how-section {
+    background: linear-gradient(to bottom right, var(--how-bg-from), var(--how-bg-to)) !important;
+}
+
+[data-theme="dark"] .how-card {
+    background-color: var(--how-card-bg) !important;
+    border-color: var(--how-card-border) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   TESTIMONIALS
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .testi-section {
+    background: linear-gradient(160deg, var(--testi-section-bg) 0%, #111827 100%) !important;
+}
+
+[data-theme="dark"] .testi-item {
+    background-color: var(--testi-bg) !important;
+    border-color: var(--testi-border) !important;
+}
+
+[data-theme="dark"] .testi-item:hover {
+    box-shadow: 0 16px 48px rgba(59, 130, 246, 0.15) !important;
+}
+
+[data-theme="dark"] .w-px.bg-slate-200 {
+    background-color: var(--border-default) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   GENERAL BORDER OVERRIDES
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .border-slate-200 {
+    border-color: var(--border-default) !important;
+}
+
+[data-theme="dark"] .border-slate-100 {
+    border-color: var(--border-subtle) !important;
+}
+
+[data-theme="dark"] .border-blue-100 {
+    border-color: #1e3a5f !important;
+}
+
+[data-theme="dark"] .shadow-slate-200\/80 {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   GENERAL BG OVERRIDES
+──────────────────────────────────────────────────── */
+[data-theme="dark"] .bg-\[\#f8faff\] {
+    background-color: var(--bg-subtle) !important;
+}
+
+[data-theme="dark"] .bg-blue-50 {
+    background-color: var(--brand-blue-soft) !important;
+}
+
+[data-theme="dark"] .bg-slate-100 {
+    background-color: var(--bg-muted) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   TOGGLE BUTTON
+──────────────────────────────────────────────────── */
+.theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--toggle-bg);
+    color: var(--toggle-icon);
+    border: 1.5px solid var(--border-default);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease !important;
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    background: var(--toggle-hover-bg);
+    border-color: var(--brand-blue);
+    transform: rotate(15deg);
+}
+
+.theme-toggle svg {
+    transition: opacity 0.2s ease, transform 0.3s ease !important;
+}
+
+/* Sun icon — tampil di dark mode */
+.icon-sun {
+    display: none;
+}
+
+.icon-moon {
+    display: block;
+}
+
+[data-theme="dark"] .icon-sun {
+    display: block;
+}
+
+[data-theme="dark"] .icon-moon {
+    display: none;
+}
