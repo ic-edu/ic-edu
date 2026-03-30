@@ -14,20 +14,6 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-// Dashboard Route
-Route::get('/dashboard-user', function () {
-    return view('dashboard.user');
-})->name('dashboard-user');
-
-// Course Route 
-Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
-Route::get('/courses/{id}', [CourseController::class, 'detail'])->name('course.detail');
-
-//User Dashboard Route
-Route::get('/dashboard', function () {
-    return view('dashboard.user');
-})->name('dashboard');
-
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
     Route::get('/dashboard', function () {
