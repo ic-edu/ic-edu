@@ -10,58 +10,44 @@ new #[Layout('layouts.test_taker')]
 class extends Component {
     public Exam $exam;
     public int $totalQuestions = 0;
-    public ?string $attemptStatus = null;
+    public bool $isEnrolled = false;
 
     public function mount(Exam $exam)
     {
         $this->exam = $exam->load(['sections' => fn($q) => $q->orderBy('order_position'), 'examType']);
         $this->totalQuestions = $this->exam->total_questions;
 
-        // Check existing attempts
+        // Check enrollment
         $userId = Auth::id();
-        $latestAttempt = ExamAttempt::where('user_id', $userId)
+        $enrollment = \App\Models\ExamEnrollment::where('user_id', $userId)
             ->where('exam_id', $this->exam->id)
-            ->latest()
             ->first();
 
-        if ($latestAttempt) {
-            $this->attemptStatus = $latestAttempt->status;
+        if ($enrollment) {
+            $this->isEnrolled = true;
         }
     }
 
-    public function startExam()
+    public function enroll()
     {
         $userId = Auth::id();
 
-        // If already finished, block
-        $finishedAttempt = ExamAttempt::where('user_id', $userId)
+        // Cek lagi untuk mencegah double-enrollment
+        $existing = \App\Models\ExamEnrollment::where('user_id', $userId)
             ->where('exam_id', $this->exam->id)
-            ->where('status', 'finished')
             ->first();
 
-        if ($finishedAttempt) {
-            return;
+        if (!$existing) {
+            \App\Models\ExamEnrollment::create([
+                'user_id' => $userId,
+                'exam_id' => $this->exam->id,
+                'enrolled_at' => now(),
+                'status' => 'active'
+            ]);
         }
 
-        // Resume ongoing
-        $existingAttempt = ExamAttempt::where('user_id', $userId)
-            ->where('exam_id', $this->exam->id)
-            ->where('status', 'ongoing')
-            ->first();
-
-        if ($existingAttempt) {
-            return redirect()->route('test_taker.exam.attempt', ['attempt' => $existingAttempt->id]);
-        }
-
-        // Create new
-        $newAttempt = ExamAttempt::create([
-            'user_id' => $userId,
-            'exam_id' => $this->exam->id,
-            'started_at' => now(),
-            'status' => 'ongoing',
-        ]);
-
-        return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id]);
+        session()->flash('success', 'Berhasil mendaftar ujian! Silakan klik tombol Start Exam untuk memulai.');
+        return redirect()->route('test_taker.exam.detail', $this->exam->id);
     }
 };
 ?>
@@ -117,13 +103,11 @@ class extends Component {
                 <p style="font-size: 1.3rem; font-weight: 900; color: var(--text);">{{ $exam->sections->count() }}</p>
             </div>
             <div style="padding: 20px 24px; text-align: center;">
-                <p style="font-size: 0.6rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">Status</p>
-                @if($attemptStatus === 'finished')
-                <span style="display:inline-block;padding:4px 10px;border-radius:99px;font-size:0.7rem;font-weight:800;background:#fef2f2;color:#dc2626;">✓ Completed</span>
-                @elseif($attemptStatus === 'ongoing')
-                <span style="display:inline-block;padding:4px 10px;border-radius:99px;font-size:0.7rem;font-weight:800;background:#fefce8;color:#ca8a04;">● In Progress</span>
+                <p style="font-size: 0.6rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">Enrollment</p>
+                @if($isEnrolled)
+                <span style="display:inline-block;padding:4px 10px;border-radius:99px;font-size:0.7rem;font-weight:800;background:#f0fdf4;color:#16a34a;">✓ Enrolled</span>
                 @else
-                <span style="display:inline-block;padding:4px 10px;border-radius:99px;font-size:0.7rem;font-weight:800;background:#ecfdf5;color:#16a34a;">● Available</span>
+                <span style="display:inline-block;padding:4px 10px;border-radius:99px;font-size:0.7rem;font-weight:800;background:#fef2f2;color:#dc2626;">Not Enrolled</span>
                 @endif
             </div>
         </div>
@@ -189,63 +173,75 @@ class extends Component {
 
     {{-- CTA BUTTON --}}
     <div class="anim-in d4" style="text-align: right;">
-        @if($attemptStatus === 'finished')
-            {{-- Already completed --}}
-            <div class="card card-pad" style="text-align: center; border: 2px solid #e5e7eb;">
-                <div style="width:48px;height:48px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-                    <svg style="width:22px;height:22px;color:#16a34a;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <p style="font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:4px;">Exam Completed</p>
-                <p style="font-size:0.8rem;color:var(--muted);">You have already taken this exam. Results are available in My Exams.</p>
-            </div>
-        @elseif($attemptStatus === 'ongoing')
-            {{-- Resume ongoing --}}
-            <button @click="showConfirm = true"
-                    style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(245,158,11,0.3); transition: all .2s;"
-                    onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
-                Resume Exam
-            </button>
+        @if($isEnrolled)
+            {{-- Already Enrolled --}}
+            @php
+                $latestAttempt = $exam->attempts()->where('user_id', auth()->id())->latest()->first();
+            @endphp
+            @if($latestAttempt && $latestAttempt->status === 'finished')
+                <button disabled style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: #e5e7eb; color: #9ca3af; border: none; cursor: not-allowed;">
+                    Exam Completed
+                </button>
+            @else
+                <form action="{{ route('test_taker.exam.start', $exam->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @if($latestAttempt && $latestAttempt->status === 'ongoing')
+                        <button type="submit" 
+                                style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(234,88,12,0.3); transition: all .2s;"
+                                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Resume Exam
+                        </button>
+                    @else
+                        <button type="submit" 
+                                style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, var(--secondary), #4f969b); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(111,175,181,0.3); transition: all .2s;"
+                                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Start Exam
+                        </button>
+                    @endif
+                </form>
+            @endif
         @else
-            {{-- Start new --}}
+            {{-- Need to Enroll --}}
             <button @click="showConfirm = true"
-                    style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, var(--blue), var(--indigo)); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(37,99,235,0.3); transition: all .2s;"
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 28px rgba(37,99,235,0.4)';"
-                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(37,99,235,0.3)';">
-                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Start Exam
+                    style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), #1e5282); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(26,69,108,0.3); transition: all .2s;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 28px rgba(26,69,108,0.4)';"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(26,69,108,0.3)';">
+                <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                Enroll Now
             </button>
         @endif
     </div>
 
     {{-- CONFIRMATION MODAL (Alpine client-side = instant, wire:click for server action) --}}
-    <div x-show="showConfirm" x-transition.opacity.duration.200ms
-         style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);"
-         x-cloak>
-        <div @click.outside="showConfirm = false" x-show="showConfirm" x-transition.scale.origin.center.duration.200ms
-             style="background:white;border-radius:24px;padding:40px;max-width:440px;width:90%;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.15);">
-            <div style="width:64px;height:64px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                <svg style="width:28px;height:28px;color:var(--blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-            </div>
-            <h3 style="font-size:1.2rem;font-weight:900;color:var(--text);margin-bottom:8px;">Ready to Begin?</h3>
-            <p style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:28px;">
-                Once started, the timer will begin and <strong style="color:var(--text);">cannot be paused</strong>.
-                Make sure you're in a quiet place with stable internet.
-            </p>
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button @click="showConfirm = false"
-                        style="padding:12px 24px;border-radius:14px;font-size:0.85rem;font-weight:700;background:white;color:var(--muted);border:1.5px solid var(--border);cursor:pointer;transition:all .2s;"
-                        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
-                    Cancel
-                </button>
-                <button wire:click="startExam" wire:loading.attr="disabled"
-                        style="padding:12px 24px;border-radius:14px;font-size:0.85rem;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--indigo));color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,0.3);display:inline-flex;align-items:center;gap:8px;">
-                    <span wire:loading.remove wire:target="startExam">Confirm & Start</span>
-                    <span wire:loading wire:target="startExam">Preparing...</span>
-                </button>
+    <template x-teleport="body">
+        <div x-show="showConfirm" x-transition.opacity.duration.200ms
+             style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);"
+             x-cloak>
+            <div @click.outside="showConfirm = false" x-show="showConfirm" x-transition.scale.origin.center.duration.200ms
+                 style="background:white;border-radius:24px;padding:40px;max-width:440px;width:90%;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.15);">
+                <div style="width:64px;height:64px;border-radius:50%;background:#f0f4ff;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                    <svg style="width:28px;height:28px;color:var(--primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                </div>
+                <h3 style="font-size:1.2rem;font-weight:900;color:var(--text);margin-bottom:8px;">Terdaftar di Ujian Ini?</h3>
+                <p style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:28px;">
+                    Anda akan terdaftar ke dalam simulasi ujian ini. Ujian akan ditambahkan ke menu <strong>My Exams</strong> Anda.
+                </p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button @click="showConfirm = false"
+                            style="padding:12px 24px;border-radius:14px;font-size:0.85rem;font-weight:700;background:white;color:var(--muted);border:1.5px solid var(--border);cursor:pointer;transition:all .2s;"
+                            onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                        Cancel
+                    </button>
+                    <button wire:click="enroll" wire:loading.attr="disabled"
+                            style="padding:12px 24px;border-radius:14px;font-size:0.85rem;font-weight:800;background:linear-gradient(135deg,var(--primary),#1e5282);color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(26,69,108,0.3);display:inline-flex;align-items:center;gap:8px;">
+                        <span wire:loading.remove wire:target="enroll">Confirm Enrollment</span>
+                        <span wire:loading wire:target="enroll">Processing...</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-
+    </template>
     <style>[x-cloak] { display: none !important; }</style>
 </div>

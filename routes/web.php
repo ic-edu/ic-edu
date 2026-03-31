@@ -57,6 +57,8 @@ Route::middleware(['auth', 'role:test_taker'])
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
+        Route::get('/my-exams', [ExamController::class, 'myExams'])->name('exam.my_exams');
+        Route::post('/exams/{exam}/start', [ExamController::class, 'startExam'])->name('exam.start');
         Route::livewire('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
         Route::livewire('/exams/{attempt}', 'user.exam')->name('exam.attempt');
     });

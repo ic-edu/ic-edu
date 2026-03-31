@@ -48,6 +48,16 @@ class SubsectionsRelationManager extends RelationManager
                     ->label('Instructions for Subsection')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+
+                FileUpload::make('instruction_audio_path')
+                    ->label('Instruction Audio (Optional)')
+                    ->directory('instructions/audio')
+                    ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/m4a']),
+
+                FileUpload::make('instruction_image_path')
+                    ->label('Instruction Image (Optional)')
+                    ->directory('instructions/images')
+                    ->image(),
             ]);
     }
 
