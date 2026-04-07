@@ -1,231 +1,281 @@
 @extends('layouts.test_taker')
-@section('title', 'My Dashboard')
+@section('title', 'Dashboard')
 
 @section('content')
-<div class="dash-grid">
+{{-- PAGE HEADER --}}
+<div class="flex items-end justify-between mb-6 anim-in d1">
+    <div>
+        <h1 class="font-heading text-2xl font-black text-slate-800">Activity Overview</h1>
+        <p class="text-[0.8rem] font-medium text-slate-500 mt-1">Let's learn something new today!</p>
+    </div>
+</div>
 
-    {{-- LEFT COLUMN  --}}
-    <div style="display:flex;flex-direction:column;gap:22px;">
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+    
+    <div class="xl:col-span-8 flex flex-col gap-6 lg:gap-8">
 
-        {{-- HERO WELCOME CARD --}}
-        <div class="hero-card anim-in d1">
-            <div class="hero-grid-dots"></div>
-            <div class="glow-1"></div>
-            <div class="glow-2"></div>
-            <div class="hero-inner">
-                <div>
-                    <span style="display:inline-block;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:14px;">
-                        🎓 IC-EDU Student Portal
-                    </span>
-                    <h2 style="font-size:2rem;font-weight:900;color:white;line-height:1.1;margin-bottom:10px;">
-                        Welcome back,<br>
-                        <span style="background:linear-gradient(90deg,#93c5fd,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-                            {{ explode(' ', auth()->user()->name ?? 'Student')[0] }}! 👋
-                        </span>
-                    </h2>
-                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.65);margin-bottom:20px;max-width:380px;line-height:1.7;">
-                        You have completed <strong style="color:white;">{{ $finishedExams ?? 0 }} Exams</strong> and currently have <strong style="color:white;">{{ $inProgressExams ?? 0 }} simulations</strong> in progress. Let's conquer the next one!
-                    </p>
-                    <div class="hero-inner-actions">
-                        <a href="#" style="display:inline-flex;align-items:center;gap:8px;background:white;color:#2563eb;font-size:0.82rem;font-weight:700;padding:10px 20px;border-radius:12px;text-decoration:none;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,0.15);">
-                            Browse Exams (Courses)
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                        </a>
+        {{-- 1. OVERVIEW CARDS --}}
+        <div class="anim-in d2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {{-- Card 1: Target --}}
+                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
+                        <x-lucide-target class="w-6 h-6" stroke-width="2.5" />
                     </div>
+                    <p class="text-xl font-black text-slate-800 leading-none">7.5</p>
+                    <p class="text-[0.65rem] font-bold text-slate-400 mt-1 uppercase tracking-wider">IELTS Target</p>
                 </div>
                 
-                {{-- Progress ring --}}
-                <div class="mobile-hide" style="text-align:center;flex-shrink:0;">
-                    <div style="position:relative;display:inline-block;">
-                        <svg width="110" height="110" viewBox="0 0 36 36" style="transform:rotate(-90deg);">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2.5"/>
-                            <circle cx="18" cy="18" r="15.9" fill="none"
-                                    stroke="white" stroke-width="2.5"
-                                    stroke-dasharray="85 15" stroke-linecap="round"
-                                    style="filter:drop-shadow(0 0 6px rgba(255,255,255,0.6));"/>
-                        </svg>
-                        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                            <span style="font-size:1.5rem;font-weight:900;color:white;line-height:1;">A+</span>
-                            <span style="font-size:0.62rem;color:rgba(255,255,255,0.6);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Status</span>
-                        </div>
+                {{-- Card 2: Band --}}
+                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-3 group-hover:scale-110 transition-transform">
+                        <x-lucide-bar-chart-2 class="w-6 h-6" stroke-width="2.5" />
                     </div>
-                    <p style="color:rgba(255,255,255,0.7);font-size:0.75rem;font-weight:600;margin-top:6px;">Avg. Accuracy</p>
+                    <p class="text-xl font-black text-slate-800 leading-none">6.5</p>
+                    <p class="text-[0.65rem] font-bold text-slate-400 mt-1 uppercase tracking-wider">Current Band</p>
+                </div>
+
+                {{-- Card 3: Mock Tests --}}
+                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-3 group-hover:scale-110 transition-transform">
+                        <x-lucide-file-text class="w-6 h-6" stroke-width="2.5" />
+                    </div>
+                    <p class="text-xl font-black text-slate-800 leading-none">12</p>
+                    <p class="text-[0.65rem] font-bold text-slate-400 mt-1 uppercase tracking-wider">Mock Tests</p>
+                </div>
+
+                {{-- Card 4: Hours --}}
+                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group">
+                    <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 mb-3 group-hover:scale-110 transition-transform">
+                        <x-lucide-clock class="w-6 h-6" stroke-width="2.5" />
+                    </div>
+                    <p class="text-xl font-black text-slate-800 leading-none flex items-baseline">48<span class="text-xs font-bold ml-0.5 text-slate-400">h</span></p>
+                    <p class="text-[0.65rem] font-bold text-slate-400 mt-1 uppercase tracking-wider">Hours Spent</p>
                 </div>
             </div>
         </div>
 
-        {{-- ── STAT MINI CARDS ── --}}
-        <div class="stats-grid anim-in d2">
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#eff6ff;">
-                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.75 19 7.5 19s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        {{-- 2. READY TO TAKE A TEST --}}
+        <div class="seamless-card rounded-[2rem] p-6 lg:p-8 anim-in d2">
+            <h2 class="font-heading text-lg font-bold text-slate-800 mb-5">Ready to take the exam?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {{-- IELTS Card --}}
+                <div class="border border-slate-100 bg-slate-50 rounded-2xl p-5 hover:border-brand-primary hover:shadow-md cursor-pointer transition-all text-center group relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                    <div class="w-12 h-12 bg-white shadow-sm rounded-2xl mx-auto flex items-center justify-center text-blue-600 mb-4 group-hover:rotate-6 transition-transform border border-blue-50 font-black text-sm">
+                        IELTS
+                    </div>
+                    <h3 class="font-heading font-bold text-slate-800 mb-1 text-sm">IELTS Simulation</h3>
+                    <p class="text-[0.65rem] font-medium text-slate-500">Full 4 sections (L, R, W, S)</p>
+                    <button class="mt-4 w-full py-2 bg-white text-brand-primary border border-slate-200 rounded-xl text-xs font-bold group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">Take Exam</button>
                 </div>
-                <div>
-                    <p style="font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;">{{ $finishedExams ?? 0 }}</p>
-                    <p style="font-size:0.78rem;font-weight:600;color:var(--muted);margin-top:2px;">Finished Exams</p>
+
+                {{-- TOEIC Card --}}
+                <div class="border border-slate-100 bg-slate-50 rounded-2xl p-5 hover:border-brand-primary hover:shadow-md cursor-pointer transition-all text-center group relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                    <div class="w-12 h-12 bg-white shadow-sm rounded-2xl mx-auto flex items-center justify-center text-emerald-600 mb-4 group-hover:rotate-6 transition-transform border border-emerald-50 font-black text-sm">
+                        TOEIC
+                    </div>
+                    <h3 class="font-heading font-bold text-slate-800 mb-1 text-sm">TOEIC Simulation</h3>
+                    <p class="text-[0.65rem] font-medium text-slate-500">Listening & Reading</p>
+                    <button class="mt-4 w-full py-2 bg-white text-brand-primary border border-slate-200 rounded-xl text-xs font-bold group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">Take Exam</button>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#f5f3ff;">
-                    <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+
+                {{-- TOEFL Card --}}
+                <div class="border border-slate-100 bg-slate-50 rounded-2xl p-5 hover:border-brand-primary hover:shadow-md cursor-pointer transition-all text-center group relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-amber-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                    <div class="w-12 h-12 bg-white shadow-sm rounded-2xl mx-auto flex items-center justify-center text-amber-600 mb-4 group-hover:rotate-6 transition-transform border border-amber-50 font-black text-sm">
+                        TOEFL
+                    </div>
+                    <h3 class="font-heading font-bold text-slate-800 mb-1 text-sm">TOEFL ITP / iBT</h3>
+                    <p class="text-[0.65rem] font-medium text-slate-500">Academic language skills</p>
+                    <button class="mt-4 w-full py-2 bg-white text-brand-primary border border-slate-200 rounded-xl text-xs font-bold group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">Take Exam</button>
                 </div>
-                <div>
-                    <p style="font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;">{{ $inProgressExams ?? 0 }}</p>
-                    <p style="font-size:0.78rem;font-weight:600;color:var(--muted);margin-top:2px;">In Progress</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background:#fffbeb;">
-                    <svg class="w-7 h-7 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div>
-                    <p style="font-size:1.6rem;font-weight:900;color:var(--text);line-height:1;">{{ number_format($avgScore ?? 0, 1) }}</p>
-                    <p style="font-size:0.78rem;font-weight:600;color:var(--muted);margin-top:2px;">Average Score</p>
-                </div>
+
             </div>
         </div>
 
-        {{-- ── CONTINUE LEARNING (IN PROGRESS EXAMS) ── --}}
-        <div class="anim-in d3">
-            <div class="sec-hd">
-                <span class="sec-title">Continue Simulation</span>
-                <a href="#" class="sec-link">View all exams →</a>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-                @forelse($recentPendingExams ?? [] as $attempt)
-                <div class="course-card" onclick="window.location='{{ route('test_taker.exam.detail', $attempt->exam->id) }}'">
-                    <div class="course-thumb" style="background:#dbeafe; color: #2563eb;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        {{-- 3. COURSE IN PROGRESS --}}
+        <div class="seamless-card rounded-[2rem] p-6 lg:p-8 anim-in d3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
+                <div class="flex items-center gap-5">
+                    <h2 class="font-heading text-lg font-bold text-slate-800">Course in Progress</h2>
+                    <div class="text-[0.65rem] font-bold text-slate-400 flex gap-4 mt-0.5">
+                        <span class="text-brand-primary border-b-[3px] border-brand-primary pb-1 cursor-pointer hover:text-brand-primary">All</span>
+                        <span class="cursor-pointer border-b-[3px] border-transparent hover:text-slate-600 pb-1 transition-colors">Active</span>
+                        <span class="cursor-pointer border-b-[3px] border-transparent hover:text-slate-600 pb-1 transition-colors">Completed</span>
                     </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-                            <p style="font-size:0.85rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                {{ $attempt->exam->title ?? 'Unknown Exam' }}
-                            </p>
-                            <span style="font-size:0.65rem;font-weight:700;color:#2563eb;background:#dbeafe;padding:3px 9px;border-radius:99px;flex-shrink:0;margin-left:10px;">
-                                In Progress
-                            </span>
+                </div>
+                <a href="#" class="text-[0.7rem] font-bold px-3 py-1.5 bg-brand-light text-brand-primary rounded-lg hover:bg-brand-primary hover:text-white transition-colors shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <x-lucide-plus class="w-3.5 h-3.5" stroke-width="3" /> Add new 
+                </a>
+            </div>
+
+            @php
+                $courses = [
+                    ['title' => 'IELTS Reading Master', 'level' => 'Advanced Level', 'category' => 'RD', 'progress' => 65, 'lessons' => '12/20', 'hours' => '4', 'color' => 'indigo', 'teacher' => 'Diana Harlow'],
+                    ['title' => 'TOEFL Listening Build', 'level' => 'Intermediate Level', 'category' => 'LS', 'progress' => 45, 'lessons' => '5/12', 'hours' => '3', 'color' => 'emerald', 'teacher' => 'David Stone'],
+                    ['title' => 'Grammar Builder', 'level' => 'Beginner Level', 'category' => 'GR', 'progress' => 88, 'lessons' => '22/25', 'hours' => '1', 'color' => 'amber', 'teacher' => 'Daniel Hill'],
+                ];
+            @endphp
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                @foreach($courses as $course)
+                <div class="border border-slate-100 bg-slate-50 rounded-2xl p-5 hover:border-brand-secondary transition-colors shadow-sm flex flex-col group cursor-pointer">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-[10px] bg-{{ $course['color'] }}-100 text-{{ $course['color'] }}-600 flex items-center justify-center font-bold text-xs uppercase group-hover:scale-105 transition-transform">
+                            {{ $course['category'] }}
                         </div>
-                        <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">
-                            {{ $attempt->exam->examType->name ?? 'Simulation' }} · Started {{ $attempt->started_at->diffForHumans() }}
-                        </p>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <div class="prog-bar" style="flex:1;">
-                                <div class="prog-fill" style="width:50%;background:#2563eb;"></div>
+                        <div>
+                            <h3 class="font-heading font-black text-sm text-slate-800 leading-tight group-hover:text-brand-primary transition-colors">{{ $course['title'] }}</h3>
+                            <p class="text-[0.65rem] text-slate-400 font-semibold">{{ $course['level'] }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 text-[0.65rem] text-slate-400 font-bold mb-4 px-1">
+                        <span class="flex items-center gap-1"><x-lucide-calendar class="w-3.5 h-3.5 text-slate-300" /> 90</span>
+                        <span class="flex items-center gap-1"><x-lucide-clock class="w-3.5 h-3.5 text-slate-300" /> 90</span>
+                        <span class="flex items-center gap-1"><x-lucide-users class="w-3.5 h-3.5 text-slate-300" /> 52</span>
+                    </div>
+
+                    <div class="mt-auto">
+                        <div class="text-[0.65rem] font-bold text-slate-800 mb-1.5 px-0.5">{{ $course['progress'] }}% Finish</div>
+                        <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden mb-3">
+                            <div class="bg-{{ $course['color'] }}-500 h-full rounded-full transition-all duration-1000" style="width: {{ $course['progress'] }}%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-[0.6rem] text-slate-400 font-bold border-b border-slate-200 pb-3 mb-3">
+                            <span class="flex items-center gap-1"><x-lucide-monitor-play class="w-3 h-3 text-slate-300" /> {{ $course['lessons'] }} Lessons</span>
+                            <span>{{ $course['hours'] }} hours left</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($course['teacher']) }}&background=e2e8f0&color=64748b" class="w-7 h-7 rounded-full" alt="Teacher">
+                                <div>
+                                    <p class="text-[0.65rem] font-bold text-slate-800 leading-none">{{ $course['teacher'] }}</p>
+                                    <p class="text-[0.55rem] text-slate-400 mt-0.5">Teacher</p>
+                                </div>
                             </div>
-                            <span style="font-size:0.72rem;font-weight:700;color:#2563eb;flex-shrink:0;">Resume</span>
+                            <button class="text-[0.55rem] font-bold px-2.5 py-1 border border-slate-200 bg-white rounded-md text-slate-500 hover:bg-slate-100 transition-colors">Follow</button>
                         </div>
-                    </div>
-                </div>
-                @empty
-                <div style="padding: 24px; text-align: center; border: 1.5px dashed var(--border); border-radius: 18px;">
-                    <p style="font-size: 0.85rem; color: var(--muted); font-weight: 600;">No pending exams. Start a new one to show up here!</p>
-                </div>
-                @endforelse
-            </div>
-        </div>
-
-        {{-- ── EXPLORE CATEGORIES ── --}}
-        <div class="anim-in d4">
-            <div class="sec-hd">
-                <span class="sec-title">Explore Categories</span>
-            </div>
-            <div class="cat-strip flex gap-3 overflow-x-auto pb-2">
-                @foreach($examCategories ?? [] as $idx => $cat)
-                @php
-                    $colors = [
-                        ['icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>', 'bg'=>'#dbeafe', 'tx'=>'#2563eb'],
-                        ['icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>', 'bg'=>'#ede9fe', 'tx'=>'#7c3aed'],
-                        ['icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>', 'bg'=>'#dcfce7', 'tx'=>'#16a34a'],
-                        ['icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>', 'bg'=>'#fef9c3', 'tx'=>'#ca8a04'],
-                        ['icon'=>'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.75 19 7.5 19s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>', 'bg'=>'#fce7f3', 'tx'=>'#db2777'],
-                    ];
-                    $c = $colors[$idx % count($colors)];
-                @endphp
-                <div class="cat-pill min-w-[140px]" style="background:{{ $c['bg'] }};">
-                    <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="{{ $c['tx'] }}" viewBox="0 0 24 24">
-                        {!! $c['icon'] !!}
-                    </svg>
-                    <div>
-                        <p style="font-size:0.8rem;font-weight:700;color:var(--text);line-height:1.2;">{{ $cat->name }}</p>
-                        <p style="font-size:0.68rem;color:var(--muted);line-height:1.2;margin-top:2px;">{{ $cat->exams_count }} exams</p>
                     </div>
                 </div>
                 @endforeach
-                
-                @if(isset($examCategories) && count($examCategories) == 0)
-                <p style="font-size:0.75rem; color: var(--muted);">No exam categories found in the database.</p>
-                @endif
             </div>
         </div>
 
     </div>
-    {{-- END LEFT --}}
 
-    {{-- RIGHT COLUMN  --}}
-    <div style="display:flex;flex-direction:column;gap:22px;">
+    <div class="xl:col-span-4 flex flex-col gap-6 lg:gap-8 anim-in d2">
 
-        {{-- ── PERFORMANCE SUMMARY ── --}}
-        <div class="card card-pad anim-in d1">
-            <div class="sec-hd">
-                <span class="sec-title">Accuracy Rate</span>
-                <span style="font-size:0.72rem;font-weight:600;color:var(--muted);">All Time</span>
-            </div>
+        <div class="seamless-card rounded-[2rem] p-6 lg:p-8 flex flex-col gap-8 relative overflow-hidden">
+            
+            {{-- PROFILE INFO --}}
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-heading text-lg font-bold text-slate-800">Profile</h2>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-400 transition-colors"><x-lucide-more-vertical class="w-5 h-5" /></button>
+                </div>
 
-            {{-- Donut --}}
-            <div style="display:flex;justify-content:center;margin-bottom:18px;">
-                <div class="donut-wrap">
-                    <svg width="100" height="100" viewBox="0 0 36 36" style="transform: rotate(-90deg);">
-                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e8eef8" stroke-width="3"/>
-                        <circle cx="18" cy="18" r="15.9" fill="none"
-                                stroke="url(#perfGrad)" stroke-width="3"
-                                stroke-dasharray="{{ min(100, $avgScore ?? 0) }} {{ max(0, 100 - ($avgScore ?? 0)) }}" stroke-linecap="round"/>
-                        <defs>
-                            <linearGradient id="perfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" style="stop-color:#2563eb"/>
-                                <stop offset="100%" style="stop-color:#6366f1"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <span style="font-size:1.4rem;font-weight:900;color:var(--text);">{{ number_format($avgScore ?? 0, 1) }}</span>
-                        <span style="font-size:0.6rem;color:var(--muted);font-weight:600;">Average</span>
+                <div class="flex flex-col items-center mt-2 group cursor-pointer pt-2">
+                    <div class="relative mb-5">
+                        {{-- Circular progress outline --}}
+                        <svg class="absolute inset-0 w-full h-full transform -rotate-90 group-hover:scale-105 transition-transform" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="48" fill="transparent" stroke="#f1f5f9" stroke-width="4" />
+                            <circle cx="50" cy="50" r="48" fill="transparent" stroke="#1A456C" stroke-width="4" stroke-dasharray="300" stroke-dashoffset="100" class="transition-all duration-1000 group-hover:stroke-[#6FAFB5]" />
+                        </svg>
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'Archie Schmidt') }}&background=f8fafc&color=1A456C&size=120&bold=true" 
+                            alt="Avatar" 
+                            class="w-24 h-24 rounded-full border-[5px] border-white object-cover m-1 shadow-sm">
                     </div>
+
+                    <h3 class="font-heading text-lg font-black text-slate-800 flex items-center gap-1.5 flex-wrap justify-center">
+                        {{ auth()->user()->name ?? 'Archie Schmidt' }}
+                        <x-lucide-badge-check class="w-4 h-4 text-brand-primary fill-brand-primary" stroke="white" />
+                    </h3>
+                    <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">Student</p>
                 </div>
             </div>
 
-            <p style="font-size:0.75rem; color:var(--muted); text-align:center; font-weight:600;">
-                Keep practicing to increase your score!
-            </p>
-        </div>
+            {{-- Divider --}}
+            <hr class="border-slate-100 border-dashed relative z-10" />
 
-        {{-- ── QUICK ACTIONS ── --}}
-        <div class="card card-pad anim-in d3">
-            <p class="sec-title" style="margin-bottom:12px;">Quick Actions</p>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-                <a href="#" style="display:flex;align-items:center;gap:12px;background:#eff6ff;border:1.5px solid transparent;border-radius:14px;padding:12px 16px;cursor:pointer;width:100%;text-align:left;transition:all .2s;text-decoration:none;"
-                   onmouseover="this.style.borderColor='#2563eb';this.style.background='white'"
-                   onmouseout="this.style.borderColor='transparent';this.style.background='#eff6ff'">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span style="font-size:0.82rem;font-weight:700;color:#2563eb;">Find Simulations</span>
-                    <svg style="margin-left:auto;color:#2563eb;" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
-                <a href="{{ route('profile.edit') }}" style="display:flex;align-items:center;gap:12px;background:#f5f3ff;border:1.5px solid transparent;border-radius:14px;padding:12px 16px;cursor:pointer;width:100%;text-align:left;transition:all .2s;text-decoration:none;"
-                   onmouseover="this.style.borderColor='#7c3aed';this.style.background='white'"
-                   onmouseout="this.style.borderColor='transparent';this.style.background='#f5f3ff'">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    <span style="font-size:0.82rem;font-weight:700;color:#7c3aed;">Setup My Profile</span>
-                    <svg style="margin-left:auto;color:#7c3aed;" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
+            {{-- STREAK INFO --}}
+            <div class="relative z-10">
+                {{-- Decorative background glow specifically for streak --}}
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-orange-50 blur-3xl pointer-events-none -z-10"></div>
+                
+                {{-- Header Streak --}}
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/Fire.png" alt="Fire" class="w-8 h-8 object-contain drop-shadow" />
+                        <div>
+                            <h3 class="font-heading font-black text-lg text-slate-800 tracking-tight">Your Streak</h3>
+                            <p class="text-[0.65rem] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Keep it going!</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <div class="bg-gradient-to-br from-orange-400 to-rose-500 text-white px-3 py-1 rounded-xl shadow-lg shadow-orange-500/20 flex items-center gap-1 transform hover:scale-105 transition-transform cursor-default">
+                            <span class="text-base font-black drop-shadow-sm">3</span>
+                            <span class="text-[0.6rem] font-bold uppercase tracking-wide opacity-90">Days</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Streak Days --}}
+                @php
+                    $streakDays = [
+                        ['day' => 'Mon', 'short' => 'M', 'active' => true],
+                        ['day' => 'Tue', 'short' => 'T', 'active' => true],
+                        ['day' => 'Wed', 'short' => 'W', 'active' => true],
+                        ['day' => 'Thu', 'short' => 'T', 'active' => false],
+                        ['day' => 'Fri', 'short' => 'F', 'active' => false],
+                        ['day' => 'Sat', 'short' => 'S', 'active' => false],
+                        ['day' => 'Sun', 'short' => 'S', 'active' => false],
+                    ];
+                @endphp
+
+                <div class="relative flex justify-between items-center mb-6">
+                    {{-- Connecting line --}}
+                    <div class="absolute top-1/2 left-3 right-3 h-1 bg-slate-100 -translate-y-1/2 z-0 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-orange-400 to-rose-400 transition-all duration-1000" style="width: 40%"></div>
+                    </div>
+
+                    @foreach($streakDays as $index => $status)
+                        <div class="z-10 flex flex-col items-center gap-1.5 group">
+                            @if($status['active'])
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 text-white flex items-center justify-center font-bold text-[0.65rem] ring-[3px] ring-white shadow-sm stroke-[3px]">
+                                    <x-lucide-check class="w-4 h-4 ml-0.5" />
+                                </div>
+                                <span class="text-[0.6rem] font-extrabold text-orange-600">{{ $status['short'] }}</span>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-300 flex items-center justify-center ring-[3px] ring-white transition-all group-hover:border-orange-300">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover:bg-orange-300 transition-colors"></div>
+                                </div>
+                                <span class="text-[0.6rem] font-bold text-slate-400 group-hover:text-slate-600 transition-colors">{{ $status['short'] }}</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Motivational footer --}}
+                <div class="bg-orange-50 rounded-2xl p-3 border border-orange-100 flex gap-3 items-center">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Party%20Popper.png" alt="Party" class="w-4 h-4 object-contain" />
+                    </div>
+                    <div>
+                        <p class="text-[0.65rem] text-slate-600 font-semibold leading-relaxed">
+                            <span class="font-extrabold text-orange-600">4 more days</span> left to unlock a Premium Mock Test voucher!
+                        </p>
+                    </div>
+                </div>
             </div>
+            
         </div>
 
     </div>
-    {{-- END RIGHT --}}
 
 </div>
 @endsection

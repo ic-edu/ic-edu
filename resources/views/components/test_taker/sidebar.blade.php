@@ -1,7 +1,7 @@
 <aside class="sidebar" id="mainSidebar">
     <div class="sidebar-header flex items-center justify-between px-4 mb-4 transition-all duration-300">
-        <div class="bg-white px-3 py-2 rounded-xl flex-shrink-0 brand-logo">
-            <img src="/assets/ic_edu_logo.png" alt="Edu Logo" class="h-7 w-auto object-contain" />
+        <div class="py-2 ml-5 flex-shrink-0 brand-logo">
+            <img src="/assets/ic_edu_logo.png" alt="Edu Logo" class="h-20 w-auto object-contain drop-shadow-sm" />
         </div>
         <button id="toggleSidebarBtn" class="text-white/60 hover:text-white p-1 rounded-md hover:bg-white/10 transition flex items-center justify-center">
             <x-lucide-panel-left-close class="w-5 h-5 icon-close" />
