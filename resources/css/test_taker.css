@@ -137,6 +137,11 @@ h6,
     color: #ffffff;
 }
 
+.s-btn.s-btn-logout:hover {
+    background: #f87171 !important; /* soft red (kurang pastel) */
+    color: #ffffff !important; /* Teks putih */
+}
+
 .s-btn.active {
     background: #ffffff;
     color: var(--primary);

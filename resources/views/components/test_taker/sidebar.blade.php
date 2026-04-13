@@ -19,7 +19,7 @@
 
         {{-- LEARN --}}
         <p class="nav-label font-heading">Learning</p>
-        <a href="#" class="s-btn">
+        <a href="{{ route('test_taker.course.index') }}" class="s-btn {{ request()->routeIs('test_taker.course.index') ? 'active' : '' }}">
             <x-lucide-book-open class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Browse Courses</span>
         </a>
@@ -62,7 +62,7 @@
     <div class="sidebar-bottom">
         <form method="POST" action="{{ route('logout') }}" class="w-full">
             @csrf
-            <button type="submit" class="s-btn w-full text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-200">
+            <button type="submit" class="s-btn s-btn-logout w-full transition-colors duration-300">
                 <x-lucide-log-out class="w-5 h-5 min-w-[20px]" />
                 <span class="s-label font-heading">Logout</span>
             </button>

@@ -3,11 +3,9 @@
 
 @section('content')
 {{-- PAGE HEADER --}}
-<div class="flex items-end justify-between mb-6 anim-in d1">
-    <div>
-        <h1 class="font-heading text-2xl font-black text-slate-800">Activity Overview</h1>
-        <p class="text-[0.8rem] font-medium text-slate-500 mt-1">Let's learn something new today!</p>
-    </div>
+<div class="greeting-box p-6 sm:p-2 bg-transparent text-black drop-shadow-none shadow-none text-left mb-6 anim-in d1">
+    <h1 class="text-3xl font-bold font-dmSans tracking-tight sm:text-2xl text-redDefault">Activity Overview</h1>
+    <p class="text-gray-600 mt-2 font-poppins text-sm">Let's learn something new today!</p>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
