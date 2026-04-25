@@ -77,6 +77,26 @@
             progress="15"
             description="Learn to write professional emails, conduct meetings, and negotiate effectively in a corporate environment."
         />
+
+        <x-test_taker.card 
+            title="TOEIC Listening & Reading" 
+            image="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&fit=crop"
+            badge="Beginner"
+            duration="12h 00m"
+            lessons="24 Lessons"
+            progress="0"
+            description="Comprehensive preparation covering all sections of the TOEIC test, focusing on workplace English."
+        />
+
+        <x-test_taker.card 
+            title="English Idioms & Phrasal Verbs" 
+            image="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=800&fit=crop"
+            badge="Advanced"
+            duration="4h 45m"
+            lessons="10 Lessons"
+            progress="5"
+            description="Sound more like a native speaker by mastering common expressions, idioms, and phrasal verbs."
+        />
     </div>
 </div>
 @endsection

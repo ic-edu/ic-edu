@@ -1,0 +1,324 @@
+.login-page-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-repeat: no-repeat;
+    font-family: 'Inter', 'Roboto', 'Outfit', sans-serif;
+    z-index: 50;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 40px 50px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 0 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 24px;
+    gap: 12px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: #1e293b;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: #2563eb;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1e3a8a;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+
+.header-title {
+    text-align: left;
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+.subtitle {
+    text-align: left;
+    font-size: 15px;
+    color: #64748b;
+    margin-top: 0;
+    margin-bottom: 24px;
+}
+
+.subtitle a {
+    color: #3b82f6;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.subtitle a:hover {
+    text-decoration: underline;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 14px;
+    color: #334155;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-input {
+    width: 100%;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 2px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 15px;
+    color: #1e293b;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.form-input::placeholder {
+    color: #94a3b8;
+}
+
+.form-input-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+.form-input-error::placeholder {
+    color: #fca5a5 !important;
+}
+
+.form-error {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+}
+
+.primary-btn:hover {
+    box-shadow: 0 15px 25px -5px rgba(37, 99, 235, 0.5);
+    transform: translateY(-2px);
+}
+
+.primary-btn:active {
+    transform: translateY(1px);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+    color: #64748b;
+    font-size: 13px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(100, 116, 139, 0.3);
+}
+
+.divider::before { margin-right: 15px; }
+.divider::after { margin-left: 15px; }
+
+.google-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #334155;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.google-btn:hover {
+    background: #ffffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+}
+
+.register-text {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.register-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: #0f172a;
+}
+
+.form-input.has-toggle {
+    padding-right: 48px;
+}
+
+.register-card {
+    max-width: 760px;
+    padding: 40px 60px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+}
+
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .register-card {
+        padding: 30px 24px;
+    }
+}
+
+.primary-btn:disabled, .primary-btn.disabled-btn {
+    background: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.7;
+}
+
+.primary-btn:disabled:hover, .primary-btn.disabled-btn:hover {
+    box-shadow: none;
+    transform: none;
+}
