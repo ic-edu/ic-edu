@@ -81,6 +81,11 @@ class SubsectionsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
+                PageAction::make('downloadTemplate')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->action(fn () => Excel::download(new \App\Exports\TemplateSoalExport($this->getOwnerRecord()), 'template_soal_ujian.xlsx')),
                 PageAction::make('importSoal')
                     ->label('Import Excel & Media')
                     ->icon('heroicon-o-arrow-up-tray')
