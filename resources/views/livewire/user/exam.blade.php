@@ -5,6 +5,7 @@ use App\Models\QuestionGroup;
 use App\Models\Question;
 use App\Models\AttemptAnswer;
 use App\Models\Section;
+use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -34,7 +35,7 @@ new #[Layout('layouts.bare')] class extends Component {
     {
         $this->attempt = $attempt;
 
-        if ($this->attempt->status === 'finished') {
+        if ($this->attempt->status === ExamAttemptStatus::FINISHED->value) {
             session()->flash('error', 'Peringatan: Ujian ini sudah selesai dan tidak dapat dikerjakan ulang.');
             $this->redirectRoute('test_taker.dashboard');
             return;
@@ -213,36 +214,60 @@ new #[Layout('layouts.bare')] class extends Component {
     public function finishExam()
     {
         $this->attempt->update([
-            'status' => 'finished',
+            'status'       => ExamAttemptStatus::FINISHED->value,
             'submitted_at' => now(),
         ]);
 
-        $allAnswers = AttemptAnswer::with('question.options')->where('exam_attempt_id', $this->attempt->id)->get();
+        $allAnswers = AttemptAnswer::with([
+            'question.options',
+            'question.questionGroup.subsection.section',
+        ])->where('exam_attempt_id', $this->attempt->id)->get();
 
-        $totalAutoScore = 0;
-
+        // 1. Auto-score pilihan ganda
         foreach ($allAnswers as $ans) {
             $question = $ans->question;
-            if (!$question) {
-                continue;
-            }
+            if (!$question) continue;
 
             $jenisSoal = strtolower(trim(str_replace(' ', '_', $question->type)));
 
             if ($jenisSoal === 'multiple_choice') {
                 $selectedOption = $question->options->where('id', $ans->selected_option_id)->first();
-
-                if ($selectedOption && $selectedOption->is_correct) {
-                    $points = $question->points ?? 10;
-                    $ans->update(['score' => $points]);
-                    $totalAutoScore += $points;
-                } else {
-                    $ans->update(['score' => 0]);
-                }
+                $points = ($selectedOption && $selectedOption->is_correct) ? ($question->points ?? 10) : 0;
+                $ans->update(['score' => $points]);
             }
         }
 
-        $this->attempt->update(['total_score' => $totalAutoScore]);
+        // Refresh koleksi setelah auto-score disimpan
+        $allAnswers = $allAnswers->fresh();
+
+        // 2. Bangun data per-section untuk scoring engine
+        $rawScore      = (int) $allAnswers->sum('score');
+        $totalQuestions = $allAnswers->count();
+        $sectionRaws   = [];
+        $sectionTotals = [];
+
+        foreach ($allAnswers as $ans) {
+            $sectionName = $ans->question->questionGroup->subsection->section->title ?? 'Unknown';
+            $sectionRaws[$sectionName]   = ($sectionRaws[$sectionName]   ?? 0) + ($ans->score ?? 0);
+            $sectionTotals[$sectionName] = ($sectionTotals[$sectionName] ?? 0) + ($ans->question->points ?? 0);
+        }
+
+        // 3. Hitung skor menggunakan scoring engine ExamType
+        $examType = $this->attempt->exam->examType;
+        $result   = $examType->calculateScore(
+            rawScore: $rawScore,
+            totalQuestions: $totalQuestions,
+            sectionRaws: $sectionRaws,
+            sectionTotals: $sectionTotals,
+        );
+
+        // 4. Simpan hasil akhir ke attempt
+        $this->attempt->update([
+            'raw_score'       => $rawScore,
+            'converted_score' => $result['converted_score'],
+            'section_scores'  => $result['section_scores'],
+            'is_passed'       => $result['is_passed'],
+        ]);
 
         session()->flash('success', 'Ujian berhasil dikumpulkan! Pilihan ganda dinilai otomatis, esai menunggu pemeriksa.');
         return redirect()->route('test_taker.dashboard');

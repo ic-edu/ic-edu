@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Models\Exam;
 use App\Models\ExamEnrollment;
+use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 
@@ -41,10 +42,10 @@ class ExamController extends Controller
             return redirect()->route('test_taker.exam.index')->with('error', 'Anda belum terdaftar.');
         }
 
-        // If already finished, block
+        // If already finished or graded, block
         $finishedAttempt = \App\Models\ExamAttempt::where('user_id', $userId)
             ->where('exam_id', $exam->id)
-            ->where('status', 'finished')
+            ->whereIn('status', [ExamAttemptStatus::FINISHED->value, ExamAttemptStatus::GRADED->value])
             ->first();
 
         if ($finishedAttempt) {
@@ -54,7 +55,7 @@ class ExamController extends Controller
         // Resume ongoing
         $existingAttempt = \App\Models\ExamAttempt::where('user_id', $userId)
             ->where('exam_id', $exam->id)
-            ->where('status', 'ongoing')
+            ->where('status', ExamAttemptStatus::ONGOING->value)
             ->first();
 
         if ($existingAttempt) {
@@ -63,12 +64,27 @@ class ExamController extends Controller
 
         // Create new attempt
         $newAttempt = \App\Models\ExamAttempt::create([
-            'user_id' => $userId,
-            'exam_id' => $exam->id,
+            'user_id'  => $userId,
+            'exam_id'  => $exam->id,
             'started_at' => now(),
-            'status' => 'ongoing',
+            'status'   => ExamAttemptStatus::ONGOING->value,
         ]);
 
         return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id]);
+    }
+
+    public function showResult(\App\Models\ExamAttempt $attempt)
+    {
+        // Pastikan hanya pemilik attempt yang bisa melihat hasil
+        if ($attempt->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Tampilkan hanya jika sudah dinilai
+        if ($attempt->status !== ExamAttemptStatus::GRADED->value) {
+            return redirect()->route('test_taker.exam.my_exams')->with('error', 'Ujian belum selesai dinilai.');
+        }
+
+        return view('test_taker.exams.result', compact('attempt'));
     }
 }

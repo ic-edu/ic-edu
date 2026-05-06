@@ -2,6 +2,7 @@
 
 use App\Models\ExamAttempt;
 use App\Models\Exam;
+use App\Enums\ExamAttemptStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,7 +27,7 @@ new class extends Component {
     public function with()
     {
         // 1. Ambil HANYA ujian yang statusnya 'finished' (sudah dikumpulkan)
-        $query = ExamAttempt::with(['user', 'exam'])->where('status', 'finished');
+        $query = ExamAttempt::with(['user', 'exam'])->where('status', ExamAttemptStatus::FINISHED->value);
 
         // 2. Filter berdasarkan nama peserta
         if (!empty($this->search)) {
@@ -130,7 +131,7 @@ new class extends Component {
                                 <td class="p-4 text-center">
                                     <span
                                         class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-bold text-sm">
-                                        {{ number_format($att->total_score, 0) }}
+                                        {{ number_format($att->converted_score ?? 0, 1) }}
                                     </span>
                                 </td>
                                 <td class="p-4 text-center">

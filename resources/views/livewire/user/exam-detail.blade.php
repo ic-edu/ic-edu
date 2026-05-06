@@ -2,6 +2,7 @@
 
 use App\Models\Exam;
 use App\Models\ExamAttempt;
+use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
@@ -178,14 +179,14 @@ class extends Component {
             @php
                 $latestAttempt = $exam->attempts()->where('user_id', auth()->id())->latest()->first();
             @endphp
-            @if($latestAttempt && $latestAttempt->status === 'finished')
+            @if($latestAttempt && $latestAttempt->status === ExamAttemptStatus::FINISHED->value)
                 <button disabled style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: #e5e7eb; color: #9ca3af; border: none; cursor: not-allowed;">
                     Exam Completed
                 </button>
             @else
                 <form action="{{ route('test_taker.exam.start', $exam->id) }}" method="POST" style="display:inline-block;">
                     @csrf
-                    @if($latestAttempt && $latestAttempt->status === 'ongoing')
+                    @if($latestAttempt && $latestAttempt->status === ExamAttemptStatus::ONGOING->value)
                         <button type="submit" 
                                 style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #ea580c); color: white; border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(234,88,12,0.3); transition: all .2s;"
                                 onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">

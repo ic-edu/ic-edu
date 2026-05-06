@@ -8,6 +8,7 @@ use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardCont
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use Livewire\Volt\Volt;
 
 // Landing Page Route
 Route::get('/', function () {
@@ -42,8 +43,8 @@ Route::middleware(['auth', 'role:examiner'])
             return view('examiner.dashboard');
         })->name('examiner.dashboard');
 
-        Route::livewire('/examiner/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
-        Route::livewire('/examiner/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
+        Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
+        Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
     });
 
 // Route Test-Examiner
@@ -59,8 +60,9 @@ Route::middleware(['auth', 'role:test_taker'])
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
         Route::get('/my-exams', [ExamController::class, 'myExams'])->name('exam.my_exams');
         Route::post('/exams/{exam}/start', [ExamController::class, 'startExam'])->name('exam.start');
-        Route::livewire('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
-        Route::livewire('/exams/{attempt}', 'user.exam')->name('exam.attempt');
+        Volt::route('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
+        Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
+        Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
     });
 
 Route::get('/download-template-soal', function () {

@@ -30,6 +30,12 @@ class Question extends Model
         return $this->belongsTo(QuestionGroup::class, 'question_group_id');
     }
 
+    // Alias lebih deskriptif untuk eager loading (question.questionGroup.subsection.section)
+    public function questionGroup()
+    {
+        return $this->belongsTo(QuestionGroup::class, 'question_group_id');
+    }
+
     public function options()
     {
         return $this->hasMany(QuestionOption::class);

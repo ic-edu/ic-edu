@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('course_exams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
-            $table->uuid('exam_id');
-            $table->foreign('exam_id')->references('id')->on('exams')->cascadeOnDelete();
+            $table->foreignId('exam_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_final_exam')->default(false);
             $table->integer('minimum_passing_score')->default(0); // Nilai KKM
             $table->timestamps();

@@ -74,12 +74,22 @@
                     @if($latestAttempt && $latestAttempt->status === 'finished')
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <span style="font-size: 0.75rem; font-weight: 700; color: #16a34a;">Status Nilai:</span>
-                                <span style="font-size: 0.8rem; font-weight: 800; color: #16a34a;">Menunggu Penilaian Akhir</span>
+                                <span style="font-size: 0.75rem; font-weight: 700; color: #f59e0b;">Status Nilai:</span>
+                                <span style="font-size: 0.8rem; font-weight: 800; color: #f59e0b;">Menunggu Penilaian Akhir</span>
                             </div>
                             <button disabled style="width: 100%; padding: 12px; border-radius: 12px; background: #e5e7eb; color: #9ca3af; font-size: 0.85rem; font-weight: 800; border: none; cursor: not-allowed;">
                                 Exam Completed
                             </button>
+                        </div>
+                    @elseif($latestAttempt && $latestAttempt->status === 'graded')
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <span style="font-size: 0.75rem; font-weight: 700; color: #16a34a;">Status Nilai:</span>
+                                <span style="font-size: 0.8rem; font-weight: 800; color: #16a34a;">Selesai Dinilai</span>
+                            </div>
+                            <a href="{{ route('test_taker.exam.result', $latestAttempt->id) }}" style="display: block; text-align: center; width: 100%; padding: 12px; border-radius: 12px; background: #10b981; color: white; font-size: 0.85rem; font-weight: 800; text-decoration: none; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(1.1)';" onmouseout="this.style.filter='brightness(1)';">
+                                Lihat Hasil Akhir
+                            </a>
                         </div>
                     @else
                         <form action="{{ route('test_taker.exam.start', $exam->id) }}" method="POST">
