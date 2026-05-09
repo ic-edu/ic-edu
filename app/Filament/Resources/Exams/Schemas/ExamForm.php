@@ -28,6 +28,15 @@ class ExamForm
                 ->numeric()
                 ->required(),
 
+            Select::make('mode')
+                ->label('Exam Mode')
+                ->options([
+                    'practice' => 'Practice (Full Navigation)',
+                    'strict' => 'Strict (No Navigation, One-Time Audio)',
+                ])
+                ->default('practice')
+                ->required(),
+
             Toggle::make('is_active')
                 ->required()
                 ->default(true),

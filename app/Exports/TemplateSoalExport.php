@@ -12,6 +12,13 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class TemplateSoalExport implements WithHeadings, WithEvents, WithStyles
 {
+    public $section;
+
+    public function __construct($section = null)
+    {
+        $this->section = $section;
+    }
+
     // 1. Membuat Judul Kolom (Sesuai ERD Penuh)
     public function headings(): array
     {
@@ -58,7 +65,12 @@ class TemplateSoalExport implements WithHeadings, WithEvents, WithStyles
                 $sheet = $event->sheet->getDelegate();
 
                 // --- A. DATA SUBSECTION DI KOLOM TERSEMBUNYI (Pindah ke kolom AA agar tidak tertabrak) ---
-                $subsections = Subsection::with('section.exam')->get();
+                $query = Subsection::with('section.exam');
+                if ($this->section) {
+                    $query->where('section_id', $this->section->id);
+                }
+                $subsections = $query->get();
+                
                 $rowAA = 1;
 
                 foreach ($subsections as $sub) {

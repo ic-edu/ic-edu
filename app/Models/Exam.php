@@ -17,6 +17,7 @@ class Exam extends Model
         'title',
         'description',
         'total_duration',
+        'mode',
         'is_active',
     ];
 
@@ -38,6 +39,11 @@ class Exam extends Model
     public function attempts()
     {
         return $this->hasMany(ExamAttempt::class);
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(ExamEnrollment::class);
     }
 
     public function getTotalQuestionsAttribute(): int

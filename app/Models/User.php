@@ -23,6 +23,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -51,6 +52,11 @@ class User extends Authenticatable implements FilamentUser
     public function examAttempts()
     {
         return $this->hasMany(ExamAttempt::class);
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(ExamEnrollment::class);
     }
 
     public function canAccessPanel(Panel $panel): bool
