@@ -59,6 +59,9 @@ Route::middleware(['auth', 'role:test_taker'])
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
         Route::livewire('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
         Route::livewire('/exams/{attempt}', 'user.exam')->name('exam.attempt');
+
+        // Course Routes
+        Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
     });
 
 Route::get('/download-template-soal', function () {

@@ -8,10 +8,11 @@ class CourseController extends Controller
 {
     public function index()
     {
-        return view('#');
+        return view('test_taker.course.index');
     }
+
     public function detail($id)
-{
-    return view('course.detail');
-}
+    {
+        return view('test_taker.course.detail');
+    }
 }
