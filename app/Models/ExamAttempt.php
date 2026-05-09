@@ -19,14 +19,20 @@ class ExamAttempt extends Model
         'status',
         'started_at',
         'finished_at',
-        'total_score',
+        'raw_score',
+        'converted_score',
+        'section_scores',
+        'is_passed',
         'current_question_id',
     ];
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'finished_at' => 'datetime',
-        'total_score' => 'integer',
+        'started_at'      => 'datetime',
+        'finished_at'     => 'datetime',
+        'raw_score'       => 'integer',
+        'converted_score' => 'decimal:1',
+        'section_scores'  => 'array',
+        'is_passed'       => 'boolean',
     ];
 
     public $incrementing = false;

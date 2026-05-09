@@ -16,6 +16,8 @@ class Subsection extends Model
         'title',
         'instructions',
         'order_position',
+        'instruction_audio_path',
+        'instruction_image_path',
     ];
 
     protected static function booted()
