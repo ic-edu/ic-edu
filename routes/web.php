@@ -47,7 +47,7 @@ Route::middleware(['auth', 'role:examiner'])
         Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
         Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
     });
-
+    
 // Route Test-Examiner
 Route::middleware(['auth', 'role:test_taker'])
     ->prefix('user')
