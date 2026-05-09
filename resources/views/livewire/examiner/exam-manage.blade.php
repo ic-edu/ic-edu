@@ -6,6 +6,7 @@ use App\Enums\ExamAttemptStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+
 new class extends Component {
     use WithPagination;
 
@@ -17,6 +18,11 @@ new class extends Component {
     public function mount($type = null)
     {
         $this->type = $type;
+    }
+
+    public function rendering($view)
+    {
+        $view->layout('layouts.examiner');
     }
 
     // Reset halaman ke 1 setiap kali user mengetik pencarian
@@ -64,19 +70,19 @@ new class extends Component {
 };
 ?>
 
-<div class="min-h-screen bg-gray-50 p-8 font-sans">
+<div class="min-h-screen bg-transparent p-2 font-poppins">
     <div class="max-w-7xl mx-auto">
 
         {{-- Header --}}
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Antrean Penilaian Ujian</h1>
-            <p class="text-gray-500 mt-2">Pilih peserta yang telah menyelesaikan ujian untuk memberikan skor manual pada
+        <div class="mb-6 anim-in d1">
+            <h1 class="text-3xl font-bold font-dmSans tracking-tight text-slate-900">Antrean Penilaian Ujian</h1>
+            <p class="text-slate-500 mt-2 text-sm font-poppins">Pilih peserta yang telah menyelesaikan ujian untuk memberikan skor manual pada
                 esai atau rekaman suara.</p>
         </div>
 
         {{-- Filter & Search Bar --}}
         <div
-            class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+            class="seamless-card rounded-[2rem] p-5 border border-slate-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center anim-in d2">
 
             <div class="w-full md:w-1/3 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -89,12 +95,12 @@ new class extends Component {
                 </div>
                 <input type="text" wire:model.live.debounce.500ms="search"
                     placeholder="Cari nama atau email peserta..."
-                    class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
             </div>
 
             <div class="w-full md:w-1/3">
                 <select wire:model.live="selectedExam"
-                    class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700">
+                    class="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                     <option value="">-- Semua Ujian --</option>
                     @foreach ($exams as $ex)
                     <option value="{{ $ex->id }}">{{ $ex->title }}</option>
@@ -102,40 +108,40 @@ new class extends Component {
                 </select>
             </div>
 
-            <div wire:loading class="text-indigo-600 text-sm font-semibold animate-pulse w-full md:w-auto text-right">
+            <div wire:loading class="class=" text-brand-primary text-sm font-bold animate-pulse w-full md:w-auto text-right">
                 Memuat data...
             </div>
         </div>
 
         {{-- Tabel Data --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm anim-in d3">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500">
-                            <th class="p-4 font-bold">Nama Peserta</th>
-                            <th class="p-4 font-bold">Ujian</th>
-                            <th class="p-4 font-bold text-center">Waktu Submit</th>
-                            <th class="p-4 font-bold text-center">Skor (Auto)</th>
-                            <th class="p-4 font-bold text-center">Aksi</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-[0.7rem] uppercase tracking-[0.2em] text-slate-400">
+                            <th class="px-6 py-5 font-bold">Nama Peserta</th>
+                            <th class="px-6 py-5 font-bold">Ujian</th>
+                            <th class="px-6 py-5 font-bold text-center">Waktu Submit</th>
+                            <th class="px-6 py-5 font-bold text-center">Skor (Auto)</th>
+                            <th class="px-6 py-5 font-bold text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($attempts as $att)
-                        <tr class="hover:bg-indigo-50/50 transition-colors">
-                            <td class="p-4">
-                                <div class="font-bold text-gray-800">
+                        <tr class="hover:bg-slate-50 transition-colors duration-200">
+                            <td class="px-6 py-5">
+                                <div class="font-bold text-slate-800">
                                     {{ $att->user->name ?? 'User Tidak Diketahui' }}
                                 </div>
-                                <div class="text-sm text-gray-500">{{ $att->user->email ?? '-' }}</div>
+                                <div class="text-sm text-slate-500 mt-0.5">{{ $att->user->email ?? '-' }}</div>
                             </td>
-                            <td class="p-4">
+                            <td class="px-6 py-5">
                                 <div class="font-semibold text-gray-700">{{ $att->exam->title ?? 'Ujian Dihapus' }}
                                 </div>
                                 <div class="text-xs text-gray-400">ID Sesi: <span
                                         class="font-mono">{{ substr($att->id, 0, 8) }}...</span></div>
                             </td>
-                            <td class="p-4 text-center">
+                            <td class="px-6 py-5 text-center">
                                 <div class="text-sm text-gray-700">
                                     {{ \Carbon\Carbon::parse($att->submitted_at)->format('d M Y') }}
                                 </div>
@@ -143,15 +149,15 @@ new class extends Component {
                                     {{ \Carbon\Carbon::parse($att->submitted_at)->format('H:i') }} WIB
                                 </div>
                             </td>
-                            <td class="p-4 text-center">
+                            <td class="px-6 py-5 text-center">
                                 <span
-                                    class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full font-bold text-sm">
+                                    class="px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full font-bold text-xs">
                                     {{ number_format($att->converted_score ?? 0, 1) }}
                                 </span>
                             </td>
-                            <td class="p-4 text-center">
+                            <td class="px-6 py-5 text-center">
                                 <a href="{{ route('examiner.grading', ['attempt' => $att->id]) }}"
-                                    class="inline-flex items-center gap-1 px-4 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg font-semibold text-sm transition-colors cursor-pointer">
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white hover:opacity-90 rounded-xl font-bold text-xs transition-all shadow-sm hover:-translate-y-0.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
                                         fill="currentColor">
                                         <path
@@ -163,7 +169,7 @@ new class extends Component {
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="p-8 text-center text-gray-500">
+                            <td colspan="5" class="py-20 text-center text-slate-500">
                                 <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -179,7 +185,7 @@ new class extends Component {
 
             {{-- Pagination Links --}}
             @if ($attempts->hasPages())
-            <div class="p-4 border-t border-gray-200 bg-gray-50">
+            <div class="p-5 border-t border-slate-100 bg-slate-50">
                 {{ $attempts->links() }}
             </div>
             @endif

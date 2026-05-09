@@ -16,9 +16,9 @@
         rel="stylesheet">
 
     @vite([
-        'resources/css/app.css',
-        'resources/css/test_taker.css',
-        'resources/js/app.js'
+    'resources/css/app.css',
+    'resources/css/test_taker.css',
+    'resources/js/app.js'
     ])
 </head>
 
@@ -35,7 +35,11 @@
             @include('components.test_taker.topbar')
 
             <div class="page-body">
+
+
                 @yield('content')
+
+                {{ $slot ?? '' }}
             </div>
 
         </div>
@@ -43,4 +47,5 @@
     </div>
 
 </body>
+
 </html>
