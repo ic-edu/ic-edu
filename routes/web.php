@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\User\ExamController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
+use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -55,6 +56,9 @@ Route::middleware(['auth', 'role:test_taker'])
 
         // Dashboard Test-Examiner
         Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
+
+        // Course Route
+        Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
