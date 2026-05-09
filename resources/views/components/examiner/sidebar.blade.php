@@ -40,7 +40,12 @@
         <p class="nav-label font-heading">Exam Management</p>
 
         <a href="{{ route('examiner.exam-manage') }}"
-            class="s-btn {{ request()->routeIs('examiner.exam-manage') ? 'active' : '' }}">
+            class="s-btn {{
+        request()->routeIs('examiner.exam-manage') &&
+        !request()->routeIs('examiner.exam-manage.type')
+            ? 'active'
+            : ''
+    }}">
 
             <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
 
@@ -49,7 +54,45 @@
             </span>
 
         </a>
-        
+
+        <a href="{{ route('examiner.exam-manage.type', 'ielts') }}"
+            class="s-btn {{
+        request()->route('type') === 'ielts'
+            ? 'active'
+            : ''
+    }}">
+
+            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
+
+            <span class="s-label font-heading">
+                IELTS Reviews
+            </span>
+        </a>
+
+        <a href="{{ route('examiner.exam-manage.type', 'toefl') }}"
+            class="s-btn {{
+        request()->route('type') === 'toefl'
+            ? 'active'
+            : ''
+    }}">
+            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
+            <span class="s-label font-heading">
+                TOEFL Reviews
+            </span>
+        </a>
+
+        <a href="{{ route('examiner.exam-manage.type', 'toeic') }}"
+            class="s-btn {{
+        request()->route('type') === 'toeic'
+            ? 'active'
+            : ''
+    }}">
+            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
+            <span class="s-label font-heading">
+                TOEIC Reviews
+            </span>
+        </a>
+
         {{-- ACCOUNT --}}
         <p class="nav-label font-heading">Account</p>
 
