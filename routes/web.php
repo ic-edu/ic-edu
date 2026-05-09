@@ -3,7 +3,6 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
-use App\Http\Controllers\User\CourseController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
 use Illuminate\Support\Facades\Auth;
@@ -57,8 +56,12 @@ Route::middleware(['auth', 'role:test_taker'])
         // Dashboard
         Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
 
-        // Course Route
+        // Course / LMS Routes
         Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');
+        Route::get('/my-courses', [TestTakerCourseController::class, 'myCourses'])->name('course.my_courses');
+        Route::get('/courses/{course}', [TestTakerCourseController::class, 'show'])->name('course.show');
+        Route::post('/courses/{course}/enroll', [TestTakerCourseController::class, 'enroll'])->name('course.enroll');
+        Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
@@ -67,13 +70,6 @@ Route::middleware(['auth', 'role:test_taker'])
         Volt::route('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
-
-        // Course / LMS Routes
-        Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
-        Route::get('/my-courses', [CourseController::class, 'myCourses'])->name('course.my_courses');
-        Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show');
-        Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll'])->name('course.enroll');
-        Route::get('/courses/{course}/lessons/{lesson}', [CourseController::class, 'lesson'])->name('course.lesson');
     });
 
 Route::get('/download-template-soal', function () {

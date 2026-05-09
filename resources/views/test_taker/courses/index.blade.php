@@ -68,17 +68,31 @@
                     </div>
                     <div>
                         <p style="font-size: 0.65rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Status</p>
+                        @if(in_array($course->id, $enrolledCourseIds))
+                        <span style="display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; background: #eff6ff; color: #2563eb;">
+                            ✓ Enrolled
+                        </span>
+                        @else
                         <span style="display: inline-block; padding: 3px 8px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; background: #ecfdf5; color: #16a34a;">
                             ● Published
                         </span>
+                        @endif
                     </div>
                 </div>
 
+                @if(in_array($course->id, $enrolledCourseIds))
+                <a href="{{ route('test_taker.course.show', $course->id) }}" 
+                   style="display: block; width: 100%; text-align: center; padding: 12px; border-radius: 12px; background: var(--surface); color: var(--text); border: 1.5px solid var(--border); font-size: 0.85rem; font-weight: 800; text-decoration: none; transition: border .2s;"
+                   onmouseover="this.style.borderColor='var(--blue)';" onmouseout="this.style.borderColor='var(--border)';">
+                    Continue Learning
+                </a>
+                @else
                 <a href="{{ route('test_taker.course.show', $course->id) }}" 
                    style="display: block; width: 100%; text-align: center; padding: 12px; border-radius: 12px; background: {{ $c['accent'] }}; color: white; font-size: 0.85rem; font-weight: 800; text-decoration: none; transition: filter 0.2s;"
                    onmouseover="this.style.filter='brightness(1.1)';" onmouseout="this.style.filter='brightness(1)';">
                     View Course
                 </a>
+                @endif
             </div>
         </div>
         @empty

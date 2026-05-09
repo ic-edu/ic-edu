@@ -10,6 +10,13 @@
         <p style="font-size: 0.85rem; color: var(--muted); margin-top: 6px;">Courses you have enrolled in. Continue your learning journey!</p>
     </div>
 
+    {{-- SUCCESS FLASH --}}
+    @if(session('success'))
+    <div class="anim-in d1" style="padding: 14px 20px; border-radius: 14px; background: #f0fdf4; border: 1.5px solid #bbf7d0; color: #15803d; font-size: 0.85rem; font-weight: 700; margin-bottom: 24px;">
+        ✅ {{ session('success') }}
+    </div>
+    @endif
+
     {{-- ENROLLED COURSES --}}
     <div style="display: flex; flex-direction: column; gap: 16px;">
         @forelse($enrollments as $enrollment)
