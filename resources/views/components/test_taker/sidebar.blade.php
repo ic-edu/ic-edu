@@ -23,7 +23,7 @@
             <x-lucide-book-open class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Browse Courses</span>
         </a>
-        <a href="#" class="s-btn">
+        <a href="{{ route('test_taker.course.my_courses') }}" class="s-btn {{ request()->routeIs('test_taker.course.my_courses') ? 'active' : '' }}">
             <x-lucide-library class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">My Courses</span>
         </a>

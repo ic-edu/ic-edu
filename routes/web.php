@@ -2,7 +2,6 @@
 
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CourseController;
 use App\Http\Controllers\User\ExamController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
@@ -48,17 +47,21 @@ Route::middleware(['auth', 'role:examiner'])
         Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
     });
 
-// Route Test-Examiner
+// Route Test-Taker
 Route::middleware(['auth', 'role:test_taker'])
     ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
 
-        // Dashboard Test-Examiner
+        // Dashboard
         Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
 
-        // Course Route
+        // Course / LMS Routes
         Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');
+        Route::get('/my-courses', [TestTakerCourseController::class, 'myCourses'])->name('course.my_courses');
+        Route::get('/courses/{course}', [TestTakerCourseController::class, 'show'])->name('course.show');
+        Route::post('/courses/{course}/enroll', [TestTakerCourseController::class, 'enroll'])->name('course.enroll');
+        Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
