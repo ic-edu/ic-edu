@@ -48,6 +48,16 @@ class SubsectionsRelationManager extends RelationManager
                     ->label('Instructions for Subsection')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+
+                FileUpload::make('instruction_audio_path')
+                    ->label('Instruction Audio (Optional)')
+                    ->directory('instructions/audio')
+                    ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/m4a']),
+
+                FileUpload::make('instruction_image_path')
+                    ->label('Instruction Image (Optional)')
+                    ->directory('instructions/images')
+                    ->image(),
             ]);
     }
 
@@ -71,6 +81,11 @@ class SubsectionsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make(),
+                PageAction::make('downloadTemplate')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->action(fn () => Excel::download(new \App\Exports\TemplateSoalExport($this->getOwnerRecord()), 'template_soal_ujian.xlsx')),
                 PageAction::make('importSoal')
                     ->label('Import Excel & Media')
                     ->icon('heroicon-o-arrow-up-tray')

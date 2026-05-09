@@ -34,11 +34,11 @@
             <x-lucide-file-text class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Browse Exams</span>
         </a>
-        <a href="#" class="s-btn {{ request()->routeIs('test_taker.exam.attempt') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.exam.my_exams') }}" class="s-btn {{ request()->routeIs('test_taker.exam.my_exams') ? 'active' : '' }}">
             <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">My Exams</span>
         </a>
-
+        
         {{-- ACCOUNT --}}
         <p class="nav-label font-heading">Account</p>
         <a href="{{ route('profile.edit') }}" class="s-btn {{ request()->routeIs('profile.edit') ? 'active' : '' }}">

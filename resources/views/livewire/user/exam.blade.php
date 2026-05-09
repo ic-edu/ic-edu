@@ -5,12 +5,15 @@ use App\Models\QuestionGroup;
 use App\Models\Question;
 use App\Models\AttemptAnswer;
 use App\Models\Section;
+use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Carbon\Carbon;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
-new class extends Component {
+new #[Layout('layouts.bare')] class extends Component {
     use WithFileUploads;
 
     public ExamAttempt $attempt;
@@ -21,14 +24,22 @@ new class extends Component {
     public int $remainingSeconds = 0;
     public array $flatQuestions = [];
 
-    // Section instruction state
-    public bool $showingSectionInstruction = true;
+    // Instruction state
+    public bool $showingInstruction = true;
     public ?int $currentSectionId = null;
+    public ?int $currentSubsectionId = null;
     public array $sectionMap = []; // groupIndex => section_id
+    public array $subsectionMap = []; // groupIndex => subsection_id
 
     public function mount(ExamAttempt $attempt)
     {
         $this->attempt = $attempt;
+
+        if ($this->attempt->status === ExamAttemptStatus::FINISHED->value) {
+            session()->flash('error', 'Peringatan: Ujian ini sudah selesai dan tidak dapat dikerjakan ulang.');
+            $this->redirectRoute('test_taker.dashboard');
+            return;
+        }
 
         $durationInSeconds = ($this->attempt->exam->total_duration ?? 120) * 60;
         $elapsedSeconds = Carbon::parse($this->attempt->started_at)->diffInSeconds(now());
@@ -41,12 +52,13 @@ new class extends Component {
             ->orderBy('sections.order_position')
             ->orderBy('subsections.order_position')
             ->orderBy('question_groups.order_position')
-            ->select('question_groups.id', 'sections.id as section_id')
+            ->select('question_groups.id', 'sections.id as section_id', 'subsections.id as subsection_id')
             ->get();
 
         $this->groupIds = $groupData->pluck('id')->toArray();
         foreach ($groupData as $i => $row) {
             $this->sectionMap[$i] = $row->section_id;
+            $this->subsectionMap[$i] = $row->subsection_id;
         }
 
         if (!empty($this->groupIds)) {
@@ -95,7 +107,8 @@ new class extends Component {
         // Set initial section
         if (!empty($this->sectionMap)) {
             $this->currentSectionId = $this->sectionMap[0] ?? null;
-            $this->showingSectionInstruction = true;
+            $this->currentSubsectionId = $this->subsectionMap[0] ?? null;
+            $this->showingInstruction = true;
         }
     }
 
@@ -115,19 +128,21 @@ new class extends Component {
 
     public function dismissInstruction()
     {
-        $this->showingSectionInstruction = false;
+        $this->showingInstruction = false;
     }
 
     public function nextGroup()
     {
         if ($this->currentIndex < count($this->groupIds) - 1) {
-            $oldSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+            $oldSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
             $this->currentIndex++;
             $newSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+            $newSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
 
-            if ($newSectionId !== $oldSectionId) {
+            if ($newSubsectionId !== $oldSubsectionId) {
                 $this->currentSectionId = $newSectionId;
-                $this->showingSectionInstruction = true;
+                $this->currentSubsectionId = $newSubsectionId;
+                $this->showingInstruction = true;
             }
         }
     }
@@ -135,26 +150,30 @@ new class extends Component {
     public function prevGroup()
     {
         if ($this->currentIndex > 0) {
-            $oldSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+            $oldSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
             $this->currentIndex--;
             $newSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+            $newSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
 
-            if ($newSectionId !== $oldSectionId) {
+            if ($newSubsectionId !== $oldSubsectionId) {
                 $this->currentSectionId = $newSectionId;
-                $this->showingSectionInstruction = true;
+                $this->currentSubsectionId = $newSubsectionId;
+                $this->showingInstruction = true;
             }
         }
     }
 
     public function goToGroup($groupIndex)
     {
-        $oldSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+        $oldSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
         $this->currentIndex = $groupIndex;
         $newSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+        $newSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
 
-        if ($newSectionId !== $oldSectionId) {
+        if ($newSubsectionId !== $oldSubsectionId) {
             $this->currentSectionId = $newSectionId;
-            $this->showingSectionInstruction = true;
+            $this->currentSubsectionId = $newSubsectionId;
+            $this->showingInstruction = true;
         }
     }
 
@@ -195,36 +214,60 @@ new class extends Component {
     public function finishExam()
     {
         $this->attempt->update([
-            'status' => 'finished',
+            'status'       => ExamAttemptStatus::FINISHED->value,
             'submitted_at' => now(),
         ]);
 
-        $allAnswers = AttemptAnswer::with('question.options')->where('exam_attempt_id', $this->attempt->id)->get();
+        $allAnswers = AttemptAnswer::with([
+            'question.options',
+            'question.questionGroup.subsection.section',
+        ])->where('exam_attempt_id', $this->attempt->id)->get();
 
-        $totalAutoScore = 0;
-
+        // 1. Auto-score pilihan ganda
         foreach ($allAnswers as $ans) {
             $question = $ans->question;
-            if (!$question) {
-                continue;
-            }
+            if (!$question) continue;
 
             $jenisSoal = strtolower(trim(str_replace(' ', '_', $question->type)));
 
             if ($jenisSoal === 'multiple_choice') {
                 $selectedOption = $question->options->where('id', $ans->selected_option_id)->first();
-
-                if ($selectedOption && $selectedOption->is_correct) {
-                    $points = $question->points ?? 10;
-                    $ans->update(['score' => $points]);
-                    $totalAutoScore += $points;
-                } else {
-                    $ans->update(['score' => 0]);
-                }
+                $points = ($selectedOption && $selectedOption->is_correct) ? ($question->points ?? 10) : 0;
+                $ans->update(['score' => $points]);
             }
         }
 
-        $this->attempt->update(['total_score' => $totalAutoScore]);
+        // Refresh koleksi setelah auto-score disimpan
+        $allAnswers = $allAnswers->fresh();
+
+        // 2. Bangun data per-section untuk scoring engine
+        $rawScore      = (int) $allAnswers->sum('score');
+        $totalQuestions = $allAnswers->count();
+        $sectionRaws   = [];
+        $sectionTotals = [];
+
+        foreach ($allAnswers as $ans) {
+            $sectionName = $ans->question->questionGroup->subsection->section->title ?? 'Unknown';
+            $sectionRaws[$sectionName]   = ($sectionRaws[$sectionName]   ?? 0) + ($ans->score ?? 0);
+            $sectionTotals[$sectionName] = ($sectionTotals[$sectionName] ?? 0) + ($ans->question->points ?? 0);
+        }
+
+        // 3. Hitung skor menggunakan scoring engine ExamType
+        $examType = $this->attempt->exam->examType;
+        $result   = $examType->calculateScore(
+            rawScore: $rawScore,
+            totalQuestions: $totalQuestions,
+            sectionRaws: $sectionRaws,
+            sectionTotals: $sectionTotals,
+        );
+
+        // 4. Simpan hasil akhir ke attempt
+        $this->attempt->update([
+            'raw_score'       => $rawScore,
+            'converted_score' => $result['converted_score'],
+            'section_scores'  => $result['section_scores'],
+            'is_passed'       => $result['is_passed'],
+        ]);
 
         session()->flash('success', 'Ujian berhasil dikumpulkan! Pilihan ganda dinilai otomatis, esai menunggu pemeriksa.');
         return redirect()->route('test_taker.dashboard');
@@ -232,15 +275,7 @@ new class extends Component {
 };
 ?>
 
-{{-- MINIMAL EXAM LAYOUT - No sidebar, no topbar, distraction-free --}}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $attempt->exam->title }} — IC-EDU Exam</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<div class="exam-container">
     <style>
         :root { --blue: #2563eb; --text: #0f172a; --muted: #64748b; --border: #e4eaf6; --surface: #ffffff; --base: #f8faff; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -292,9 +327,9 @@ new class extends Component {
             .instruction-card { padding: 32px 24px; }
         }
     </style>
-</head>
-<body>
-<div class="exam-shell">
+
+    {{-- INTERFACE START --}}
+    <div class="exam-shell">
 
     {{-- EXAM HEADER BAR --}}
     <header class="exam-header">
@@ -338,48 +373,62 @@ new class extends Component {
         </div>
     </header>
 
-    {{-- SECTION INSTRUCTION PAGE --}}
-    @if($showingSectionInstruction && $this->currentSection)
+    {{-- UNIFIED INSTRUCTION PAGE --}}
+    @if($showingInstruction && $this->currentGroup)
     <div class="instruction-page">
         <div class="instruction-card">
+            @php
+                $subsection = $this->currentGroup->subsection;
+                $section = $subsection->section;
+                // Hanya tampilkan deskripsi section jika ini adalah subsection pertama agar tidak berulang
+                $isFirstSubsection = ($subsection->order_position == 1);
+            @endphp
             <div style="width: 56px; height: 56px; border-radius: 50%; background: #eff6ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
                 <svg style="width:24px;height:24px;color:var(--blue);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <p style="font-size: 0.65rem; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Section {{ collect($this->sectionMap)->search($this->currentSectionId) !== false ? collect($this->sectionMap)->values()->unique()->search($this->currentSectionId) + 1 : '' }}</p>
-            <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text); margin-bottom: 16px;">{{ $this->currentSection->title }}</h2>
+            <p style="font-size: 0.65rem; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Section: {{ $section->title }}</p>
+            <h2 style="font-size: 1.5rem; font-weight: 900; color: var(--text); margin-bottom: 16px;">{{ $subsection->title }}</h2>
             
-            @if($this->currentSection->description)
-            <div style="font-size: 0.85rem; color: #475569; line-height: 1.8; margin-bottom: 24px; text-align: left; background: var(--base); padding: 20px; border-radius: 14px;">
-                {!! $this->currentSection->description !!}
+            @if($isFirstSubsection && $section->description)
+            <div style="font-size: 0.85rem; color: #475569; line-height: 1.8; margin-bottom: 16px; text-align: left; background: var(--base); padding: 20px; border-radius: 14px; border-left: 4px solid var(--blue);">
+                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:0.75rem;text-transform:uppercase;">ℹ️ Informasi Section</strong>
+                {!! $section->description !!}
             </div>
             @endif
 
-            {{-- Instruction Media --}}
-            @if($this->currentSection->instruction_audio_path)
+            @if($subsection->instructions)
+            <div style="font-size: 0.85rem; color: #78350f; line-height: 1.8; margin-bottom: 24px; text-align: left; background: #fffbeb; padding: 20px; border-radius: 14px; border-left: 4px solid #f59e0b;">
+                <strong style="display:block;margin-bottom:8px;color:#b45309;font-size:0.75rem;text-transform:uppercase;">📋 Instruksi Soal (Subsection)</strong>
+                {!! $subsection->instructions !!}
+            </div>
+            @endif
+
+            {{-- Instruction Media (Subsection Level) --}}
+            @if($subsection->instruction_audio_path)
             <div class="media-box" style="margin-bottom: 16px;">
-                <p style="font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 8px;">🎧 Audio Instruction</p>
+                <p style="font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 8px;">🎧 Audio Instruction (Subsection)</p>
                 <audio controls preload="metadata" controlsList="nodownload" style="width: 100%;">
-                    <source src="{{ asset('storage/' . str_replace('public/', '', $this->currentSection->instruction_audio_path)) }}">
+                    <source src="{{ asset('storage/' . str_replace('public/', '', $subsection->instruction_audio_path)) }}">
                 </audio>
             </div>
             @endif
 
-            @if($this->currentSection->instruction_image_path)
+            @if($subsection->instruction_image_path)
             <div class="media-box" style="margin-bottom: 16px;">
-                <p style="font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 8px;">🖼️ Instruction Image</p>
-                <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentSection->instruction_image_path)) }}" alt="Section Instruction" style="max-height: 320px; width: auto; margin: 0 auto; display: block; border-radius: 10px;">
+                <p style="font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 8px;">🖼️ Instruction Image (Subsection)</p>
+                <img src="{{ asset('storage/' . str_replace('public/', '', $subsection->instruction_image_path)) }}" alt="Subsection Instruction" style="max-height: 320px; width: auto; margin: 0 auto; display: block; border-radius: 10px;">
             </div>
             @endif
 
-            @if($this->currentSection->duration)
+            @if($isFirstSubsection && $section->duration)
             <p style="font-size: 0.82rem; color: var(--muted); margin-bottom: 24px;">
-                ⏱️ Duration: <strong style="color: var(--text);">{{ $this->currentSection->duration }} Minutes</strong>
+                ⏱️ Duration: <strong style="color: var(--text);">{{ $section->duration }} Minutes</strong>
             </p>
             @endif
 
             <button wire:click="dismissInstruction"
                     style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 14px; font-size: 0.88rem; font-weight: 800; background: var(--blue); color: white; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,0.3); transition: all .2s;">
-                Start Section
+                Mulai Kerjakan
                 <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </button>
         </div>
@@ -392,7 +441,7 @@ new class extends Component {
 
             {{-- Loading Overlay --}}
             <div wire:loading.flex wire:target="nextGroup,prevGroup,goToGroup"
-                 style="position:fixed;inset:0;z-index:100;background:rgba(255,255,255,0.7);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                 style="position:fixed;inset:0;z-index:100;background:rgba(255,255,255,0.7);backdrop-filter:blur(2px);flex-direction:column;align-items:center;justify-content:center;">
                 <svg style="width:40px;height:40px;color:var(--blue);animation:spin 1s linear infinite;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle style="opacity:0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path style="opacity:0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -408,34 +457,39 @@ new class extends Component {
                     <span style="color: var(--blue);">{{ $this->currentGroup->subsection->title }}</span>
                 </div>
 
-                {{-- Subsection Instructions (shown once at first group of subsection) --}}
-                @php
-                    $subsection = $this->currentGroup->subsection;
-                    $isFirstGroupOfSubsection = true;
-                    if ($currentIndex > 0) {
-                        $prevGroup = QuestionGroup::with('subsection')->find($groupIds[$currentIndex - 1]);
-                        if ($prevGroup && $prevGroup->subsection_id === $subsection->id) {
-                            $isFirstGroupOfSubsection = false;
-                        }
-                    }
-                @endphp
-
-                @if($isFirstGroupOfSubsection && $subsection->instructions)
-                <div class="subsection-header">
-                    <p style="font-size: 0.65rem; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">📋 Subsection Instructions</p>
-                    <div style="font-size: 0.82rem; color: #78350f; line-height: 1.7;">
-                        {!! $subsection->instructions !!}
-                    </div>
-                </div>
-                @endif
-
                 {{-- QuestionGroup Media --}}
                 @if ($this->currentGroup->audio_path || $this->currentGroup->image_path)
                 <div class="media-box">
                     @if ($this->currentGroup->audio_path)
-                    <audio controls preload="metadata" controlsList="nodownload" style="width: 100%;">
-                        <source src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->audio_path)) }}">
-                    </audio>
+                        @if($this->attempt->exam->mode === 'strict')
+                        <div x-data="{
+                            played: false, playing: false, audioObj: null,
+                            togglePlay() {
+                                if(this.played) return;
+                                if(!this.audioObj) {
+                                    this.audioObj = new Audio('{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->audio_path)) }}');
+                                    this.audioObj.onended = () => { this.playing = false; this.played = true; };
+                                }
+                                if(!this.playing) {
+                                    this.audioObj.play();
+                                    this.playing = true;
+                                }
+                            }
+                        }" style="margin-bottom:16px;">
+                            <button type="button" @click="togglePlay" :disabled="played || playing"
+                                    :style="(played || playing) ? 'opacity:0.6;cursor:not-allowed;background:#94a3b8;' : 'background:var(--blue);'"
+                                    style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                <svg x-show="!playing && !played" style="width:20px;height:20px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                                <svg x-show="playing" style="width:20px;height:20px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
+                                <svg x-show="played" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span x-text="played ? 'Audio Selesai Diputar' : (playing ? 'Playing Audio...' : '▶ Putar Audio (Hanya 1x)')"></span>
+                            </button>
+                        </div>
+                        @else
+                        <audio controls preload="metadata" controlsList="nodownload" style="width: 100%;">
+                            <source src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->audio_path)) }}">
+                        </audio>
+                        @endif
                     @endif
                     @if ($this->currentGroup->image_path)
                     <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" alt="Group Media" style="margin-top:12px;max-height:320px;width:auto;border-radius:10px;display:block;margin-left:auto;margin-right:auto;">
@@ -453,7 +507,7 @@ new class extends Component {
                 {{-- QUESTIONS --}}
                 <div style="display: flex; flex-direction: column; gap: 32px; padding-bottom: 80px;">
                     @foreach ($this->currentGroup->questions as $index => $question)
-                    <div>
+                    <div wire:key="q-wrap-{{ $question->id }}">
                         {{-- Question text --}}
                         <div style="display: flex; gap: 12px; margin-bottom: 14px;">
                             <div class="q-number">
@@ -473,7 +527,33 @@ new class extends Component {
                         @endif
                         @if ($question->audio_path)
                         <div style="margin-left:44px;margin-bottom:14px;max-width:360px;">
+                            @if($this->attempt->exam->mode === 'strict')
+                            <div x-data="{
+                                played: false, playing: false, audioObj: null,
+                                togglePlay() {
+                                    if(this.played) return;
+                                    if(!this.audioObj) {
+                                        this.audioObj = new Audio('{{ asset('storage/' . str_replace('public/', '', $question->audio_path)) }}');
+                                        this.audioObj.onended = () => { this.playing = false; this.played = true; };
+                                    }
+                                    if(!this.playing) {
+                                        this.audioObj.play();
+                                        this.playing = true;
+                                    }
+                                }
+                            }">
+                                <button type="button" @click="togglePlay" :disabled="played || playing"
+                                        :style="(played || playing) ? 'opacity:0.6;cursor:not-allowed;background:#94a3b8;' : 'background:var(--blue);'"
+                                        style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-size:0.8rem;">
+                                    <svg x-show="!playing && !played" style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                                    <svg x-show="playing" style="width:16px;height:16px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
+                                    <svg x-show="played" style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span x-text="played ? 'Audio Selesai Diputar' : (playing ? 'Playing Audio...' : '▶ Putar Audio (Hanya 1x)')"></span>
+                                </button>
+                            </div>
+                            @else
                             <audio controls style="width:100%;height:40px;"><source src="{{ asset('storage/' . str_replace('public/', '', $question->audio_path)) }}"></audio>
+                            @endif
                         </div>
                         @endif
 
@@ -499,7 +579,7 @@ new class extends Component {
                                       style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;font-size:0.85rem;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s;background:var(--surface);"
                                       onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
 
-                            @elseif($question->type === 'record')
+                            @elseif($question->type === 'record' || $question->type === 'audio_record')
                             <div style="border:2px dashed var(--border);border-radius:14px;padding:20px;background:#fafbfc;">
                                 @php
                                     $existingAudio = '';
@@ -557,20 +637,35 @@ new class extends Component {
 
                 {{-- Bottom Nav --}}
                 <div style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:40;">
+                    @if($this->attempt->exam->mode !== 'strict')
                     <button wire:click="prevGroup" wire:loading.attr="disabled" @disabled($currentIndex === 0)
                             style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:700;background:var(--surface);color:var(--text);border:1.5px solid var(--border);cursor:pointer;{{ $currentIndex === 0 ? 'opacity:0.3;pointer-events:none;' : '' }}">
                         ← Back
                     </button>
+                    @else
+                    <div></div> {{-- Spacer to keep Next button on the right --}}
+                    @endif
+
                     <div wire:loading wire:target="answers" style="font-size:0.72rem;font-weight:700;color:var(--blue);">Saving...</div>
-                    <button wire:click="nextGroup" wire:loading.attr="disabled" @disabled($currentIndex === count($groupIds) - 1)
-                            style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:800;background:var(--blue);color:white;border:none;cursor:pointer;{{ $currentIndex === count($groupIds) - 1 ? 'opacity:0.3;pointer-events:none;' : '' }}">
+                    
+                    @if ($currentIndex === count($groupIds) - 1)
+                    <button wire:click="finishExam" wire:loading.attr="disabled"
+                            onclick="return confirm('Are you sure you want to submit? You cannot change answers after this.') || event.stopImmediatePropagation()"
+                            style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:800;background:#16a34a;color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,0.3);">
+                        ✓ Submit Exam
+                    </button>
+                    @else
+                    <button wire:click="nextGroup" wire:loading.attr="disabled"
+                            style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:800;background:var(--blue);color:white;border:none;cursor:pointer;">
                         Next →
                     </button>
+                    @endif
                 </div>
             @endif
         </div>
 
         {{-- RIGHT SIDEBAR - Navigation Grid --}}
+        @if($this->attempt->exam->mode !== 'strict')
         <div class="exam-sidebar">
             <p style="font-size:0.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;">Question Navigator</p>
             <div class="nav-grid" style="max-height:360px;overflow-y:auto;">
@@ -595,14 +690,13 @@ new class extends Component {
                 ✓ Finish Exam
             </button>
         </div>
+        @endif
     </div>
     @endif
+    </div>
 
+    <script>
+        window.addEventListener('beforeunload', function(e) { e.preventDefault(); e.returnValue = ''; });
+    </script>
+    <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
 </div>
-
-<script>
-    window.addEventListener('beforeunload', function(e) { e.preventDefault(); e.returnValue = ''; });
-</script>
-<style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
-</body>
-</html>

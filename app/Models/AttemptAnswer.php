@@ -17,6 +17,7 @@ class AttemptAnswer extends Model
         'essay_content',
         'audio_answer_path',
         'score',
+        'feedback',
         'is_correct',
         'answered_at',
     ];
