@@ -89,6 +89,25 @@
     .icon-moon { display: block; }
     [data-theme="dark"] .icon-sun  { display: block; }
     [data-theme="dark"] .icon-moon { display: none; }
+
+    .scrolled-nav {
+    top: 15px !important; /* Jarak dari atas lebih sedikit agar slim */
+    width: 90% !important;
+    max-width: 1200px; /* Batas lebar maksimal agar tidak terlalu melar di layar besar */
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* Paksa ke tengah */
+    border-radius: 999px; 
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    padding: 0px 10px !important; /* Mengurangi padding vertikal */
+}
+
+/* Tambahkan ini juga agar transisi tidak patah */
+#navbar {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
 </style>
 
 {{-- ══════════════════════════════════════════════
@@ -99,7 +118,7 @@
 
         {{-- Logo --}}
         <a href="{{ url('/') }}" class="flex-shrink-0">
-            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="IC EDU" class="h-9">
+            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-9">
         </a>
 
         {{-- Centre nav links --}}
@@ -343,6 +362,16 @@
             if (doc)   doc.style.borderColor   = '';
         });
     });
-
+function applyScroll() {
+    const scrolled = window.scrollY > 50;
+    if (scrolled) {
+        navbar.classList.add('scrolled-nav');
+        navbar.classList.remove('bg-transparent', 'border-transparent', 'py-4');
+        navbar.classList.add('py-2'); 
+    } else {
+        navbar.classList.remove('scrolled-nav', 'py-2');
+        navbar.classList.add('bg-transparent', 'border-transparent', 'py-4');
+    }
+}
 })();
 </script>
