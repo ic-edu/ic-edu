@@ -45,6 +45,10 @@ Route::middleware(['auth', 'role:examiner'])
 
         Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
         Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
+
+        // Exam manage per type
+        Volt::route('/exam-manage/{type}', 'examiner.exam-manage')
+            ->name('examiner.exam-manage.type');
     });
 
 // Route Test-Taker
