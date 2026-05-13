@@ -75,6 +75,27 @@
         box-shadow: 0 16px 48px rgba(37,99,235,0.10);
         transform: translateY(-3px);
     }
+    
+    /* Animasi Bumi Berputar */
+    .rotating-earth {
+        animation: rotateEarth 60s linear infinite;
+        transform-origin: center;
+    }
+
+    @keyframes rotateEarth {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Animasi Awan Melayang */
+    .floating-cloud {
+        animation: cloudFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes cloudFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
 </style>
 @endpush
 
@@ -715,6 +736,7 @@
                         @endforeach
                     </div>
                 </div>
+                
 
             </div>
 
@@ -722,53 +744,44 @@
     </div>
 </section>
 
+{{-- SECTION: UNLOCK ENGLISH SKILLS (TEMA PUTIH) --}}
+<section class="relative bg-white pt-32 pb-0 overflow-hidden text-center">
+    
+    {{-- Awan Bergerak (Mascot) --}}
+    <div class="absolute top-10 left-[10%] floating-cloud" style="animation-delay: 0s;">
+        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-24 lg:w-32">
+    </div>
+    <div class="absolute top-40 right-[15%] floating-cloud" style="animation-delay: 2s;">
+        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-24 lg:w-32">
+    </div>
+    <div class="absolute bottom-60 left-[5%] floating-cloud" style="animation-delay: 1s;">
+        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-20 lg:w-28">
+    </div>
+    <div class="absolute bottom-80 right-[5%] floating-cloud" style="animation-delay: 3s;">
+        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-20 lg:w-28">
+    </div>
 
-{{-- ════════════════════════════════════════════════════════════════════════
-     SECTION 8 — CTA BANNER
-     ════════════════════════════════════════════════════════════════════════
-     🔧 BACKEND (route):
-        - route('register') → harus terdaftar di web.php
-        - route('login')    → harus terdaftar di web.php
-     🔧 BACKEND (data):
-        - Angka "12,000" HARDCODE → ganti dengan $stats->total_students
-     ════════════════════════════════════════════════════════════════════════ --}}
-<section class="py-20 px-[5%]">
-    <div class="max-w-[1160px] mx-auto bg-gradient-to-br from-blue-800 via-blue-600 to-indigo-600
-                rounded-[32px] p-16 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-center
-                relative overflow-hidden" data-reveal>
+    <div class="relative z-10 px-[5%] mb-16">
+        <h2 class="text-4xl lg:text-6xl font-extrabold mb-10 leading-tight text-[#1a3a5a]">
+            Unlock English Skills <br> Anytime, Anywhere
+        </h2>
+        
+        <a href="{{ route('register') }}" 
+           class="inline-block bg-[#1a3a5a] hover:bg-[#2c4e7a] text-white px-12 py-4 rounded-full font-bold text-xl transition-all shadow-xl shadow-blue-100">
+            Get Started – Its Free Trial
+        </a>
+    </div>
 
-        {{-- Background orbs — dekoratif, tidak butuh backend --}}
-        <div class="absolute -top-20 right-48 w-72 h-72 rounded-full bg-white/[0.06] pointer-events-none"></div>
-        <div class="absolute -bottom-16 -right-16 w-60 h-60 rounded-full bg-white/[0.04] pointer-events-none"></div>
-
-        <div class="relative z-10">
-            <h2 class="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mb-3">
-                Ready to Grow<br>with IC.EDU?
-            </h2>
-            {{-- 🔧 BACKEND: Ganti "12,000" dengan {{ $stats->total_students }} --}}
-            <p class="text-sm text-white/75 leading-7 max-w-lg">
-                Join over 12,000 students who are already on their path to English fluency.
-                Your first 7 days are completely free — no credit card required.
-            </p>
+    {{-- Bumi Berputar --}}
+    <div class="flex justify-center relative">
+        <div class="w-[800px] lg:w-[1100px] -mb-64 lg:-mb-80">
+            {{-- Gunakan gambar bumi dengan warna biru/kontras agar terlihat di bg putih --}}
+            <img src="{{ asset('assets/maskot/bumi.png') }}" 
+                 class="rotating-earth w-full h-auto opacity-90" 
+                 alt="World Map">
         </div>
-
-        <div class="flex flex-col gap-3 flex-shrink-0 relative z-10">
-            <a href="{{ route('register') }}"
-               class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold
-                      text-blue-600 bg-white shadow-md hover:-translate-y-0.5 hover:shadow-lg transition-all">
-                Get Started — It's Free
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-            <a href="{{ route('login') }}"
-               class="text-center text-sm text-white/60 font-medium py-2 hover:text-white/85 transition-colors">
-                Already have an account? Sign In
-            </a>
-            <p class="text-center text-xs text-white/40">No credit card · Cancel anytime</p>
-        </div>
-
     </div>
 </section>
+
 
 @endsection
