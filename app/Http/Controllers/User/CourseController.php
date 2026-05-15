@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TestTaker;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -15,15 +15,12 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $userId = Auth::id();
-        $enrolledCourseIds = CourseEnrollment::where('user_id', $userId)->pluck('course_id')->toArray();
-
         $courses = Course::where('is_published', true)
             ->withCount(['modules', 'enrollments'])
             ->latest()
             ->get();
 
-        return view('test_taker.courses.index', compact('courses', 'enrolledCourseIds'));
+        return view('test_taker.courses.index', compact('courses'));
     }
 
     /**
@@ -82,7 +79,7 @@ class CourseController extends Controller
             ]);
         }
 
-        return redirect()->route('test_taker.course.my_courses')
+        return redirect()->route('test_taker.course.show', $course->id)
             ->with('success', 'Berhasil mendaftar kursus! Selamat belajar.');
     }
 
@@ -93,6 +90,7 @@ class CourseController extends Controller
     {
         $userId = Auth::id();
 
+        // Must be enrolled (unless lesson is previewable)
         $isEnrolled = CourseEnrollment::where('user_id', $userId)
             ->where('course_id', $course->id)
             ->exists();
@@ -105,6 +103,7 @@ class CourseController extends Controller
         $course->load(['modules.lessons']);
         $lesson->load('module');
 
+        // Find prev/next lessons for navigation
         $allLessons = $course->modules->flatMap->lessons;
         $currentIndex = $allLessons->search(fn ($l) => $l->id === $lesson->id);
         $prevLesson = $currentIndex > 0 ? $allLessons[$currentIndex - 1] : null;

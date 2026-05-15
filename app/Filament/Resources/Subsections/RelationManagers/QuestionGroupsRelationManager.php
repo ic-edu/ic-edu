@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\SubsectionResource\RelationManagers;
+namespace App\Filament\Resources\Subsections\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -146,10 +146,10 @@ class QuestionGroupsRelationManager extends RelationManager
                     ->modalWidth('7xl'),
             ])
             ->actions([
-                EditAction::make()
+                EditAction::make('edit_group')
                     ->label('Edit Group & Questions')
                     ->modalWidth('7xl'),
-                DeleteAction::make()->label('Delete Group & Questions'),
+                DeleteAction::make('delete_group')->label('Delete Group & Questions'),
             ]);
     }
 }
