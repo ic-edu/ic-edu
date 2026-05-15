@@ -31,16 +31,12 @@
         {{-- EXAMS --}}
         <p class="nav-label font-heading">Exams</p>
         <a href="{{ route('test_taker.exam.index') }}" class="s-btn {{ request()->routeIs('test_taker.exam.index') ? 'active' : '' }}">
-            <span class="tip">Browse Exams</span>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('test_taker.exam.index') ? '2.2' : '1.8' }}" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
+            <x-lucide-file-text class="w-5 h-5 min-w-[20px]" />
+            <span class="s-label font-heading">Browse Exams</span>
         </a>
-        <a href="#" class="s-btn {{ request()->routeIs('test_taker.exam.attempt') ? 'active' : '' }}">
-            <span class="tip">My Exams</span>
-            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="{{ request()->routeIs('test_taker.exam.attempt') ? '2.2' : '1.8' }}" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+        <a href="{{ route('test_taker.exam.my_exams') }}" class="s-btn {{ request()->routeIs('test_taker.exam.my_exams') ? 'active' : '' }}">
+            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
+            <span class="s-label font-heading">My Exams</span>
         </a>
         
         {{-- ACCOUNT --}}
