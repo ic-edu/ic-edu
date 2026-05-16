@@ -1106,7 +1106,7 @@ dan loop $recentStudents->profile_photo_url
             <h2 class="text-4xl lg:text-5xl font-extrabold text-[#1a3a5a] mb-6 leading-[1.1]">
                 All-in-one platform for English
                 <br class="hidden md:block">
-                learning and test preparation
+                learning and test preparation 
             </h2>
         </div>
 
