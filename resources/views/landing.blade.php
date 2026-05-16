@@ -2,12 +2,10 @@
 
 @section('title', 'Home')
 
-{{-- ╔══════════════════════════════════════════════════════════════════════╗
-     ║  PAGE-SPECIFIC STYLES                                               ║
-     ║  (at)keyframes di-wrap (at)verbatim agar Blade tidak salah parse "(at)"      ║
-     ╚══════════════════════════════════════════════════════════════════════╝ --}}
 @push('styles')
 <style>
+
+    
     /* ── Hero doodle decorations ── */
     .hero-doodle {
         position: absolute;
@@ -96,7 +94,152 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-20px); }
     }
+
+    /* ... kode lainnya ... */
+
+    /* Animasi Scroll Ke Atas */
+    @keyframes testiScrollUp {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-50%); }
+    }
+
+    /* Animasi Scroll Ke Bawah */
+    @keyframes testiScrollDown {
+        0% { transform: translateY(-50%); }
+        100% { transform: translateY(0); }
+    }
+
+    .testi-track-up {
+        animation: testiScrollUp 30s linear infinite;
+    }
+
+    .testi-track-down {
+        animation: testiScrollDown 35s linear infinite;
+    }
+
+    /* Agar animasi berhenti saat di-hover */
+    .testi-col-wrap:hover .testi-track {
+        animation-play-state: paused;
+    }
+
+    /* Gaya tulisan header testimonial */
+    .testi-title {
+        font-family: 'Poppins', sans-serif;
+        color: #1a3a5a; /* Navy sesuai desain kamu */
+        font-weight: 800;
+        line-height: 1.1;
+    }
+   
+/* Board Tempat Menyusun Puzzle */
+    .puzzle-board {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        height: 600px; /* Tinggi disesuaikan dengan proporsi puzzle */
+        margin: 40px auto 0 auto;
+    }
+
+    /* Setiap Potongan Puzzle */
+    .puzzle-piece-img {
+        position: absolute;
+        height: auto;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+    }
+
+    /* Efek Hover: Potongan Puzzle Seperti Dicabut */
+    .puzzle-piece-img:hover {
+        transform: scale(1.05) translateY(-10px);
+        z-index: 99 !important;
+        filter: drop-shadow(0 25px 35px rgba(0,0,0,0.3));
+    }
+
+    /* Pembungkus Konten Teks di Atas Puzzle */
+    .puzzle-text-content {
+        position: absolute;
+        z-index: 10;
+        padding: 30px;
+        pointer-events: none; /* Supaya mouse tetap bisa nge-hover gambar di bawahnya */
+    }
+
+    .puzzle-text-content h3 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 900;
+        font-size: 3.5rem;
+        margin-bottom: 15px;
+    }
+
+    .puzzle-text-content p {
+        font-size: 1rem;
+        line-height: 1.6;
+        font-weight: 500;
+        max-width: 320px;
+    }
+
+    /* ========================================================
+       KOORDINAT PERSEN AGAR PAS SESUAI IMAGE_71A264.PNG
+       ======================================================== */
+    
+    /* --- BARIS ATAS --- */
+    .p-kiri-atas {
+        width: 37.5%; /* Lebih lebar karena ada tonjolan bawah & kanan */
+        left: 0;
+        top: 0;
+        z-index: 5; /* Menang tumpukan ke bawah & kanan */
+    }
+
+    .p-tengah-atas {
+        width: 34%; /* Polos kotak biasa di atas, lubang kiri-kanan ketutup tonjolan */
+        left: 33.33%;
+        top: 0;
+        z-index: 1;
+    }
+
+    .p-kanan-atas {
+        width: 36%; /* Lebar karena ada tonjolan kiri */
+        right: 0;
+        top: 0;
+        z-index: 3;
+    }
+
+    /* --- BARIS BAWAH --- */
+    .p-kiri-bawah {
+        width: 37.5%; /* Ada tonjolan kanan, lubang atas ketutup p-kiri-atas */
+        left: 0;
+        bottom: 0;
+        z-index: 4;
+    }
+
+    .p-tengah-bawah {
+        width: 34%; /* Kotak polos, semua lubang ketutup dari luar */
+        left: 33.33%;
+        bottom: 0;
+        z-index: 1;
+    }
+
+    .p-kanan-bawah {
+        width: 36%; /* Ada tonjolan atas & kiri */
+        right: 0;
+        bottom: 0;
+        z-index: 6; /* Paling tinggi karena numpang ke kiri dan ke atas */
+    }
+
+    /* --- POSISI TEKS --- */
+    .t-toeic { left: 4%; top: 8%; color: white; }
+    .t-ielts { right: 4%; top: 8%; color: white; text-align: right; }
+    .t-lms { left: 4%; bottom: 12%; color: #1A456C; } /* Teks Navy di Abu-abu */
+    .t-toefl { left: 37%; bottom: 12%; color: white; }
+
+    /* Responsif: Jika layar kekecilan (Tablet/HP), kita ubah jadi susunan list normal */
+    @media (max-width: 992px) {
+        .puzzle-board { height: auto; display: flex; flex-direction: column; gap: 20px; padding: 0 20px; }
+        .puzzle-piece-img { position: relative; width: 100% !important; left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; border-radius: 20px; }
+        .puzzle-text-content { position: absolute; left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important; display: flex; flex-direction: column; justify-content: center; text-align: left !important; align-items: flex-start !important; }
+        .t-lms, .t-toefl, .t-toeic, .t-ielts { color: white !important; }
+        .t-lms h3, .t-lms p { color: #1A456C !important; }
+    }
 </style>
+
 @endpush
 
 @section('content')
@@ -612,155 +755,203 @@
     </div>
 </section>
 
+<div class="marquee-strip overflow-hidden py-5 bg-blue-50 border-y border-blue-100">
+    <div class="marquee-track flex gap-10 w-max">
+        @php
+            $marqueeItems = [
+                'IELTS Preparation', 'TOEFL Training', 'Academic Writing', 'Public Speaking',
+                'Grammar Mastery', 'Vocabulary Builder', 'Listening Skills', 'Pronunciation',
+                'Business English', 'TOEIC Prep', 'Reading Skills', 'Daily Conversation',
+            ];
+        @endphp
+        {{-- Duplikat array untuk looping seamless --}}
+        @foreach(array_merge($marqueeItems, $marqueeItems) as $item)
+            <div class="marquee-item flex items-center gap-2.5 text-xs font-bold text-blue-600 uppercase tracking-widest whitespace-nowrap">
+                <span class="w-[5px] h-[5px] rounded-full bg-blue-400 flex-shrink-0"></span>
+                {{ $item }}
+            </div>
+        @endforeach
+    </div>
+</div>
 
-{{-- ════════════════════════════════════════════════════════════════════════
-     SECTION 7 — TESTIMONIALS
-     ════════════════════════════════════════════════════════════════════════
-     🔧 BACKEND (data):
-        - $colA dan $colB saat ini HARDCODE di (at)php block.
-          Untuk dynamic: buat tabel `testimonials` dengan kolom:
-            (name, achievement, quote, avatar_color)
-          Kirim dari controller:
-            $testimonials = Testimonial::latest()->take(8)->get();
-          Lalu di view:
-            (at)php
-              $colA = $testimonials->take(4);
-              $colB = $testimonials->skip(4)->take(4);
-            (at)endphp
-          Dan akses field dengan $t->name, $t->achievement, $t->quote, dst.
-
-     🔧 BACKEND (avatar):
-        - Saat ini pakai ui-avatars.com dengan initial nama.
-          Jika ada foto real: ganti src dengan $t->avatar_url
-          atau {{ Storage::url($t->avatar) }}
-
-     🔧 BACKEND (statistik):
-        - Angka 12K+, 4.9★, 98% HARDCODE.
-          Ganti dengan $stats->total_students, $stats->avg_rating,
-          $stats->satisfaction_rate dari controller.
-     ════════════════════════════════════════════════════════════════════════ --}}
-<section class="testi-section py-24 overflow-hidden" id="testimonials"
-         style="background: linear-gradient(160deg, #f8faff 0%, #eff4ff 100%);">
+{{-- SECTION 6 — WHY CHOOSE US --}}
+<section class="py-24 bg-white overflow-hidden" id="why-choose-us">
     <div class="max-w-[1200px] mx-auto px-[5%]">
+        {{-- Header Tetap --}}
+        <div class="text-center mb-16" data-aos="fade-up">
+            <span class="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold mb-6 inline-block uppercase tracking-widest">Why Choose Us</span>
+            <h2 class="text-4xl lg:text-5xl font-extrabold text-[#1a3a5a] mb-6 leading-[1.1]">All-in-one platform for English <br class="hidden md:block"> learning and test preparation</h2>
+        </div>
+    </div>
+    <div class="puzzle-board">
+            
+            <img src="{{ asset('/assets/kiri atas.png') }}" class="puzzle-piece-img p-kiri-atas" data-aos="fade-right" alt="TOEIC Piece">
+            <div class="puzzle-text-content t-toeic" data-aos="fade-right" data-aos-delay="100">
+                <h3>TOEIC</h3>
+                <p>Focus on workplace communication skills, including business conversations, emails, and daily office situations.</p>
+            </div>
+
+            <div class="puzzle-piece-img p-tengah-atas flex items-center justify-center" data-aos="fade-down">
+                <img src="{{ asset('assets/tengah atas.png') }}" class="w-full h-full object-cover">
+                {{-- Taruh Gambar Burung Owl Kamu di Sini secara Absolute --}}
+                <img src="{{ asset('images/owl.png') }}" class="w-[180px] absolute z-20 floating" style="top: 25%;">
+            </div>
+
+            <img src="{{ asset('assets/kanan atas.png') }}" class="puzzle-piece-img p-kanan-as" style="display:none;"> <img src="{{ asset('assets/kanan atas.png') }}" class="puzzle-piece-img p-kanan-as p-kanan-atas" data-aos="fade-left" alt="IELTS Piece">
+            <div class="puzzle-text-content t-ielts" data-aos="fade-left" data-aos-delay="100">
+                <h3>IELTS</h3>
+                <p>Designed for academic and international purposes, covering listening, reading, writing, and speaking.</p>
+            </div>
+
+
+            <img src="{{ asset('assets/kiri bawah.png') }}" class="puzzle-piece-img p-kiri-bawah" data-aos="fade-right" data-aos-delay="200" alt="LMS Piece">
+            <div class="puzzle-text-content t-lms" data-aos="fade-right" data-aos-delay="300">
+                <h3>LMS</h3>
+                <p>A flexible learning system to track progress, access materials, and improve English skills at your own pace.</p>
+            </div>
+
+            <img src="{{ asset('assets/tengah bawah.png') }}" class="puzzle-piece-img p-tengah-bawah" data-aos="fade-up" data-aos-delay="400" alt="TOEFL Piece">
+            <div class="puzzle-text-content t-toefl" data-aos="fade-up" data-aos-delay="500">
+                <h3>TOEFL</h3>
+                <p>Focuses on academic English used in universities, including lectures, essays, and campus discussions.</p>
+            </div>
+
+            <div class="puzzle-piece-img p-kanan-bawah flex items-center justify-center" data-aos="fade-left" data-aos-delay="200">
+                <img src="{{ asset('assets/kanan bawah.png') }}" class="w-full h-full object-cover">
+                {{-- Taruh Gambar Burung Owl Kedua Kamu di Sini secara Absolute --}}
+                <img src="{{ asset('images/owl.png') }}" class="w-[150px] absolute z-20 floating second-owl" style="top: 25%;">
+            </div>
+
+        </div>
+</section>
+
+{{-- SECTION 7 — TESTIMONIALS + STATISTIC BAR --}}
+<section class="testi-section py-24 overflow-hidden bg-white" id="testimonials">
+    <div class="max-w-[1200px] mx-auto px-[5%]">   
+        @php
+            /* DEFINISI DATA LANGSUNG DI SINI BIAR GA ERROR UNDEFINED VARIABLE */
+            $displayColA = [
+                ['name' => 'Arran Douglas', 'achievement' => 'IELTS Score: 7.5 → 8.0', 'quote' => 'The modules at IC.EDU were very easy to understand. The LMS monitored my progress every day.'],
+                ['name' => 'Jeffrey Avery', 'achievement' => 'TOEFL iBT: 89 → 107', 'quote' => 'I really enjoyed the online test platform. The interface has a simple, fast, and the UI/UX is comfortable.']
+            ];
+            
+            $displayColB = [
+                ['name' => 'Amanda Banks', 'achievement' => 'Business English Certified', 'quote' => 'This platform made my English preparation more effective. The results were beyond my expectations.']
+            ];
+        @endphp
         <div class="grid lg:grid-cols-[400px_1fr] gap-16 items-center">
-
-            {{-- LEFT: Heading + statistik --}}
             <div data-reveal>
-                <div class="inline-flex items-center gap-2 mb-5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                    <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Testimonials</span>
+                <div class="mb-6">
+                    <svg width="60" height="45" viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.8571 0V30H0V60H34.2857V0H22.8571ZM68.5714 0V30H45.7143V60H80V0H68.5714Z" fill="#1a3a5a"/>
+                    </svg>
                 </div>
-                <h2 class="text-[2.8rem] lg:text-[3.2rem] font-extrabold leading-[1.1] tracking-tight text-slate-900 mb-5">
-                    Don't just<br>take our<br><span class="text-blue-600">word for it</span>
+                <h2 style="font-family: 'Poppins', sans-serif; color: #1a3a5a; font-weight: 800; line-height: 1.1; font-size: 3.2rem;" class="mb-6">
+                    Stories from<br>IC.EDU<br>Learners
                 </h2>
-                <p class="text-[0.97rem] text-slate-500 leading-[1.8] mb-8 max-w-[340px]">
-                    Read what our students have to say about their IC.EDU journey — real results, real people.
-                </p>
-                {{-- 🔧 BACKEND: Ganti angka hardcode dengan variabel dari controller --}}
-                <div class="flex gap-8">
-                    <div>
-                        <div class="text-2xl font-extrabold text-slate-900">12K+</div>
-                        <div class="text-xs text-slate-400 font-medium mt-0.5">Active Learners</div>
-                    </div>
-                    <div class="w-px bg-slate-200"></div>
-                    <div>
-                        <div class="text-2xl font-extrabold text-slate-900">4.9 <span class="text-amber-400 text-lg">★</span></div>
-                        <div class="text-xs text-slate-400 font-medium mt-0.5">Average Rating</div>
-                    </div>
-                    <div class="w-px bg-slate-200"></div>
-                    <div>
-                        <div class="text-2xl font-extrabold text-slate-900">98%</div>
-                        <div class="text-xs text-slate-400 font-medium mt-0.5">Satisfaction Rate</div>
-                    </div>
-                </div>
+                <p class="text-slate-500 text-lg max-w-[320px]">Read what our students have to say about their journey.</p>
             </div>
-
-            {{-- RIGHT: Dua kolom auto-scroll --}}
-            <div class="hidden lg:grid grid-cols-2 gap-4" style="height: 560px;">
-
-                {{-- 🔧 BACKEND: Ganti (at)php hardcode ini dengan query dari DB (lihat komentar di atas) --}}
-                @php
-                $colA = [
-                    // Format: [name, achievement, quote, avatar_initials, avatar_hex_color]
-                    ['Rina Kusuma',   'IELTS Score: 7.5 → 8.0',    'I never thought I could hit 8.0. The speaking modules and weekly live practice sessions were the complete game-changer for me. I finally feel confident!',    'Rina+K',   '2563eb'],
-                    ['Budi Santoso',  'TOEFL iBT: 89 → 107',       "IC.EDU helped me fix grammar issues I didn't even know I had. My writing score jumped from 22 to 28 in just 6 weeks. Unbelievable results.",                'Budi+S',   '6366f1'],
-                    ['Sari Wijaya',   'Business English Graduate',  'IC.EDU helped me land my dream job at a multinational company. The course prepared me perfectly for every interview I had.',                                 'Sari+W',   '0d9488'],
-                    ['Ahmad Fauzi',   'TOEIC: 650 → 860',          'The TOEIC preparation course is incredibly structured. In just 8 weeks, my score jumped by 210 points. The practice tests felt exactly like the real exam!', 'Ahmad+F',  'f59e0b'],
-                ];
-                $colB = [
-                    ['Dewi Rahayu',   'IELTS General: Band 7.0',   "IC.EDU's AI feedback on my essays was a revelation — it caught patterns I never noticed. My writing improved dramatically in just 3 weeks.",               'Dewi+R',   'ec4899'],
-                    ['Reza Pratama',  'DET Score: 120',             'Studying for the DET felt overwhelming until I found IC.EDU. The bite-sized lessons and adaptive quizzes made everything click in just 4 weeks.',           'Reza+P',   '8b5cf6'],
-                    ['Citra Lestari', 'TOEFL Essentials: 12/14',   'Live speaking club was the best thing that happened to my confidence. I went from freezing in presentations to leading team meetings in English.',           'Citra+L',  '14b8a6'],
-                    ['Hendra Wijaya', 'Business English Certified', 'I got promoted to Regional Manager largely because I could finally communicate clearly with our international clients. Thank you IC.EDU!',                  'Hendra+W', 'f97316'],
-                ];
-                @endphp
-
-                {{-- Kolom A — scroll ke ATAS --}}
+            <div class="hidden lg:grid grid-cols-2 gap-6" style="height: 600px;">
+                {{-- Kolom Kiri (UP) --}}
                 <div class="testi-col-wrap">
-                    <div class="testi-track testi-track-up">
-                        {{-- Duplikat untuk looping seamless --}}
-                        @foreach(array_merge($colA, $colA) as $t)
-                            <div class="testi-item">
-                                <div class="text-amber-400 text-sm tracking-wider mb-3">★★★★★</div>
-                                <p class="text-[0.82rem] text-slate-600 leading-[1.75] mb-4">"{{ $t[2] }}"</p>
-                                <div class="flex items-center gap-2.5">
-                                    {{-- 🔧 BACKEND: Ganti dengan $t->avatar_url jika dari DB --}}
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($t[3]) }}&background={{ $t[4] }}&color=fff&size=80"
-                                         class="w-9 h-9 rounded-full object-cover flex-shrink-0" alt="{{ $t[0] }}">
+                    <div class="testi-track testi-track-up flex flex-col gap-6">
+                        @foreach(array_merge($displayColA, $displayColA, $displayColA) as $t)
+                            <div class="bg-white border border-slate-100 p-8 rounded-[32px] shadow-sm">
+                                <div class="text-amber-400 mb-4 text-sm">★★★★★</div>
+                                <p class="text-slate-600 mb-6 italic">"{{ $t['quote'] }}"</p>
+                                <div class="flex items-center gap-4">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($t['name']) }}&background=1a3a5a&color=fff" class="w-11 h-11 rounded-full">
                                     <div>
-                                        <div class="text-xs font-bold text-slate-800">{{ $t[0] }}</div>
-                                        <div class="text-[0.68rem] text-slate-400 mt-0.5">{{ $t[1] }}</div>
+                                        <div class="font-bold text-[#1a3a5a] text-sm">{{ $t['name'] }}</div>
+                                        <div class="text-xs text-slate-400">{{ $t['achievement'] }}</div>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
+                    </div>
+                </div>
+                <div class="testi-col-wrap mt-12">
+                    <div class="testi-track testi-track-down flex flex-col gap-6">
+                        @foreach(array_merge($displayColB, $displayColB, $displayColB) as $t)
+                            <div class="bg-white border border-slate-100 p-8 rounded-[32px] shadow-sm">
+                                <div class="text-amber-400 mb-4 text-sm">★★★★★</div>
+                                <p class="text-slate-600 mb-6 italic">"{{ $t['quote'] }}"</p>
+                                <div class="flex items-center gap-4">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($t['name']) }}&background=1a3a5a&color=fff" class="w-11 h-11 rounded-full">
+                                    <div>
+                                        <div class="font-bold text-[#1a3a5a] text-sm">{{ $t['name'] }}</div>
+                                        <div class="text-xs text-slate-400">{{ $t['achievement'] }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="py-10 bg-white border-t border-b border-slate-100 mt-12">
+        <div class="max-w-[1100px] mx-auto px-[5%]">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                
+                <div class="flex flex-col items-center">
+                    <div style="font-weight: 800;" class="text-2xl lg:text-3xl text-[#1a3a5a] tracking-tight mb-1">
+                        <span class="counter" data-target="250">0</span>K +
+                    </div>
+                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">
+                        Premium Courses
                     </div>
                 </div>
 
-                {{-- Kolom B — scroll ke BAWAH, offset mt-10 agar tidak simetris --}}
-                <div class="testi-col-wrap mt-10">
-                    <div class="testi-track testi-track-down">
-                        @foreach(array_merge($colB, $colB) as $t)
-                            <div class="testi-item">
-                                <div class="text-amber-400 text-sm tracking-wider mb-3">★★★★★</div>
-                                <p class="text-[0.82rem] text-slate-600 leading-[1.75] mb-4">"{{ $t[2] }}"</p>
-                                <div class="flex items-center gap-2.5">
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($t[3]) }}&background={{ $t[4] }}&color=fff&size=80"
-                                         class="w-9 h-9 rounded-full object-cover flex-shrink-0" alt="{{ $t[0] }}">
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-800">{{ $t[0] }}</div>
-                                        <div class="text-[0.68rem] text-slate-400 mt-0.5">{{ $t[1] }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
+                <div class="flex flex-col items-center">
+                    <div style="font-weight: 800;" class="text-2xl lg:text-3xl text-[#1a3a5a] tracking-tight mb-1">
+                        <span class="counter" data-target="500">0</span>K+
+                    </div>
+                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">
+                        Active Learner
                     </div>
                 </div>
-                
+
+                <div class="flex flex-col items-center">
+                    <div style="font-weight: 800;" class="text-2xl lg:text-3xl text-[#1a3a5a] tracking-tight mb-1">
+                        <span class="counter" data-target="98">0</span>%
+                    </div>
+                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">
+                        Face Rate
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <div style="font-weight: 800;" class="text-2xl lg:text-3xl text-[#1a3a5a] tracking-tight mb-1">
+                        <span class="counter" data-target="100">0</span>K+
+                    </div>
+                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">
+                        Certificates Issued
+                    </div>
+                </div>
 
             </div>
-
         </div>
     </div>
 </section>
 
-{{-- SECTION: UNLOCK ENGLISH SKILLS (TEMA PUTIH) --}}
+{{-- SECTION: UNLOCK ENGLISH SKILLS  --}}
 <section class="relative bg-white pt-32 pb-0 overflow-hidden text-center">
-    
-    {{-- Awan Bergerak (Mascot) --}}
-    <div class="absolute top-10 left-[10%] floating-cloud" style="animation-delay: 0s;">
-        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-24 lg:w-32">
+    <div class="absolute top-[10%] left-[8%] floating-cloud" style="animation-delay: 0s;">
+        <img src="{{ asset('assets/maskot/awan 1.png') }}" alt="Mascot" class="w-24 lg:w-32">
     </div>
-    <div class="absolute top-40 right-[15%] floating-cloud" style="animation-delay: 2s;">
-        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-24 lg:w-32">
+    <div class="absolute bottom-[15%] left-[5%] floating-cloud" style="animation-delay: 3s;">
+        <img src="{{ asset('assets/maskot/awan 3.png') }}" alt="Mascot" class="w-20 lg:w-28">
     </div>
-    <div class="absolute bottom-60 left-[5%] floating-cloud" style="animation-delay: 1s;">
-        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-20 lg:w-28">
+    <div class="absolute bottom-[35%] left-[25%] floating-cloud" style="animation-delay: 1.3s;">
+        <img src="{{ asset('assets/maskot/awan 2.png') }}" alt="Mascot" class="w-24 lg:w-28">
     </div>
-    <div class="absolute bottom-80 right-[5%] floating-cloud" style="animation-delay: 3s;">
-        <img src="{{ asset('assets/maskot/maskot_cloud.png') }}" alt="Mascot" class="w-20 lg:w-28">
+    <div class="absolute top-[15%] right-[12%] floating-cloud" style="animation-delay: 2s;">
+        <img src="{{ asset('assets/maskot/awan 5.png') }}" alt="Mascot" class="w-24 lg:w-32">
     </div>
-
+    <div class="absolute bottom-[25%] right-[5%] floating-cloud" style="animation-delay: 4.5s;">
+        <img src="{{ asset('assets/maskot/awan 4.png') }}" alt="Mascot" class="w-24 lg:w-32">
+    </div>
     <div class="relative z-10 px-[5%] mb-16">
         <h2 class="text-4xl lg:text-6xl font-extrabold mb-10 leading-tight text-[#1a3a5a]">
             Unlock English Skills <br> Anytime, Anywhere
@@ -771,10 +962,8 @@
             Get Started – Its Free Trial
         </a>
     </div>
-
-    {{-- Bumi Berputar --}}
     <div class="flex justify-center relative">
-        <div class="w-[800px] lg:w-[1100px] -mb-64 lg:-mb-80">
+        <div class="w-[300px] lg:w-[500px] -mb-64 lg:-mb-80">
             {{-- Gunakan gambar bumi dengan warna biru/kontras agar terlihat di bg putih --}}
             <img src="{{ asset('assets/maskot/bumi.png') }}" 
                  class="rotating-earth w-full h-auto opacity-90" 
@@ -784,4 +973,42 @@
 </section>
 
 
+<script>
+    const counters = document.querySelectorAll('.counter');
+    const speed = 200;
+
+    const startCounter = (entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = +entry.target.getAttribute('data-target');
+                const count = +entry.target.innerText;
+                const increment = target / speed;
+
+                const updateCount = () => {
+                    const currentCount = +entry.target.innerText;
+                    if (currentCount < target) {
+                        // Cek apakah angka punya desimal (seperti 2.5)
+                        if(target % 1 !== 0) {
+                            entry.target.innerText = (currentCount + increment).toFixed(1);
+                        } else {
+                            entry.target.innerText = Math.ceil(currentCount + increment);
+                        }
+                        setTimeout(updateCount, 1);
+                    } else {
+                        entry.target.innerText = target;
+                    }
+                };
+
+                updateCount();
+                observer.unobserve(entry.target); // Biar animasinya cuma jalan sekali
+            }
+        });
+    };
+
+    const observer = new IntersectionObserver(startCounter, {
+        threshold: 0.5 // Animasi jalan pas 50% elemen kelihatan di layar
+    });
+
+    counters.forEach(counter => observer.observe(counter));
+</script>
 @endsection

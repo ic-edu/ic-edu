@@ -1,6 +1,3 @@
-{{-- ══════════════════════════════════════════════
-     NAVBAR STYLES
-══════════════════════════════════════════════ --}}
 <style>
     .test-card { position: relative; cursor: pointer; }
 
@@ -67,7 +64,6 @@
     }
     .btn-shimmer:hover { animation-duration: 1.2s; }
 
-    /* ── Theme toggle button ── */
     .theme-toggle {
         width: 38px; height: 38px; border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
@@ -84,49 +80,38 @@
         transform: rotate(15deg);
     }
 
-    /* Sun = tampil di dark, Moon = tampil di light */
     .icon-sun  { display: none; }
     .icon-moon { display: block; }
     [data-theme="dark"] .icon-sun  { display: block; }
     [data-theme="dark"] .icon-moon { display: none; }
 
     .scrolled-nav {
-    top: 15px !important; /* Jarak dari atas lebih sedikit agar slim */
+    top: 15px !important; 
     width: 90% !important;
-    max-width: 1200px; /* Batas lebar maksimal agar tidak terlalu melar di layar besar */
+    max-width: 1200px; 
     left: 50% !important;
-    transform: translateX(-50%) !important; /* Paksa ke tengah */
+    transform: translateX(-50%) !important; 
     border-radius: 999px; 
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(12px);
     border: 1px solid rgba(226, 232, 240, 0.7);
     box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-    padding: 0px 10px !important; /* Mengurangi padding vertikal */
+    padding: 0px 10px !important; 
 }
 
-/* Tambahkan ini juga agar transisi tidak patah */
 #navbar {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
 
-{{-- ══════════════════════════════════════════════
-     NAVBAR
-══════════════════════════════════════════════ --}}
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-transparent">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
-
-        {{-- Logo --}}
         <a href="{{ url('/') }}" class="flex-shrink-0">
             <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-9">
         </a>
-
-        {{-- Centre nav links --}}
         <div class="hidden md:flex items-center gap-7">
             <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
             <a href="#courses"      class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Courses</a>
-
-            {{-- OUR TESTS MEGA-DROPDOWN --}}
             <div class="relative" id="tests-menu">
                 <button id="tests-btn" type="button"
                     class="nav-link nav-pill inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors select-none">
@@ -135,13 +120,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-
                 <div id="tests-dropdown"
                      class="absolute top-[calc(100%+18px)] left-0 w-[520px] bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-100 shadow-[0_32px_80px_rgba(0,0,0,0.14)] p-6 opacity-0 invisible pointer-events-none"
                      style="transform: translateY(10px); transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.2,.64,1), visibility .25s;">
-
-                    <div class="absolute -top-[7px] left-8 w-3.5 h-3.5 bg-white border-l border-t border-slate-100 rotate-45 rounded-tl-sm"></div>
-
+                <div class="absolute -top-[7px] left-8 w-3.5 h-3.5 bg-white border-l border-t border-slate-100 rotate-45 rounded-tl-sm"></div>
                     <div class="mb-5 px-1">
                         <p class="text-[0.68rem] font-bold text-slate-400 uppercase tracking-[0.12em]">Pick Your Test</p>
                         <p class="text-xs text-slate-500 mt-0.5">Choose the exam you need and start achieving your goals</p>
@@ -184,28 +166,19 @@
                     </div>
                 </div>
             </div>
-            {{-- END DROPDOWN --}}
-
             <a href="#pricing" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Pricing</a>
         </div>
-
-        {{-- Right side: Theme toggle + Auth buttons --}}
         <div class="flex items-center gap-3">
-
-            {{-- ── THEME TOGGLE BUTTON ── --}}
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Switch theme">
-                {{-- Moon: tampil saat light mode (klik untuk ke dark) --}}
                 <svg class="icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                 </svg>
-                {{-- Sun: tampil saat dark mode (klik untuk ke light) --}}
                 <svg class="icon-sun w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                 </svg>
             </button>
-
             <a href="{{ route('login') }}" id="btn-signin"
                class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
                       border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
@@ -217,32 +190,15 @@
                 Get Started
             </a>
         </div>
-
     </div>
 </nav>
 
-{{-- ══════════════════════════════════════════════
-     NAVBAR + THEME SCRIPT
-     Diletakkan di sini agar theme diterapkan
-     SECEPAT MUNGKIN sebelum page render penuh
-     (mencegah flash of wrong theme / FOWT)
-══════════════════════════════════════════════ --}}
 <script>
 (function () {
     'use strict';
-
-    /* ─────────────────────────────────────────
-       CONSTANTS
-    ───────────────────────────────────────── */
     const STORAGE_KEY = 'icedu_theme';
     const html        = document.documentElement;
     const toggleBtn   = document.getElementById('theme-toggle');
-
-    /* ─────────────────────────────────────────
-       THEME FUNCTIONS
-    ───────────────────────────────────────── */
-
-    /** Apply theme ke <html> dan simpan ke localStorage */
     function applyTheme(theme) {
         if (theme === 'dark') {
             html.setAttribute('data-theme', 'dark');
@@ -251,50 +207,33 @@
         }
         localStorage.setItem(STORAGE_KEY, theme);
     }
-
-    /** Toggle antara light ↔ dark */
     function toggleTheme() {
         const isDark = html.getAttribute('data-theme') === 'dark';
         applyTheme(isDark ? 'light' : 'dark');
     }
-
-    /** Init: baca saved preference, fallback ke system preference */
     function initTheme() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved === 'dark' || saved === 'light') {
             applyTheme(saved);
         } else {
-            // Ikuti system preference browser
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             applyTheme(prefersDark ? 'dark' : 'light');
         }
     }
-
-    // Jalankan init immediately
-    initTheme();
-
-    // Bind toggle button
+    initTheme()
     if (toggleBtn) {
         toggleBtn.addEventListener('click', toggleTheme);
     }
-
-    // Sync perubahan tema antar tab browser
     window.addEventListener('storage', function (e) {
         if (e.key === STORAGE_KEY && (e.newValue === 'dark' || e.newValue === 'light')) {
             applyTheme(e.newValue);
         }
     });
-
-    // Listen system preference change (jika user belum pernah manual set)
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
         if (!localStorage.getItem(STORAGE_KEY)) {
             applyTheme(e.matches ? 'dark' : 'light');
         }
     });
-
-    /* ─────────────────────────────────────────
-       NAVBAR SCROLL
-    ───────────────────────────────────────── */
     const navbar    = document.getElementById('navbar');
     const dropdown  = document.getElementById('tests-dropdown');
     const testsMenu = document.getElementById('tests-menu');
@@ -313,10 +252,6 @@
     }
     window.addEventListener('scroll', applyScroll, { passive: true });
     applyScroll();
-
-    /* ─────────────────────────────────────────
-       DROPDOWN
-    ───────────────────────────────────────── */
     function openDrop() {
         clearTimeout(dropTimer);
         dropdown.classList.add('open');
@@ -335,10 +270,6 @@
     document.addEventListener('click', function (e) {
         if (!testsMenu.contains(e.target)) closeDrop();
     });
-
-    /* ─────────────────────────────────────────
-       TEST CARD HOVER
-    ───────────────────────────────────────── */
     document.querySelectorAll('.test-card').forEach(function (card) {
         var accent = card.dataset.accent;
 
