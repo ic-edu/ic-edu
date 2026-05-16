@@ -24,6 +24,12 @@ new #[Layout('layouts.bare')] class extends Component {
     public int $remainingSeconds = 0;
     public array $flatQuestions = [];
 
+    // Strict mode per-section timer
+    public bool $isStrictMode = false;
+    public array $sectionDurations = []; // section_id => seconds remaining
+    public array $sectionOrder = [];     // ordered list of unique section_ids
+    public int $currentSectionRemainingSeconds = 0;
+
     // Instruction state
     public bool $showingInstruction = true;
     public ?int $currentSectionId = null;
@@ -41,6 +47,9 @@ new #[Layout('layouts.bare')] class extends Component {
             return;
         }
 
+        $this->isStrictMode = ($this->attempt->exam->mode === 'strict');
+
+        // --- Global timer (untuk mode non-strict) ---
         $durationInSeconds = ($this->attempt->exam->total_duration ?? 120) * 60;
         $elapsedSeconds = Carbon::parse($this->attempt->started_at)->diffInSeconds(now());
         $this->remainingSeconds = max(0, $durationInSeconds - $elapsedSeconds);
@@ -59,6 +68,32 @@ new #[Layout('layouts.bare')] class extends Component {
         foreach ($groupData as $i => $row) {
             $this->sectionMap[$i] = $row->section_id;
             $this->subsectionMap[$i] = $row->subsection_id;
+        }
+
+        // --- Per-section timer setup (untuk strict mode) ---
+        if ($this->isStrictMode) {
+            // Ambil semua section unik, urut
+            $uniqueSectionIds = collect($this->sectionMap)->unique()->values()->toArray();
+            $this->sectionOrder = $uniqueSectionIds;
+
+            $sections = Section::whereIn('id', $uniqueSectionIds)->get()->keyBy('id');
+            $sectionCount = max(1, count($uniqueSectionIds));
+
+            // Fallback: bagi total_duration rata ke tiap section jika section.duration null
+            $fallbackSeconds = (int) round($durationInSeconds / $sectionCount);
+
+            foreach ($uniqueSectionIds as $sId) {
+                $sec = $sections->get($sId);
+                $this->sectionDurations[$sId] = $sec && $sec->duration
+                    ? ($sec->duration * 60)
+                    : $fallbackSeconds;
+            }
+
+            // Sisa waktu section pertama = total durasi section - waktu yang sudah berlalu
+            $firstSectionId = $uniqueSectionIds[0] ?? null;
+            if ($firstSectionId) {
+                $this->currentSectionRemainingSeconds = max(0, $this->sectionDurations[$firstSectionId] - $elapsedSeconds);
+            }
         }
 
         if (!empty($this->groupIds)) {
@@ -110,6 +145,48 @@ new #[Layout('layouts.bare')] class extends Component {
             $this->currentSubsectionId = $this->subsectionMap[0] ?? null;
             $this->showingInstruction = true;
         }
+    }
+
+    /**
+     * Dipanggil dari Alpine.js saat timer section habis (strict mode).
+     * Lanjut ke section berikutnya, atau submit jika sudah section terakhir.
+     */
+    public function advanceToNextSection()
+    {
+        // Cari group index pertama dari section BERIKUTNYA
+        $currentSectionIdx = array_search($this->currentSectionId, $this->sectionOrder);
+        $nextSectionIdx    = $currentSectionIdx + 1;
+
+        if ($nextSectionIdx >= count($this->sectionOrder)) {
+            // Sudah section terakhir → submit
+            $this->finishExam();
+            return;
+        }
+
+        $nextSectionId = $this->sectionOrder[$nextSectionIdx];
+
+        // Cari group index pertama yang termasuk nextSectionId
+        $nextGroupIndex = null;
+        foreach ($this->sectionMap as $gIdx => $sId) {
+            if ($sId === $nextSectionId) {
+                $nextGroupIndex = $gIdx;
+                break;
+            }
+        }
+
+        if ($nextGroupIndex === null) {
+            $this->finishExam();
+            return;
+        }
+
+        // Pindah ke section berikutnya
+        $this->currentIndex            = $nextGroupIndex;
+        $this->currentSectionId        = $nextSectionId;
+        $this->currentSubsectionId     = $this->subsectionMap[$nextGroupIndex] ?? null;
+        $this->showingInstruction      = true;
+        $this->currentSectionRemainingSeconds = $this->sectionDurations[$nextSectionId] ?? 0;
+
+        $this->dispatch('section-timer-reset', seconds: $this->currentSectionRemainingSeconds);
     }
 
     public function getCurrentGroupProperty()
@@ -343,7 +420,71 @@ new #[Layout('layouts.bare')] class extends Component {
             </div>
         </div>
 
-        {{-- Timer --}}
+        {{-- Time-up overlay (non-blocking) --}}
+        <div id="timeup-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+            <div style="background:white;border-radius:24px;padding:48px 40px;text-align:center;max-width:400px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);">
+                <div style="width:64px;height:64px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                    <svg style="width:32px;height:32px;color:#dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 style="font-size:1.4rem;font-weight:900;color:#0f172a;margin-bottom:8px;">Waktu Habis!</h2>
+                <p style="font-size:0.875rem;color:#64748b;margin-bottom:24px;">Ujian Anda sedang dikumpulkan secara otomatis...</p>
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                    <div style="width:10px;height:10px;border-radius:50%;background:#2563eb;animation:timeup-dot 1.2s ease-in-out infinite;"></div>
+                    <div style="width:10px;height:10px;border-radius:50%;background:#2563eb;animation:timeup-dot 1.2s ease-in-out 0.4s infinite;"></div>
+                    <div style="width:10px;height:10px;border-radius:50%;background:#2563eb;animation:timeup-dot 1.2s ease-in-out 0.8s infinite;"></div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Section time-up toast (strict mode) --}}
+        <div id="section-timeup-toast" style="display:none;position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:9990;background:#f97316;color:white;border-radius:14px;padding:14px 28px;font-size:0.88rem;font-weight:800;box-shadow:0 8px 24px rgba(249,115,22,0.4);">
+            ⏰ Waktu section habis! Pindah ke section berikutnya...
+        </div>
+
+        <style>@keyframes timeup-dot { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }</style>
+
+        @if($isStrictMode)
+        {{-- STRICT MODE: Per-section timer --}}
+        <div class="timer" x-data="{
+            timeLeft: {{ $currentSectionRemainingSeconds }},
+            get formattedTime() {
+                const m = Math.floor(this.timeLeft / 60).toString().padStart(2, '0');
+                const s = (this.timeLeft % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            },
+            get isDanger() { return this.timeLeft <= 60 && this.timeLeft > 0; },
+            startTimer() {
+                clearInterval(this._timer);
+                this._timer = setInterval(() => {
+                    if (this.timeLeft > 0) {
+                        this.timeLeft--;
+                    } else {
+                        clearInterval(this._timer);
+                        if (this.timeLeft > -1) {
+                            this.timeLeft = -1;
+                            const toast = document.getElementById('section-timeup-toast');
+                            if (toast) { toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
+                            $wire.advanceToNextSection();
+                        }
+                    }
+                }, 1000);
+            },
+            init() {
+                this.startTimer();
+                $wire.on('section-timer-reset', ({ seconds }) => {
+                    this.timeLeft = seconds;
+                    this.startTimer();
+                });
+            }
+        }" :class="isDanger ? 'danger' : ''">
+            <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div style="display:flex;flex-direction:column;line-height:1.2;">
+                <span style="font-size:0.55rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Section Timer</span>
+                <span x-text="formattedTime">--:--</span>
+            </div>
+        </div>
+        @else
+        {{-- NON-STRICT MODE: Global timer --}}
         <div class="timer" x-data="{
             timeLeft: {{ $remainingSeconds }},
             get formattedTime() {
@@ -360,9 +501,10 @@ new #[Layout('layouts.bare')] class extends Component {
                     } else {
                         clearInterval(timer);
                         if (this.timeLeft > -1) {
-                            alert('Waktu Habis!');
-                            $wire.finishExam();
                             this.timeLeft = -1;
+                            const overlay = document.getElementById('timeup-overlay');
+                            if (overlay) overlay.style.display = 'flex';
+                            $wire.finishExam();
                         }
                     }
                 }, 1000);
@@ -371,6 +513,7 @@ new #[Layout('layouts.bare')] class extends Component {
             <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span x-text="formattedTime">--:--:--</span>
         </div>
+        @endif
     </header>
 
     {{-- UNIFIED INSTRUCTION PAGE --}}
@@ -650,7 +793,6 @@ new #[Layout('layouts.bare')] class extends Component {
                     
                     @if ($currentIndex === count($groupIds) - 1)
                     <button wire:click="finishExam" wire:loading.attr="disabled"
-                            onclick="return confirm('Are you sure you want to submit? You cannot change answers after this.') || event.stopImmediatePropagation()"
                             style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:800;background:#16a34a;color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,0.3);">
                         ✓ Submit Exam
                     </button>
@@ -684,7 +826,6 @@ new #[Layout('layouts.bare')] class extends Component {
             </div>
 
             <button wire:click="finishExam" wire:loading.attr="disabled" type="button"
-                    onclick="return confirm('Are you sure you want to submit? You cannot change answers after this.') || event.stopImmediatePropagation()"
                     style="width:100%;padding:12px;border-radius:14px;font-size:0.85rem;font-weight:800;background:#16a34a;color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,0.3);transition:all .2s;"
                     onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
                 ✓ Finish Exam
