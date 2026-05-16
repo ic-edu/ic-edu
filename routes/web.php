@@ -16,6 +16,8 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::view('/courses', 'courses')->name('courses');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
     Route::get('/dashboard', function () {
