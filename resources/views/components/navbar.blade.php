@@ -111,7 +111,7 @@
         </a>
         <div class="hidden md:flex items-center gap-7">
             <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
-            <a href="#courses"      class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Courses</a>
+            <a href="{{ route('courses') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Courses</a>
             <div class="relative" id="tests-menu">
                 <button id="tests-btn" type="button"
                     class="nav-link nav-pill inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors select-none">
