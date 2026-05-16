@@ -268,46 +268,46 @@
     /* ===== TOP ===== */
 
     .p-kiri-atas {
-        width: 473px;
+        width: 523px;
         top: 0;
-        left: 0;
+        left: -15px;
         z-index: 5;
     }
 
     .p-tengah-atas {
-        width: 300px;
+        width: 331px;
         top: 0;
-        left: 425px;
+        left: 455px;
         z-index: 2;
     }
 
     .p-kanan-atas {
-        width: 448px;
+        width: 492px;
         top: 0;
-        left: 665px;
+        left: 723px;
         z-index: 4;
     }
 
     /* ===== BOTTOM ===== */
 
     .p-kiri-bawah {
-        width: 430px;
-        top: 220px;
-        left: 0;
+        width: 480px;
+        top: 244px;
+        left: -15px;
         z-index: 3;
     }
 
     .p-tengah-bawah {
-        width: 455px;
-        top: 220px;
-        left: 370px;
+        width: 505px;
+        top: 244px;
+        left: 400px;
         z-index: 1;
     }
 
     .p-kanan-bawah {
-        width: 345px;
-        top: 155px;
-        left: 768px;
+        width: 383px;
+        top: 172px;
+        left: 833px;
         z-index: 6;
     }
 
