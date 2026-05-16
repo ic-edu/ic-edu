@@ -39,6 +39,7 @@
                 ['bg' => 'linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%)', 'tx' => '#9d174d', 'accent' => '#db2777', 'emoji' => '📝'],
             ];
             $color = $bgColors[$loop->index % count($bgColors)];
+            $isStrict = $exam->mode === 'strict';
         @endphp
         
         <div class="card anim-in d{{ ($loop->index % 5) + 1 }}" style="display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;"
@@ -55,7 +56,7 @@
                 
                 {{-- Duration Badge --}}
                 <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; color: #334155; backdrop-filter: blur(4px);">
-                    ⏱️ {{ $exam->duration }} Mins
+                    ⏱️ {{ $exam->total_duration }} Mins
                 </div>
 
                 {{-- Emoji Icon --}}
@@ -64,6 +65,13 @@
                      onmouseout="this.style.transform='scale(1) rotate(0)';">
                     {{ $color['emoji'] }}
                 </div>
+
+                {{-- Strict Mode Badge --}}
+                @if($isStrict)
+                <div style="position: absolute; bottom: 12px; left: 12px; display: flex; align-items: center; gap: 5px; background: rgba(30,30,30,0.75); color: #fde68a; padding: 4px 10px; border-radius: 8px; font-size: 0.62rem; font-weight: 800; backdrop-filter: blur(4px); letter-spacing: 0.04em;">
+                    🔒 STRICT MODE
+                </div>
+                @endif
 
                 <div style="position: absolute; bottom: -30px; right: -30px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.2; background: {{ $color['accent'] }}; filter: blur(20px);"></div>
             </div>
@@ -83,6 +91,12 @@
                         <p style="font-size: 0.65rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Status</p>
                         <span style="display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; background: #ecfdf5; color: #16a34a;">
                             ● Active
+                        </span>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.65rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Mode</p>
+                        <span style="display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; {{ $isStrict ? 'background:#fef3c7;color:#b45309;' : 'background:#f1f5f9;color:#64748b;' }}">
+                            {{ $isStrict ? '🔒 Strict' : '🔓 Practice' }}
                         </span>
                     </div>
                 </div>
