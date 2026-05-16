@@ -309,7 +309,7 @@ new #[Layout('layouts.bare')] class extends Component {
 
             if ($jenisSoal === 'multiple_choice') {
                 $selectedOption = $question->options->where('id', $ans->selected_option_id)->first();
-                $points = ($selectedOption && $selectedOption->is_correct) ? ($question->points ?? 10) : 0;
+                $points = ($selectedOption && $selectedOption->is_correct) ? ($question->points ?? 1) : 0;
                 $ans->update(['score' => $points]);
             }
         }
@@ -326,7 +326,7 @@ new #[Layout('layouts.bare')] class extends Component {
         foreach ($allAnswers as $ans) {
             $sectionName = $ans->question->questionGroup->subsection->section->title ?? 'Unknown';
             $sectionRaws[$sectionName]   = ($sectionRaws[$sectionName]   ?? 0) + ($ans->score ?? 0);
-            $sectionTotals[$sectionName] = ($sectionTotals[$sectionName] ?? 0) + ($ans->question->points ?? 0);
+            $sectionTotals[$sectionName] = ($sectionTotals[$sectionName] ?? 0) + ($ans->question->points ?? 1);
         }
 
         // 3. Hitung skor menggunakan scoring engine ExamType
@@ -395,6 +395,25 @@ new #[Layout('layouts.bare')] class extends Component {
 
         /* Media box */
         .media-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 14px; padding: 16px; margin-bottom: 20px; }
+
+        /* Passage rich-text formatting */
+        .passage-content { font-size: 0.87rem; color: #1e293b; line-height: 1.9; }
+        .passage-content p { margin-bottom: 1em; }
+        .passage-content p:last-child { margin-bottom: 0; }
+        .passage-content strong, .passage-content b { font-weight: 700; color: #0f172a; }
+        .passage-content em, .passage-content i { font-style: italic; }
+        .passage-content u { text-decoration: underline; }
+        .passage-content ul { list-style: disc; padding-left: 1.4em; margin-bottom: 1em; }
+        .passage-content ol { list-style: decimal; padding-left: 1.4em; margin-bottom: 1em; }
+        .passage-content li { margin-bottom: 0.3em; }
+
+        /* Image lightbox */
+        .zoomable-img { cursor: zoom-in; transition: opacity .15s; }
+        .zoomable-img:hover { opacity: 0.9; }
+        .lightbox-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+        .lightbox-overlay img { max-width: 92vw; max-height: 88vh; border-radius: 12px; object-fit: contain; box-shadow: 0 32px 64px rgba(0,0,0,0.5); }
+        .lightbox-close { position: absolute; top: 20px; right: 24px; color: white; font-size: 2rem; line-height: 1; cursor: pointer; opacity: 0.7; }
+        .lightbox-close:hover { opacity: 1; }
 
         /* Mobile */
         @media (max-width: 768px) {
@@ -593,171 +612,211 @@ new #[Layout('layouts.bare')] class extends Component {
             </div>
 
             @if ($this->currentGroup)
-                {{-- Section & Subsection breadcrumb --}}
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-bottom: 20px;">
+                @php $groupType = $this->currentGroup->group_type ?? 'default'; @endphp
+
+                {{-- Breadcrumb --}}
+                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:20px;">
                     <span>{{ $this->currentGroup->subsection->section->title }}</span>
                     <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    <span style="color: var(--blue);">{{ $this->currentGroup->subsection->title }}</span>
+                    <span style="color:var(--blue);">{{ $this->currentGroup->subsection->title }}</span>
+                    @if($groupType === 'split')
+                    <span style="margin-left:8px;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:6px;font-size:0.65rem;">📖 Reading Mode</span>
+                    @endif
                 </div>
 
-                {{-- QuestionGroup Media --}}
-                @if ($this->currentGroup->audio_path || $this->currentGroup->image_path)
+                {{-- ══════════════════════════════════════════════════════
+                     SPLIT LAYOUT: passage left | questions right
+                     ══════════════════════════════════════════════════════ --}}
+                @if($groupType === 'split')
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 160px);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+
+                    {{-- LEFT PANEL: passage / image --}}
+                    <div style="border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 160px);position:sticky;top:0;">
+                        <div style="padding:24px;">
+                            @if($this->currentGroup->title)
+                            <p style="font-size:0.65rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">{{ $this->currentGroup->title }}</p>
+                            @endif
+                            @if($this->currentGroup->instruction)
+                            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--base);border-radius:10px;border-left:3px solid var(--blue);">
+                                {!! $this->currentGroup->instruction !!}
+                            </div>
+                            @endif
+                            @if($this->currentGroup->image_path)
+                            <div x-data="{ open: false }">
+                                <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" alt="Passage Image"
+                                     class="zoomable-img" style="width:100%;border-radius:10px;margin-bottom:16px;"
+                                     @click="open = true">
+                                <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
+                                    <span class="lightbox-close" @click.stop="open = false">×</span>
+                                    <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" @click.stop>
+                                </div>
+                            </div>
+                            @endif
+                            @if($this->currentGroup->audio_path)
+                            <div style="margin-bottom:16px;">
+                                @if($attempt->exam->mode === 'strict')
+                                <div x-data="{played:false,playing:false,audioObj:null,togglePlay(){if(this.played)return;if(!this.audioObj){this.audioObj=new Audio('{{ asset('storage/'.str_replace('public/','',$this->currentGroup->audio_path)) }}');this.audioObj.onended=()=>{this.playing=false;this.played=true};}if(!this.playing){this.audioObj.play();this.playing=true;}}}">
+                                    <button type="button" @click="togglePlay" :disabled="played||playing" :style="(played||playing)?'opacity:0.6;cursor:not-allowed;background:#94a3b8;':'background:var(--blue);'" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;color:white;font-weight:700;border:none;cursor:pointer;font-size:0.8rem;">
+                                        <svg x-show="!playing&&!played" style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                                        <svg x-show="playing" style="width:16px;height:16px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728"/></svg>
+                                        <svg x-show="played" style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        <span x-text="played?'Done':(playing?'Playing...':'▶ Play Audio (1x only)')"></span>
+                                    </button>
+                                </div>
+                                @else
+                                <audio controls preload="metadata" controlsList="nodownload" style="width:100%;"><source src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->audio_path)) }}"></audio>
+                                @endif
+                            </div>
+                            @endif
+                            @if($this->currentGroup->passage_text)
+                            <div class="passage-content">
+                                {!! $this->currentGroup->passage_text !!}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- RIGHT PANEL: questions --}}
+                    <div style="overflow-y:auto;max-height:calc(100vh - 160px);background:var(--base);">
+                        <div style="padding:24px;display:flex;flex-direction:column;gap:28px;padding-bottom:100px;">
+                            @foreach($this->currentGroup->questions as $question)
+                            <div wire:key="q-wrap-{{ $question->id }}" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;">
+                                <div style="display:flex;gap:10px;margin-bottom:14px;">
+                                    <div class="q-number">@php echo collect($flatQuestions)->firstWhere('id',$question->id)['number'] ?? '?'; @endphp</div>
+                                    <div style="font-size:0.9rem;color:var(--text);line-height:1.7;padding-top:3px;">{!! $question->question_text !!}</div>
+                                </div>
+                                <div style="margin-left:44px;">
+                                    @if($question->type === 'multiple_choice')
+                                    <div style="display:flex;flex-direction:column;gap:10px;">
+                                        @foreach($question->options as $option)
+                                        <label wire:key="option-{{ $option->id }}" class="option-label {{ isset($answers[$question->id]) && $answers[$question->id] == $option->id ? 'selected' : '' }}">
+                                            <input type="radio" name="question_{{ $question->id }}" wire:model.live="answers.{{ $question->id }}" value="{{ $option->id }}">
+                                            <div style="font-size:0.85rem;color:#374151;line-height:1.6;">{!! $option->option_text !!}</div>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    @elseif($question->type === 'short_answer')
+                                    <input type="text" wire:model.live.debounce.1000ms="answers.{{ $question->id }}" placeholder="Type your answer here..." autocomplete="off"
+                                           style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-size:0.85rem;font-family:inherit;outline:none;transition:border-color .2s;background:var(--surface);"
+                                           onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+                                    @elseif($question->type === 'essay')
+                                    <textarea wire:model.live.debounce.1000ms="answers.{{ $question->id }}" rows="4" placeholder="Type your answer here..."
+                                              style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-size:0.85rem;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s;background:var(--surface);"
+                                              onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ══════════════════════════════════════════════════════
+                     DEFAULT LAYOUT: everything stacked vertically
+                     ══════════════════════════════════════════════════════ --}}
+                @else
+                {{-- Group Media --}}
+                @if($this->currentGroup->audio_path || $this->currentGroup->image_path)
                 <div class="media-box">
-                    @if ($this->currentGroup->audio_path)
-                        @if($this->attempt->exam->mode === 'strict')
-                        <div x-data="{
-                            played: false, playing: false, audioObj: null,
-                            togglePlay() {
-                                if(this.played) return;
-                                if(!this.audioObj) {
-                                    this.audioObj = new Audio('{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->audio_path)) }}');
-                                    this.audioObj.onended = () => { this.playing = false; this.played = true; };
-                                }
-                                if(!this.playing) {
-                                    this.audioObj.play();
-                                    this.playing = true;
-                                }
-                            }
-                        }" style="margin-bottom:16px;">
-                            <button type="button" @click="togglePlay" :disabled="played || playing"
-                                    :style="(played || playing) ? 'opacity:0.6;cursor:not-allowed;background:#94a3b8;' : 'background:var(--blue);'"
-                                    style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-                                <svg x-show="!playing && !played" style="width:20px;height:20px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                    @if($this->currentGroup->audio_path)
+                        @if($attempt->exam->mode === 'strict')
+                        <div x-data="{played:false,playing:false,audioObj:null,togglePlay(){if(this.played)return;if(!this.audioObj){this.audioObj=new Audio('{{ asset('storage/'.str_replace('public/','',$this->currentGroup->audio_path)) }}');this.audioObj.onended=()=>{this.playing=false;this.played=true};}if(!this.playing){this.audioObj.play();this.playing=true;}}}" style="margin-bottom:16px;">
+                            <button type="button" @click="togglePlay" :disabled="played||playing" :style="(played||playing)?'opacity:0.6;cursor:not-allowed;background:#94a3b8;':'background:var(--blue);'" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                <svg x-show="!playing&&!played" style="width:20px;height:20px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
                                 <svg x-show="playing" style="width:20px;height:20px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
                                 <svg x-show="played" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span x-text="played ? 'Audio Selesai Diputar' : (playing ? 'Playing Audio...' : '▶ Putar Audio (Hanya 1x)')"></span>
+                                <span x-text="played?'Audio Selesai Diputar':(playing?'Playing Audio...':'▶ Putar Audio (Hanya 1x)')"></span>
                             </button>
                         </div>
                         @else
-                        <audio controls preload="metadata" controlsList="nodownload" style="width: 100%;">
-                            <source src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->audio_path)) }}">
-                        </audio>
+                        <audio controls preload="metadata" controlsList="nodownload" style="width:100%;"><source src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->audio_path)) }}"></audio>
                         @endif
                     @endif
-                    @if ($this->currentGroup->image_path)
-                    <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" alt="Group Media" style="margin-top:12px;max-height:320px;width:auto;border-radius:10px;display:block;margin-left:auto;margin-right:auto;">
+                    @if($this->currentGroup->image_path)
+                    <div x-data="{ open: false }">
+                        <img src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->image_path)) }}" alt="Group Media"
+                             class="zoomable-img" style="margin-top:12px;max-height:320px;width:auto;border-radius:10px;display:block;margin-left:auto;margin-right:auto;"
+                             @click="open = true">
+                        <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
+                            <span class="lightbox-close" @click.stop="open = false">×</span>
+                            <img src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->image_path)) }}" @click.stop>
+                        </div>
+                    </div>
                     @endif
                 </div>
                 @endif
 
                 {{-- Passage Text --}}
-                @if ($this->currentGroup->passage_text)
-                <div style="font-size:0.85rem;color:#1e293b;line-height:1.8;background:#fefce8;padding:20px;border-radius:14px;border:1px solid #fde68a;margin-bottom:24px;">
-                    {!! $this->currentGroup->passage_text !!}
+                @if($this->currentGroup->passage_text)
+                <div style="background:#fefce8;padding:20px;border-radius:14px;border:1px solid #fde68a;margin-bottom:24px;">
+                    <div class="passage-content">{!! $this->currentGroup->passage_text !!}</div>
                 </div>
                 @endif
 
                 {{-- QUESTIONS --}}
-                <div style="display: flex; flex-direction: column; gap: 32px; padding-bottom: 80px;">
-                    @foreach ($this->currentGroup->questions as $index => $question)
+                <div style="display:flex;flex-direction:column;gap:32px;padding-bottom:80px;">
+                    @foreach($this->currentGroup->questions as $index => $question)
                     <div wire:key="q-wrap-{{ $question->id }}">
-                        {{-- Question text --}}
-                        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
+                        <div style="display:flex;gap:12px;margin-bottom:14px;">
                             <div class="q-number">
                                 @php $qNumber = collect($flatQuestions)->firstWhere('id', $question->id)['number'] ?? '?'; @endphp
                                 {{ $qNumber }}
                             </div>
-                            <div style="font-size: 0.92rem; color: var(--text); line-height: 1.7; padding-top: 4px;">
+                            <div style="font-size:0.92rem;color:var(--text);line-height:1.7;padding-top:4px;">
                                 {!! $question->question_text !!}
                             </div>
                         </div>
-
-                        {{-- Question-level media --}}
-                        @if ($question->image_path)
-                        <div style="margin-left:44px;margin-bottom:14px;">
-                            <img src="{{ asset('storage/' . str_replace('public/', '', $question->image_path)) }}" style="max-height:240px;border-radius:12px;border:1px solid var(--border);">
+                        @if($question->image_path)
+                        <div style="margin-left:44px;margin-bottom:14px;" x-data="{ open: false }">
+                            <img src="{{ asset('storage/'.str_replace('public/','',$question->image_path)) }}"
+                                 class="zoomable-img" style="max-height:240px;border-radius:12px;border:1px solid var(--border);"
+                                 @click="open = true">
+                            <p style="font-size:0.65rem;color:var(--muted);margin-top:4px;">🔍 Click image to zoom</p>
+                            <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
+                                <span class="lightbox-close" @click.stop="open = false">×</span>
+                                <img src="{{ asset('storage/'.str_replace('public/','',$question->image_path)) }}" @click.stop>
+                            </div>
                         </div>
                         @endif
-                        @if ($question->audio_path)
+                        @if($question->audio_path)
                         <div style="margin-left:44px;margin-bottom:14px;max-width:360px;">
-                            @if($this->attempt->exam->mode === 'strict')
-                            <div x-data="{
-                                played: false, playing: false, audioObj: null,
-                                togglePlay() {
-                                    if(this.played) return;
-                                    if(!this.audioObj) {
-                                        this.audioObj = new Audio('{{ asset('storage/' . str_replace('public/', '', $question->audio_path)) }}');
-                                        this.audioObj.onended = () => { this.playing = false; this.played = true; };
-                                    }
-                                    if(!this.playing) {
-                                        this.audioObj.play();
-                                        this.playing = true;
-                                    }
-                                }
-                            }">
-                                <button type="button" @click="togglePlay" :disabled="played || playing"
-                                        :style="(played || playing) ? 'opacity:0.6;cursor:not-allowed;background:#94a3b8;' : 'background:var(--blue);'"
-                                        style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-size:0.8rem;">
-                                    <svg x-show="!playing && !played" style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+                            @if($attempt->exam->mode === 'strict')
+                            <div x-data="{played:false,playing:false,audioObj:null,togglePlay(){if(this.played)return;if(!this.audioObj){this.audioObj=new Audio('{{ asset('storage/'.str_replace('public/','',$question->audio_path)) }}');this.audioObj.onended=()=>{this.playing=false;this.played=true};}if(!this.playing){this.audioObj.play();this.playing=true;}}}">
+                                <button type="button" @click="togglePlay" :disabled="played||playing" :style="(played||playing)?'opacity:0.6;cursor:not-allowed;background:#94a3b8;':'background:var(--blue);'" style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;color:white;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-size:0.8rem;">
+                                    <svg x-show="!playing&&!played" style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
                                     <svg x-show="playing" style="width:16px;height:16px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
                                     <svg x-show="played" style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span x-text="played ? 'Audio Selesai Diputar' : (playing ? 'Playing Audio...' : '▶ Putar Audio (Hanya 1x)')"></span>
+                                    <span x-text="played?'Audio Selesai Diputar':(playing?'Playing Audio...':'▶ Putar Audio (Hanya 1x)')"></span>
                                 </button>
                             </div>
                             @else
-                            <audio controls style="width:100%;height:40px;"><source src="{{ asset('storage/' . str_replace('public/', '', $question->audio_path)) }}"></audio>
+                            <audio controls style="width:100%;height:40px;"><source src="{{ asset('storage/'.str_replace('public/','',$question->audio_path)) }}"></audio>
                             @endif
                         </div>
                         @endif
-
-                        {{-- Answer Input --}}
-                        <div style="margin-left: 44px;">
-                            @if ($question->type === 'multiple_choice')
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                @foreach ($question->options as $option)
+                        <div style="margin-left:44px;">
+                            @if($question->type === 'multiple_choice')
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                @foreach($question->options as $option)
                                 <label wire:key="option-{{ $option->id }}" class="option-label {{ isset($answers[$question->id]) && $answers[$question->id] == $option->id ? 'selected' : '' }}">
                                     <input type="radio" name="question_{{ $question->id }}" wire:model.live="answers.{{ $question->id }}" value="{{ $option->id }}">
                                     <div style="font-size:0.85rem;color:#374151;line-height:1.6;">{!! $option->option_text !!}</div>
                                 </label>
                                 @endforeach
                             </div>
-
                             @elseif($question->type === 'short_answer')
-                            <input type="text" wire:key="short-answer-{{ $question->id }}" wire:model.live.debounce.1000ms="answers.{{ $question->id }}" placeholder="Type your answer here..." autocomplete="off"
+                            <input type="text" wire:model.live.debounce.1000ms="answers.{{ $question->id }}" placeholder="Type your answer here..." autocomplete="off"
                                    style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:14px;font-size:0.85rem;font-family:inherit;outline:none;transition:border-color .2s;background:var(--surface);"
                                    onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
-
                             @elseif($question->type === 'essay')
                             <textarea wire:model.live.debounce.1000ms="answers.{{ $question->id }}" rows="5" placeholder="Type your essay here..."
                                       style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:14px;font-size:0.85rem;font-family:inherit;outline:none;resize:vertical;transition:border-color .2s;background:var(--surface);"
                                       onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-
                             @elseif($question->type === 'record' || $question->type === 'audio_record')
                             <div style="border:2px dashed var(--border);border-radius:14px;padding:20px;background:#fafbfc;">
-                                @php
-                                    $existingAudio = '';
-                                    if (isset($answers[$question->id]) && is_string($answers[$question->id])) {
-                                        $existingAudio = asset('storage/' . str_replace('public/', '', $answers[$question->id]));
-                                    }
-                                @endphp
-
-                                <div x-data="{
-                                    recording: false, mediaRecorder: null, audioChunks: [], audioUrl: '{{ $existingAudio }}', uploading: false,
-                                    startRecording() {
-                                        navigator.mediaDevices.getUserMedia({ audio: true })
-                                            .then(stream => {
-                                                this.mediaRecorder = new MediaRecorder(stream);
-                                                this.audioChunks = [];
-                                                this.mediaRecorder.ondataavailable = e => this.audioChunks.push(e.data);
-                                                this.mediaRecorder.onstop = () => {
-                                                    let blob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                                                    this.audioUrl = URL.createObjectURL(blob);
-                                                    this.uploadAudio(blob);
-                                                    stream.getTracks().forEach(track => track.stop());
-                                                };
-                                                this.mediaRecorder.start();
-                                                this.recording = true;
-                                            })
-                                            .catch(e => alert('Microphone access is required.'));
-                                    },
-                                    stopRecording() { if (this.mediaRecorder) { this.mediaRecorder.stop(); this.recording = false; } },
-                                    uploadAudio(blob) {
-                                        this.uploading = true;
-                                        let file = new File([blob], 'recording_{{ $question->id }}.webm', { type: 'audio/webm' });
-                                        $wire.upload('answers.{{ $question->id }}', file, () => { this.uploading = false; }, () => { this.uploading = false; alert('Upload failed.'); });
-                                    }
-                                }">
-                                    <div x-show="audioUrl" style="margin-bottom:14px;background:white;padding:12px;border-radius:10px;border:1px solid var(--border); {{ $existingAudio ? '' : 'display:none;' }}">
+                                @php $existingAudio = isset($answers[$question->id]) && is_string($answers[$question->id]) ? asset('storage/'.str_replace('public/','',$answers[$question->id])) : ''; @endphp
+                                <div x-data="{recording:false,mediaRecorder:null,audioChunks:[],audioUrl:'{{ $existingAudio }}',uploading:false,startRecording(){navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{this.mediaRecorder=new MediaRecorder(stream);this.audioChunks=[];this.mediaRecorder.ondataavailable=e=>this.audioChunks.push(e.data);this.mediaRecorder.onstop=()=>{let blob=new Blob(this.audioChunks,{type:'audio/webm'});this.audioUrl=URL.createObjectURL(blob);this.uploadAudio(blob);stream.getTracks().forEach(t=>t.stop());};this.mediaRecorder.start();this.recording=true;}).catch(e=>alert('Microphone access is required.'));},stopRecording(){if(this.mediaRecorder){this.mediaRecorder.stop();this.recording=false;}},uploadAudio(blob){this.uploading=true;let file=new File([blob],'recording_{{ $question->id }}.webm',{type:'audio/webm'});$wire.upload('answers.{{ $question->id }}',file,()=>{this.uploading=false;},()=>{this.uploading=false;alert('Upload failed.');});}}">
+                                    <div x-show="audioUrl" style="margin-bottom:14px;background:white;padding:12px;border-radius:10px;border:1px solid var(--border);{{ $existingAudio ? '' : 'display:none;' }}">
                                         <audio :src="audioUrl" controls style="width:100%;height:40px;" controlsList="nodownload"></audio>
                                     </div>
                                     <div style="display:flex;align-items:center;gap:12px;">
@@ -777,6 +836,7 @@ new #[Layout('layouts.bare')] class extends Component {
                     </div>
                     @endforeach
                 </div>
+                @endif {{-- end default layout --}}
 
                 {{-- Bottom Nav --}}
                 <div style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:40;">

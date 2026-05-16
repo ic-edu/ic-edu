@@ -147,7 +147,7 @@ new class extends Component
                 @php
                     $q = $ans->question;
                     $type = strtolower(trim(str_replace(' ', '_', $q->type)));
-                    $maxPoints = $q->points ?? 10;
+                    $maxPoints = $q->points ?? 1;
                 @endphp
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
