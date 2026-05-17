@@ -23,8 +23,7 @@
 @endpush
 
 @section('content')
-<section class="w-full relative pt-40 pb-28 flex items-center overflow-hidden select-none"
-    style="background-image: url('{{ asset('assets/background.png') }}'); background-size: cover; background-position: center;">
+<section class="w-full relative pt-40 pb-32 flex items-center overflow-hidden select-none bg-gradient-to-br from-slate-50 via-slate-100 via-40% to-[#1A456C]">
     <div class="max-w-[1300px] mx-auto px-[5%] w-full relative min-h-[500px] md:min-h-[440px] flex flex-col justify-center">
         <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-4 items-center w-full">
             <div class="text-center lg:text-left pr-0 lg:pr-6" data-aos="fade-right" data-aos-duration="1000">
@@ -56,36 +55,20 @@
             </div>
         </div>
     </div>
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+        <svg class="relative block w-[calc(100%+1.3px)] h-[50px] md:h-[80px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.06,155.43,109.84,233.15,92.83c83.15-18.17,159.95-46.06,242.21-59.5Z" fill="#f8fafc"></path>
+        </svg>
+    </div>
 </section>
 
 
-<div class="bg-[#f8fafc] min-h-screen pt-32 pb-16">
+<div class="bg-[#f8fafc] min-h-screen pt-25 pb-16">
     <div class="max-w-[1400px] mx-auto px-[4%] w-full">
-
-        <div class="mb-10 w-full">
-            <div class="relative w-full max-w-[1200px] mx-auto mb-6">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </span>
-                <input type="text"
-                    placeholder="Search for courses, instructors, or skills..."
-                    class="w-full pl-12 pr-4 py-3.5 bg-[#e2e8f0] text-slate-700 placeholder-slate-500 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base transition-all">
-            </div>
-
-            <div class="flex flex-wrap items-center justify-start gap-3 max-w-[1200px] mx-auto">
-                <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#f1f5f9] text-slate-600 hover:bg-slate-200 transition-all">IELTS</button>
-                <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#f1f5f9] text-slate-600 hover:bg-slate-200 transition-all">TOEFL</button>
-                <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#f1f5f9] text-slate-600 hover:bg-slate-200 transition-all">Grammar</button>
-                <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#f1f5f9] text-slate-600 hover:bg-slate-200 transition-all">Speaking</button>
-                <button class="px-6 py-2 rounded-full text-sm font-bold bg-[#1a456c] text-white shadow-sm transition-all">All Courses</button>
-            </div>
-        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 items-start w-full">
 
-            <aside class="bg-[#f1f5f9] p-6 rounded-2xl border border-slate-100 shadow-sm sticky top-28">
+            <aside class="bg-[#f1f5f9] p-6 rounded-2xl border border-slate-100 shadow-sm sticky top-28 z-30">
                 <h2 class="text-xl font-extrabold text-[#1a456c] mb-1">Filters</h2>
                 <p class="text-xs font-semibold text-slate-400 mb-6 uppercase tracking-wider">Refine your search</p>
 
@@ -112,80 +95,102 @@
                 </div>
             </aside>
 
-            <main id="courseContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
-
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
-                    data-price="49.99" data-duration="12">
-                    <div class="relative overflow-hidden aspect-video bg-slate-100">
-                        <span class="absolute top-3 left-3 bg-lime-500 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Best Seller</span>
-                        <img src="{{ asset('assets/instructor-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+            <div class="w-full flex flex-col">
+                
+                <div class="sticky top-28 z-40 bg-[#f8fafc] pb-6 mb-2 w-full pt-2">
+                    <div class="relative w-full mb-6">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </span>
+                        <input type="text"
+                            placeholder="Search for courses, instructors, or skills..."
+                            class="w-full pl-12 pr-4 py-3.5 bg-[#e2e8f0] text-slate-700 placeholder-slate-500 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base transition-all">
                     </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
-                            <span>★ 4.8</span> <span class="text-slate-400 font-normal">(315 students)</span>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Advanced English Grammar</h3>
-                        <p class="text-xs font-semibold text-slate-400 mb-6">John Smith</p>
 
-                        <div class="mt-auto mb-6 flex flex-wrap gap-2">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 12 hours</span>
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Advanced</span>
-                        </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xl font-black text-slate-800">$49.99</span>
-                        </div>
+                    <div class="flex flex-wrap items-center justify-start gap-3 w-full">
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">IELTS</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">TOEFL</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">Grammar</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">Speaking</button>
+                        <button class="px-6 py-2 rounded-full text-sm font-bold bg-[#1a456c] text-white shadow-sm transition-all">All Courses</button>
                     </div>
                 </div>
 
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
-                    data-price="0" data-duration="5">
-                    <div class="relative overflow-hidden aspect-video bg-slate-100">
-                        <span class="absolute top-3 left-3 bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Popular</span>
-                        <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
-                            <span>★ 4.5</span> <span class="text-slate-400 font-normal">(120 students)</span>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Speaking Basics</h3>
-                        <p class="text-xs font-semibold text-slate-400 mb-6">Sarah Jane</p>
+                <main id="courseContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
 
-                        <div class="mt-auto mb-6 flex flex-wrap gap-2">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 5 hours</span>
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Beginner</span>
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="49.99" data-duration="12">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <span class="absolute top-3 left-3 bg-lime-500 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Best Seller</span>
+                            <img src="{{ asset('assets/instructor-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
                         </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xl font-black text-indigo-700">Free</span>
-                        </div>
-                    </div>
-                </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.8</span> <span class="text-slate-400 font-normal">(315 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Advanced English Grammar</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">John Smith</p>
 
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
-                    data-price="29.99" data-duration="24">
-                    <div class="relative overflow-hidden aspect-video bg-slate-100">
-                        <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
-                            <span>★ 4.9</span> <span class="text-slate-400 font-normal">(500 students)</span>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Complete TOEFL Prep</h3>
-                        <p class="text-xs font-semibold text-slate-400 mb-6">Mike Ross</p>
-
-                        <div class="mt-auto mb-6 flex flex-wrap gap-2">
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 24 hours</span>
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 All Levels</span>
-                        </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xl font-black text-slate-800">$29.99</span>
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 12 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Advanced</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-slate-800">$49.99</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            </main>
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="0" data-duration="5">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <span class="absolute top-3 left-3 bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Popular</span>
+                            <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.5</span> <span class="text-slate-400 font-normal">(120 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Speaking Basics</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">Sarah Jane</p>
 
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 5 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Beginner</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-indigo-700">Free</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="29.99" data-duration="24">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.9</span> <span class="text-slate-400 font-normal">(500 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Complete TOEFL Prep</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">Mike Ross</p>
+
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 24 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 All Levels</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-slate-800">$29.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+            </div>
         </div>
-
     </div>
 </div>
 

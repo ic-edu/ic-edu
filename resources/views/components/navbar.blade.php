@@ -107,11 +107,11 @@
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-transparent">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
         <a href="{{ url('/') }}" class="flex-shrink-0">
-            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-9">
+            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-15">
         </a>
         <div class="hidden md:flex items-center gap-7">
-            <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
-            <a href="{{ route('courses') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Courses</a>
+            <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold hover:text-blue-600 transition-colors {{ request()->is('/') ? 'active text-blue-600' : 'text-slate-700' }}">Home</a>
+            <a href="{{ route('courses') }}" class="nav-link nav-pill text-sm font-semibold hover:text-blue-600 transition-colors {{ request()->routeIs('courses*') ? 'active text-blue-600' : 'text-slate-700' }}">Courses</a>
             <div class="relative" id="tests-menu">
                 <button id="tests-btn" type="button"
                     class="nav-link nav-pill inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors select-none">
@@ -166,7 +166,7 @@
                     </div>
                 </div>
             </div>
-            <a href="#pricing" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Pricing</a>
+            <a href="{{ route('pricing') }}" class="nav-link nav-pill text-sm font-semibold hover:text-blue-600 transition-colors {{ request()->routeIs('pricing*') ? 'active text-blue-600' : 'text-slate-700' }}">Pricing</a>
         </div>
         <div class="flex items-center gap-3">
             <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Switch theme">
