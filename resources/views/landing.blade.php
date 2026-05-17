@@ -120,7 +120,7 @@
     .puzzle-board {
         position: relative;
         width: 1200px;
-        height: 720px;
+        height: 420px;
         margin: 0 auto;
         overflow: visible;
     }
@@ -208,18 +208,20 @@
         .puzzle-board {
             transform: scale(.9);
             transform-origin: top center;
-            height: 650px;
+            height: 460px;
+            margin-bottom: 20px;
         }
     }
 
     @media (max-width: 1024px) {
         .puzzle-board {
             width: 100%;
-            height: auto;
+            height: auto !important;
             display: flex;
             flex-direction: column;
             gap: 24px;
-            transform: none;
+            transform: none !important;
+            padding: 0 20px;
         }
 
         .piece {
@@ -292,12 +294,9 @@
 
 @section('content')
 
-{{-- ════════════════════════════════════════════════════════════════════════
-     SECTION 1 — HERO (TAILWIND STYLE FIX)
-     ════════════════════════════════════════════════════════════════════════ --}}
-<section class="w-full bg-white pt-24 pb-16 lg:pt-36 lg:pb-24 px-[5%]">
+{{--  SECTION 1 -  Hero --}}
+<section class="w-full bg-white pt-24 pb-16 lg:pt-36 lg:pb-24 px-[5%] overflow-hidden">
     <div class="max-w-[1140px] mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
-        
         <div class="w-full lg:max-w-[550px] flex flex-col items-center lg:items-start text-center lg:text-left">
             <span class="inline-block bg-slate-100 text-[#2b4c7e] text-xs lg:text-sm font-semibold px-4 py-1.5 rounded-full mb-6">
                 #1 English Learning Platform
@@ -333,15 +332,73 @@
                 </p>
             </div>
         </div>
+        <div class="w-full lg:flex-1 flex justify-center lg:justify-end lg:pr-8 relative z-10" data-aos="fade-left" data-aos-duration="1000">
+            <div class="relative w-[290px] h-[290px] sm:w-[350px] sm:h-[350px] lg:w-[380px] lg:h-[380px] flex items-center justify-center">
+                <div class="w-full h-full bg-[#1A456C] rounded-full shadow-xl"></div>
+                <img src="{{ asset('assets/maskot/hero maskot.png') }}" 
+                    alt="IC EDU Mascot" 
+                    class="absolute w-[125%] sm:w-[130%] h-auto object-contain drop-shadow-[0_25px_35px_rgba(0,0,0,0.3)] z-20 -bottom-8 -right-6 lg:-right-8">
+            </div>
+        </div>
+    </div>
+</section>
 
-        <div class="w-full lg:flex-1 flex justify-center lg:justify-end">
-            <div class="w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] bg-[#bfebe8] rounded-full flex items-center justify-center p-4 transition-transform hover:scale-105 duration-300">
-                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" alt="Mascot" class="w-[85%] h-auto object-contain">
+<section class="relative bg-[#1a395b] w-[100vw] left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] pt-24 pb-24 px-[5%] rounded-t-[50px] lg:rounded-t-[80px] overflow-hidden">
+    <div class="max-w-[1140px] mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-16 relative z-10">
+        <div class="w-full lg:w-[45%] flex justify-center lg:justify-start" data-aos="fade-right" data-aos-duration="1000">
+            <div class="relative w-full max-w-[380px] aspect-[4/5] rounded-[30px] rounded-tl-[100px] overflow-hidden shadow-2xl bg-slate-800">
+                <img src="{{ asset('assets/images/building.png') }}" 
+                     alt="PT Edukasi Persada Indonesia Building" 
+                     class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+            </div>
+        </div>
+
+        <div class="w-full lg:w-[55%] text-white" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+            <div class="mb-6 flex justify-center lg:justify-start">
+                <span class="inline-block bg-white/10 backdrop-blur-md text-white text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
+                    Who we are - Who we are
+                </span>
+            </div>
+            
+            <h2 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight mb-6 tracking-tight text-center lg:text-left">
+                Your Trusted Platform for <br class="hidden sm:block">
+                English Learning and Test Preparation
+            </h2>
+            
+            <p class="text-sm lg:text-base text-slate-300 leading-relaxed mb-8 max-w-[580px] text-center lg:text-left">
+                IC Edu is an English education platform operated by <strong class="text-white">PT Edukasi Persada Indonesia</strong>, providing tailored language training programs for students, professionals, universities, and companies.
+            </p>
+            <div class="space-y-6 max-w-[500px] mx-auto lg:mx-0">
+                {{-- Point 1 --}}
+                <div class="flex items-start gap-4">
+                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold text-white leading-tight mb-1">Interactive Practice</h4>
+                        <p class="text-sm text-slate-300">Engaging modules and real test simulations</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold text-white leading-tight mb-1">International Preparation</h4>
+                        <p class="text-sm text-slate-300">Programs for IELTS, TOEFL, and TOEIC success.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold text-white leading-tight mb-1">Flexible Learning</h4>
+                        <p class="text-sm text-slate-300">Study anytime through our digital platform.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 </section>
+
 
 {{-- MARQUEE STRIP --}}
 <div class="marquee-strip overflow-hidden py-5 bg-blue-50 border-y border-blue-100">
@@ -353,117 +410,6 @@
         'Business English', 'TOEIC Prep', 'Reading Skills', 'Daily Conversation',
         ];
         @endphp
-        @foreach(array_merge($marqueeItems, $marqueeItems) as $item)
-        <div class="marquee-item flex items-center gap-2.5 text-xs font-bold text-blue-600 uppercase tracking-widest whitespace-nowrap">
-            <span class="w-[5px] h-[5px] rounded-full bg-blue-400 flex-shrink-0"></span>
-            {{ $item }}
-        </div>
-        @endforeach
-    </div>
-</div>
-
-{{-- SECTION 3 — COURSE CATEGORIES --}}
-<section class="course-section py-24 px-[5%] bg-[#f8faff]" id="courses">
-    <div class="max-w-[1160px] mx-auto">
-
-        <div class="text-center max-w-xl mx-auto mb-14">
-            <span class="inline-block bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-                Course Categories
-            </span>
-            <h2 class="text-3xl lg:text-4xl font-extrabold tracking-tight leading-[1.15] mb-3">
-                Every Skill You Need to Speak with Confidence
-            </h2>
-            <p class="text-slate-500 leading-7">
-                Structured, expert-led courses designed for real-world English — not just exams.
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            @php
-            $courseCards = [
-            [
-            'svg' => 'undraw_followers_m4z4.svg',
-            'thumbBg' => '#dbeafe',
-            'accent' => '#1d4ed8',
-            'badgeBg' => '#eff6ff',
-            'badge' => 'Foundation',
-            'meta' => '24 Lessons · All Levels',
-            'title' => 'Advanced Listening Comprehension',
-            'desc' => 'Train your ear with native speakers, podcasts, and IELTS audio.',
-            ],
-            [
-            'svg' => 'undraw_learning-to-sketch_uaxi.svg',
-            'thumbBg' => '#ede9fe',
-            'accent' => '#6d28d9',
-            'badgeBg' => '#f5f3ff',
-            'badge' => 'Most Popular',
-            'meta' => '18 Lessons · Beginner+',
-            'title' => 'Fluent & Confident Speaking',
-            'desc' => 'Break the fear barrier with structured drills and live speaking clubs.',
-            ],
-            [
-            'svg' => 'undraw_schedule_ry1w.svg',
-            'thumbBg' => '#dcfce7',
-            'accent' => '#15803d',
-            'badgeBg' => '#f0fdf4',
-            'badge' => 'Academic',
-            'meta' => '20 Lessons · Intermediate',
-            'title' => 'Academic Reading Mastery',
-            'desc' => 'Speed-read complex texts and master skimming & scanning techniques.',
-            ],
-            [
-            'svg' => 'undraw_tasting_cd81.svg',
-            'thumbBg' => '#fef9c3',
-            'accent' => '#a16207',
-            'badgeBg' => '#fefce8',
-            'badge' => 'Core Skill',
-            'meta' => '32 Lessons · All Levels',
-            'title' => 'English Grammar Deep Dive',
-            'desc' => 'From basic tenses to complex clauses — build the grammar foundation.',
-            ],
-            ];
-            @endphp
-
-            @foreach($courseCards as $card)
-            <div class="course-card bg-white border border-slate-200 rounded-[20px] overflow-hidden hover:-translate-y-1.5 hover:shadow-xl hover:shadow-blue-100 hover:border-blue-100 transition-all cursor-pointer group">
-                <div class="relative overflow-hidden flex items-end justify-center px-6 pt-6 pb-0" style="background: {{ $card['thumbBg'] }}; height: 160px;">
-                    <div class="absolute w-28 h-28 rounded-full opacity-20 -right-4 -top-4 transition-transform duration-500 group-hover:scale-125" style="background: {{ $card['accent'] }};"></div>
-                    <img src="{{ asset('assets/' . $card['svg']) }}" alt="{{ $card['title'] }}" class="relative z-10 w-full max-w-[148px] h-[130px] object-contain object-bottom transition-transform duration-500 group-hover:-translate-y-2 group-hover:scale-105 drop-shadow-md">
-                </div>
-
-                <div class="p-5">
-                    <span class="inline-block text-[0.68rem] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full mb-2" style="background: {{ $card['badgeBg'] }}; color: {{ $card['accent'] }};">
-                        {{ $card['badge'] }}
-                    </span>
-                    <h3 class="text-sm font-bold text-slate-800 mb-1.5">{{ $card['title'] }}</h3>
-                    <p class="text-xs text-slate-500 leading-[1.6] mb-4">{{ $card['desc'] }}</p>
-                    <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <span class="text-xs text-slate-400 font-medium">{{ $card['meta'] }}</span>
-                        <div class="w-[30px] h-[30px] rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="text-blue-600 group-hover:text-white transition-colors duration-300">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        <div class="text-center mt-10">
-            <a href="#" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-bold text-white bg-blue-600 shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">
-                View All Courses
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </a>
-        </div>
-    </div>
-</section>
-
-{{-- MARQUEE STRIP KEDUA --}}
-<div class="marquee-strip overflow-hidden py-5 bg-blue-50 border-y border-blue-100">
-    <div class="marquee-track flex gap-10 w-max">
         @foreach(array_merge($marqueeItems, $marqueeItems) as $item)
         <div class="marquee-item flex items-center gap-2.5 text-xs font-bold text-blue-600 uppercase tracking-widest whitespace-nowrap">
             <span class="w-[5px] h-[5px] rounded-full bg-blue-400 flex-shrink-0"></span>
@@ -534,38 +480,6 @@
         <div class="piece p-kanan-bawah flex items-center justify-center">
             <img src="{{ asset('assets/puzzle/kanan-bawah.png') }}" alt="Bottom Right Piece">
             <img src="{{ asset('images/owl.png') }}" class="absolute z-20 w-[150px] owl-two" alt="Owl">
-        </div>
-    </div>
-</section>
-
-{{-- SECTION 7 — COMMUNITY --}}
-<section class="py-24 px-[5%]">
-    <div class="max-w-[1160px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div>
-            <span class="inline-block bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-                You're Not Learning Alone
-            </span>
-            <h2 class="text-3xl lg:text-[2.2rem] font-extrabold tracking-tight leading-[1.2] mb-4">
-                Join a community of learners from across the world
-            </h2>
-            <p class="text-sm text-slate-500 leading-7 mb-6">
-                At IC.EDU, learning means more than just watching lessons — it's about growing together.
-            </p>
-            <ul class="flex flex-col gap-2.5 mb-7">
-                @foreach(['Weekly Live Speaking Clubs', 'Peer Study Groups', 'Native Speaker Exchange', '24/7 Discussion Forums'] as $item)
-                <li class="flex items-center gap-2.5 text-sm font-semibold text-slate-900">
-                    <span class="w-[22px] h-[22px] rounded-full bg-blue-50 text-blue-600 text-xs font-extrabold flex items-center justify-center flex-shrink-0">✓</span>
-                    {{ $item }}
-                </li>
-                @endforeach
-            </ul>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white bg-blue-600 shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">
-                Join Our Community
-            </a>
-        </div>
-
-        <div class="rounded-3xl overflow-hidden shadow-2xl shadow-blue-100">
-            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80" alt="Community" class="w-full block">
         </div>
     </div>
 </section>
