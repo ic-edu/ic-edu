@@ -328,17 +328,11 @@ new #[Layout('layouts.bare')] class extends Component {
 
     public function finishExam()
     {
-        $this->attempt->update([
-            'status'       => ExamAttemptStatus::FINISHED->value,
-            'submitted_at' => now(),
-        ]);
-
         $allAnswers = AttemptAnswer::with([
             'question.options',
             'question.questionGroup.subsection.section',
         ])->where('exam_attempt_id', $this->attempt->id)->get();
 
-        // 1. Auto-score pilihan ganda
         foreach ($allAnswers as $ans) {
             $question = $ans->question;
             if (!$question) continue;
@@ -352,12 +346,10 @@ new #[Layout('layouts.bare')] class extends Component {
             }
         }
 
-        // Refresh koleksi setelah auto-score disimpan
         $allAnswers = $allAnswers->fresh();
 
-        // 2. Bangun data per-section untuk scoring engine
         $rawScore      = (int) $allAnswers->sum('score');
-        $totalQuestions = $allAnswers->count();
+        $totalQuestions = count($this->flatQuestions); // Total aktual soal
         $sectionRaws   = [];
         $sectionTotals = [];
 
@@ -367,7 +359,6 @@ new #[Layout('layouts.bare')] class extends Component {
             $sectionTotals[$sectionName] = ($sectionTotals[$sectionName] ?? 0) + ($ans->question->points ?? 1);
         }
 
-        // 3. Hitung skor menggunakan scoring engine ExamType
         $examType = $this->attempt->exam->examType;
         $result   = $examType->calculateScore(
             rawScore: $rawScore,
@@ -376,15 +367,38 @@ new #[Layout('layouts.bare')] class extends Component {
             sectionTotals: $sectionTotals,
         );
 
-        // 4. Simpan hasil akhir ke attempt
+        $hasSubjective = false;
+        $examQuestionTypes = Question::whereIn('id', array_column($this->flatQuestions, 'id'))->pluck('type');
+        foreach ($examQuestionTypes as $type) {
+            $jenisSoal = strtolower(trim(str_replace(' ', '_', $type)));
+            if ($jenisSoal !== 'multiple_choice') {
+                $hasSubjective = true;
+                break;
+            }
+        }
+
+        $finalStatus = $hasSubjective ? ExamAttemptStatus::FINISHED->value : ExamAttemptStatus::GRADED->value;
+
         $this->attempt->update([
+            'status'          => $finalStatus,
+            'submitted_at'    => now(),
             'raw_score'       => $rawScore,
             'converted_score' => $result['converted_score'],
             'section_scores'  => $result['section_scores'],
             'is_passed'       => $result['is_passed'],
         ]);
 
-        session()->flash('success', 'Ujian berhasil dikumpulkan! Pilihan ganda dinilai otomatis, esai menunggu pemeriksa.');
+        if (!$hasSubjective) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($this->attempt->user->email)->send(new \App\Mail\ExamGradedMail($this->attempt));
+            } catch (\Exception $e) {
+                // Ignore email error to not break submission
+            }
+            session()->flash('success', 'Ujian selesai! Karena 100% Pilihan Ganda, ujian Anda telah dinilai otomatis secara real-time dan hasilnya sudah dikirim ke email Anda.');
+        } else {
+            session()->flash('success', 'Ujian berhasil dikumpulkan! Pilihan ganda dinilai otomatis, soal esai/audio sedang menunggu penilaian dari Examiner.');
+        }
+
         return redirect()->route('test_taker.dashboard');
     }
 };

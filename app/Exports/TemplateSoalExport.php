@@ -102,8 +102,7 @@ class TemplateSoalExport implements WithHeadings, WithEvents, WithStyles
                     $valGroupType->setErrorStyle(DataValidation::STYLE_STOP);
                     $valGroupType->setAllowBlank(true);
                     $valGroupType->setShowDropDown(true);
-                    // Masukkan 3 opsi layout emas kita:
-                    $valGroupType->setFormula1('"split_screen,single_column,standalone"');
+                    $valGroupType->setFormula1('"default,split"');
 
                     // 3. Dropdown Question_Type (Kolom J)
                     $valQType = $sheet->getCell("J{$i}")->getDataValidation();
