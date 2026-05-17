@@ -3,6 +3,7 @@
 use App\Models\ExamAttempt;
 use App\Models\AttemptAnswer;
 use App\Enums\ExamAttemptStatus;
+use App\Services\ExamNotificationService;
 use Livewire\Component;
 
 new class extends Component
@@ -108,8 +109,12 @@ new class extends Component
     {
         // Pastikan skor akhir dihitung ulang sebelum finalisasi
         $this->recalculateScore();
+
         // Ubah status jadi graded
         $this->attempt->update(['status' => ExamAttemptStatus::GRADED->value]);
+
+        // Kirim notifikasi email ke test taker
+        app(ExamNotificationService::class)->notifyTestTakerGraded($this->attempt);
 
         session()->flash('success', 'Penilaian selesai! Skor akhir berhasil disimpan.');
         return redirect()->route('examiner.exam-manage'); // Kembali ke antrean ujian
