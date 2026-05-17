@@ -15,6 +15,12 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::view('/courses', 'courses')->name('courses');
+Route::view('/pricing', 'pricing')->name('pricing');
+Route::view('/toefl', 'toefl')->name('toefl');
+Route::view('/toeic', 'toeic')->name('toeic');
+Route::view('/ielts', 'ielts')->name('ielts');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
     Route::get('/dashboard', function () {
