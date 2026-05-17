@@ -70,6 +70,19 @@ new #[Layout('layouts.bare')] class extends Component {
             $this->subsectionMap[$i] = $row->subsection_id;
         }
 
+        // Restore progress from DB using current_question_id
+        $savedIndex = 0;
+        if ($this->attempt->current_question_id) {
+            $q = DB::table('questions')->where('id', $this->attempt->current_question_id)->first();
+            if ($q) {
+                $idx = array_search($q->question_group_id, $this->groupIds);
+                if ($idx !== false) {
+                    $savedIndex = $idx;
+                }
+            }
+        }
+        $this->currentIndex = min(max(0, $savedIndex), max(0, count($this->groupIds) - 1));
+
         // --- Per-section timer setup (untuk strict mode) ---
         if ($this->isStrictMode) {
             // Ambil semua section unik, urut
@@ -89,10 +102,13 @@ new #[Layout('layouts.bare')] class extends Component {
                     : $fallbackSeconds;
             }
 
-            // Sisa waktu section pertama = total durasi section - waktu yang sudah berlalu
-            $firstSectionId = $uniqueSectionIds[0] ?? null;
-            if ($firstSectionId) {
-                $this->currentSectionRemainingSeconds = max(0, $this->sectionDurations[$firstSectionId] - $elapsedSeconds);
+            // Sisa waktu section saat ini = durasi section - (waktu refresh - waktu mulai section)
+            $sectionStartedAt = session()->get('exam_section_started_at_' . $this->attempt->id, $this->attempt->started_at);
+            $sectionElapsedSeconds = Carbon::parse($sectionStartedAt)->diffInSeconds(now());
+            
+            $currentSectionId = $this->sectionMap[$this->currentIndex] ?? ($uniqueSectionIds[0] ?? null);
+            if ($currentSectionId) {
+                $this->currentSectionRemainingSeconds = max(0, $this->sectionDurations[$currentSectionId] - $sectionElapsedSeconds);
             }
         }
 
@@ -141,9 +157,25 @@ new #[Layout('layouts.bare')] class extends Component {
 
         // Set initial section
         if (!empty($this->sectionMap)) {
-            $this->currentSectionId = $this->sectionMap[0] ?? null;
-            $this->currentSubsectionId = $this->subsectionMap[0] ?? null;
-            $this->showingInstruction = true;
+            $this->currentSectionId = $this->sectionMap[$this->currentIndex] ?? null;
+            $this->currentSubsectionId = $this->subsectionMap[$this->currentIndex] ?? null;
+            // Only show instruction if starting from the beginning of a section
+            $this->showingInstruction = true; 
+        }
+    }
+
+    private function persistCurrentIndex()
+    {
+        $currentGroupId = $this->groupIds[$this->currentIndex] ?? null;
+        if ($currentGroupId) {
+            $firstQuestion = DB::table('questions')
+                ->where('question_group_id', $currentGroupId)
+                ->orderBy('order_position')
+                ->first();
+                
+            if ($firstQuestion) {
+                $this->attempt->update(['current_question_id' => $firstQuestion->id]);
+            }
         }
     }
 
@@ -186,6 +218,9 @@ new #[Layout('layouts.bare')] class extends Component {
         $this->showingInstruction      = true;
         $this->currentSectionRemainingSeconds = $this->sectionDurations[$nextSectionId] ?? 0;
 
+        $this->persistCurrentIndex();
+        session()->put('exam_section_started_at_' . $this->attempt->id, now());
+
         $this->dispatch('section-timer-reset', seconds: $this->currentSectionRemainingSeconds);
     }
 
@@ -221,6 +256,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 $this->currentSubsectionId = $newSubsectionId;
                 $this->showingInstruction = true;
             }
+            $this->persistCurrentIndex();
         }
     }
 
@@ -237,6 +273,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 $this->currentSubsectionId = $newSubsectionId;
                 $this->showingInstruction = true;
             }
+            $this->persistCurrentIndex();
         }
     }
 
@@ -252,6 +289,7 @@ new #[Layout('layouts.bare')] class extends Component {
             $this->currentSubsectionId = $newSubsectionId;
             $this->showingInstruction = true;
         }
+        $this->persistCurrentIndex();
     }
 
     public function updated($property, $value)
@@ -362,7 +400,8 @@ new #[Layout('layouts.bare')] class extends Component {
         .exam-shell { display: flex; flex-direction: column; min-height: 100vh; }
         .exam-header { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 50; }
         .exam-body { display: flex; flex: 1; }
-        .exam-content { flex: 1; padding: 32px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .exam-content { flex: 1; padding: 32px 32px 100px 32px; max-width: 900px; margin: 0 auto; width: 100%; transition: max-width 0.3s ease; }
+        .exam-content.is-split { max-width: 1400px; }
         .exam-sidebar { width: 280px; background: var(--surface); border-left: 1px solid var(--border); padding: 24px; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; flex-shrink: 0; }
 
         /* Timer */
@@ -407,13 +446,17 @@ new #[Layout('layouts.bare')] class extends Component {
         .passage-content ol { list-style: decimal; padding-left: 1.4em; margin-bottom: 1em; }
         .passage-content li { margin-bottom: 0.3em; }
 
-        /* Image lightbox */
-        .zoomable-img { cursor: zoom-in; transition: opacity .15s; }
-        .zoomable-img:hover { opacity: 0.9; }
-        .lightbox-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-        .lightbox-overlay img { max-width: 92vw; max-height: 88vh; border-radius: 12px; object-fit: contain; box-shadow: 0 32px 64px rgba(0,0,0,0.5); }
-        .lightbox-close { position: absolute; top: 20px; right: 24px; color: white; font-size: 2rem; line-height: 1; cursor: pointer; opacity: 0.7; }
-        .lightbox-close:hover { opacity: 1; }
+        /* Image lightbox pan & zoom (inline) */
+        .zoom-container { overflow: hidden; position: relative; background: #f8fafc; display: flex; align-items: center; justify-content: center; }
+        .zoom-container img { cursor: grab; transform-origin: center; transition: transform 0.05s linear; user-select: none; }
+        .zoom-container img:active { cursor: grabbing; }
+        .zoom-container.is-fullscreen { position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.95); border-radius: 0 !important; margin: 0 !important; }
+        .zoom-container.is-fullscreen img { max-height: 90vh !important; max-width: 90vw !important; object-fit: contain; }
+        .fullscreen-btn { position: absolute; top: 16px; right: 16px; z-index: 100000; background: rgba(255,255,255,0.95); border: 1px solid #cbd5e1; padding: 8px; border-radius: 8px; cursor: pointer; color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.2s; }
+        .fullscreen-btn:hover { background: white; transform: scale(1.05); }
+        
+        body.is-fullscreen-mode .exam-header,
+        body.is-fullscreen-mode .exam-footer { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
 
         /* Mobile */
         @media (max-width: 768px) {
@@ -421,6 +464,10 @@ new #[Layout('layouts.bare')] class extends Component {
             .exam-content { padding: 20px 16px; }
             .exam-header { padding: 0 16px; }
             .instruction-card { padding: 32px 24px; }
+            
+            /* Responsive split screen */
+            .split-grid { grid-template-columns: 1fr !important; }
+            .split-left-panel { border-right: none !important; border-bottom: 2px solid var(--border); max-height: 40vh !important; position: static !important; }
         }
     </style>
 
@@ -598,8 +645,9 @@ new #[Layout('layouts.bare')] class extends Component {
 
     @else
     {{-- ACTUAL EXAM CONTENT --}}
+    @php $globalGroupType = $this->currentGroup->group_type ?? 'default'; @endphp
     <div class="exam-body">
-        <div class="exam-content">
+        <div class="exam-content {{ $globalGroupType === 'split' ? 'is-split' : '' }}">
 
             {{-- Loading Overlay --}}
             <div wire:loading.flex wire:target="nextGroup,prevGroup,goToGroup"
@@ -614,25 +662,16 @@ new #[Layout('layouts.bare')] class extends Component {
             @if ($this->currentGroup)
                 @php $groupType = $this->currentGroup->group_type ?? 'default'; @endphp
 
-                {{-- Breadcrumb --}}
-                <div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:20px;">
-                    <span>{{ $this->currentGroup->subsection->section->title }}</span>
-                    <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    <span style="color:var(--blue);">{{ $this->currentGroup->subsection->title }}</span>
-                    @if($groupType === 'split')
-                    <span style="margin-left:8px;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:6px;font-size:0.65rem;">📖 Reading Mode</span>
-                    @endif
-                </div>
 
                 {{-- ══════════════════════════════════════════════════════
                      SPLIT LAYOUT: passage left | questions right
                      ══════════════════════════════════════════════════════ --}}
                 @if($groupType === 'split')
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 160px);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+                <div class="split-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - 160px);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
 
                     {{-- LEFT PANEL: passage / image --}}
-                    <div style="border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 160px);position:sticky;top:0;">
-                        <div style="padding:24px;">
+                    <div class="split-left-panel" style="border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 160px);position:sticky;top:76px;">
+                        <div style="padding:24px;padding-bottom:100px;">
                             @if($this->currentGroup->title)
                             <p style="font-size:0.65rem;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">{{ $this->currentGroup->title }}</p>
                             @endif
@@ -642,14 +681,20 @@ new #[Layout('layouts.bare')] class extends Component {
                             </div>
                             @endif
                             @if($this->currentGroup->image_path)
-                            <div x-data="{ open: false }">
+                            <div style="margin-bottom:16px;border-radius:10px;" class="zoom-container" :class="{ 'is-fullscreen': isFullscreen }"
+                                 x-data="panzoomImage()" @wheel.prevent="handleWheel" 
+                                 @mousedown="startDrag" @mousemove="doDrag" @mouseup="endDrag" @mouseleave="endDrag"
+                                 @touchstart="startDrag" @touchmove.prevent="doDrag" @touchend="endDrag">
+                                
+                                <button type="button" class="fullscreen-btn" @click.prevent.stop="toggleFullscreen" title="Toggle Fullscreen">
+                                    <svg x-show="!isFullscreen" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                                    <svg x-show="isFullscreen" x-cloak style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4M4 14l5 5m11-5h-4v4m4-4l-5 5M4 10h4V6M4 10l5-5m11 5h-4V6m4 4l-5-5"/></svg>
+                                </button>
+
                                 <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" alt="Passage Image"
-                                     class="zoomable-img" style="width:100%;border-radius:10px;margin-bottom:16px;"
-                                     @click="open = true">
-                                <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
-                                    <span class="lightbox-close" @click.stop="open = false">×</span>
-                                    <img src="{{ asset('storage/' . str_replace('public/', '', $this->currentGroup->image_path)) }}" @click.stop>
-                                </div>
+                                     style="width:100%;border-radius:10px;"
+                                     :style="`transform: translate(${panX}px, ${panY}px) scale(${scale});`" 
+                                     draggable="false">
                             </div>
                             @endif
                             @if($this->currentGroup->audio_path)
@@ -733,14 +778,20 @@ new #[Layout('layouts.bare')] class extends Component {
                         @endif
                     @endif
                     @if($this->currentGroup->image_path)
-                    <div x-data="{ open: false }">
+                    <div style="margin-top:12px;margin-bottom:12px;border-radius:10px;" class="zoom-container" :class="{ 'is-fullscreen': isFullscreen }"
+                         x-data="panzoomImage()" @wheel.prevent="handleWheel"
+                         @mousedown="startDrag" @mousemove="doDrag" @mouseup="endDrag" @mouseleave="endDrag"
+                         @touchstart="startDrag" @touchmove.prevent="doDrag" @touchend="endDrag">
+                        
+                        <button type="button" class="fullscreen-btn" @click.prevent.stop="toggleFullscreen" title="Toggle Fullscreen">
+                            <svg x-show="!isFullscreen" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                            <svg x-show="isFullscreen" x-cloak style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4M4 14l5 5m11-5h-4v4m4-4l-5 5M4 10h4V6M4 10l5-5m11 5h-4V6m4 4l-5-5"/></svg>
+                        </button>
+
                         <img src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->image_path)) }}" alt="Group Media"
-                             class="zoomable-img" style="margin-top:12px;max-height:320px;width:auto;border-radius:10px;display:block;margin-left:auto;margin-right:auto;"
-                             @click="open = true">
-                        <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
-                            <span class="lightbox-close" @click.stop="open = false">×</span>
-                            <img src="{{ asset('storage/'.str_replace('public/','',$this->currentGroup->image_path)) }}" @click.stop>
-                        </div>
+                             style="max-height:320px;width:auto;border-radius:10px;display:block;margin-left:auto;margin-right:auto;"
+                             :style="`transform: translate(${panX}px, ${panY}px) scale(${scale});`" 
+                             draggable="false">
                     </div>
                     @endif
                 </div>
@@ -767,15 +818,20 @@ new #[Layout('layouts.bare')] class extends Component {
                             </div>
                         </div>
                         @if($question->image_path)
-                        <div style="margin-left:44px;margin-bottom:14px;" x-data="{ open: false }">
+                        <div style="margin-left:44px;margin-bottom:14px;border-radius:12px;border:1px solid var(--border);" class="zoom-container" :class="{ 'is-fullscreen': isFullscreen }"
+                             x-data="panzoomImage()" @wheel.prevent="handleWheel"
+                             @mousedown="startDrag" @mousemove="doDrag" @mouseup="endDrag" @mouseleave="endDrag"
+                             @touchstart="startDrag" @touchmove.prevent="doDrag" @touchend="endDrag">
+                            
+                            <button type="button" class="fullscreen-btn" @click.prevent.stop="toggleFullscreen" title="Toggle Fullscreen">
+                                <svg x-show="!isFullscreen" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                                <svg x-show="isFullscreen" x-cloak style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h4v4M4 14l5 5m11-5h-4v4m4-4l-5 5M4 10h4V6M4 10l5-5m11 5h-4V6m4 4l-5-5"/></svg>
+                            </button>
+
                             <img src="{{ asset('storage/'.str_replace('public/','',$question->image_path)) }}"
-                                 class="zoomable-img" style="max-height:240px;border-radius:12px;border:1px solid var(--border);"
-                                 @click="open = true">
-                            <p style="font-size:0.65rem;color:var(--muted);margin-top:4px;">🔍 Click image to zoom</p>
-                            <div x-show="open" x-cloak class="lightbox-overlay" @click="open = false">
-                                <span class="lightbox-close" @click.stop="open = false">×</span>
-                                <img src="{{ asset('storage/'.str_replace('public/','',$question->image_path)) }}" @click.stop>
-                            </div>
+                                 style="max-height:240px;border-radius:12px;display:block;"
+                                 :style="`transform: translate(${panX}px, ${panY}px) scale(${scale});`" 
+                                 draggable="false">
                         </div>
                         @endif
                         @if($question->audio_path)
@@ -839,7 +895,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 @endif {{-- end default layout --}}
 
                 {{-- Bottom Nav --}}
-                <div style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:40;">
+                <div class="exam-footer" style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:40;">
                     @if($this->attempt->exam->mode !== 'strict')
                     <button wire:click="prevGroup" wire:loading.attr="disabled" @disabled($currentIndex === 0)
                             style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:700;background:var(--surface);color:var(--text);border:1.5px solid var(--border);cursor:pointer;{{ $currentIndex === 0 ? 'opacity:0.3;pointer-events:none;' : '' }}">
@@ -898,6 +954,71 @@ new #[Layout('layouts.bare')] class extends Component {
 
     <script>
         window.addEventListener('beforeunload', function(e) { e.preventDefault(); e.returnValue = ''; });
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('panzoomImage', () => ({
+                scale: 1,
+                panX: 0,
+                panY: 0,
+                isDragging: false,
+                startX: 0,
+                startY: 0,
+                isFullscreen: false,
+                toggleFullscreen() {
+                    this.isFullscreen = !this.isFullscreen;
+                    // Reset zoom & pan when toggling
+                    this.scale = 1;
+                    this.panX = 0;
+                    this.panY = 0;
+                    
+                    if (this.isFullscreen) {
+                        document.body.style.overflow = 'hidden';
+                        document.body.classList.add('is-fullscreen-mode');
+                    } else {
+                        document.body.style.overflow = '';
+                        document.body.classList.remove('is-fullscreen-mode');
+                    }
+                },
+                handleWheel(e) {
+                    e.preventDefault();
+                    const zoomSensitivity = 0.002;
+                    this.scale += e.deltaY * -zoomSensitivity;
+                    this.scale = Math.min(Math.max(1, this.scale), 5); // Limit zoom between 1x (original) and 5x
+                    
+                    // Reset pan position if scaled back to 1
+                    if (this.scale === 1) {
+                        this.panX = 0;
+                        this.panY = 0;
+                    }
+                },
+                startDrag(e) {
+                    if (this.scale > 1 || this.isFullscreen) {
+                        // Avoid preventing default on touchstart if possible, but we need it for mouse
+                        if (e.type === 'mousedown') e.preventDefault();
+                        this.isDragging = true;
+                        
+                        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                        const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                        
+                        this.startX = clientX - this.panX;
+                        this.startY = clientY - this.panY;
+                    }
+                },
+                doDrag(e) {
+                    if (!this.isDragging) return;
+                    e.preventDefault(); // Prevent page scroll when dragging image
+                    
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                    
+                    this.panX = clientX - this.startX;
+                    this.panY = clientY - this.startY;
+                },
+                endDrag() {
+                    this.isDragging = false;
+                }
+            }));
+        });
     </script>
     <style>@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
 </div>
