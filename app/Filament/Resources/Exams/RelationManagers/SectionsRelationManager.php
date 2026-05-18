@@ -33,6 +33,8 @@ class SectionsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
+        $isStrictMode = $this->getOwnerRecord()->mode === 'strict';
+
         return $schema
             ->schema([
                 TextInput::make('title')
@@ -43,7 +45,19 @@ class SectionsRelationManager extends RelationManager
                 TextInput::make('duration')
                     ->label('Duration (Minutes)')
                     ->numeric()
-                    ->placeholder('Leave blank if no strict time limit'),
+                    ->minValue(1)
+                    ->required($isStrictMode)
+                    ->placeholder($isStrictMode ? 'Wajib diisi untuk mode Strict' : 'Kosongkan jika tidak ada batas waktu')
+                    ->hint($isStrictMode
+                        ? '⚠️ Wajib diisi karena exam ini menggunakan mode Strict (timer per-section).'
+                        : 'Opsional. Isi jika ingin membatasi waktu per-section.')
+                    ->hintColor($isStrictMode ? 'warning' : 'gray'),
+
+                Textarea::make('description')
+                    ->label('Section Description')
+                    ->maxLength(65535)
+                    ->columnSpanFull()
+                    ->hint('Deskripsi ini ditampilkan di halaman instruksi section saat ujian dimulai.'),
 
                 Textarea::make('instructions')
                     ->label('Section Instructions')

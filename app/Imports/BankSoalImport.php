@@ -45,6 +45,7 @@ class BankSoalImport implements ToCollection, WithHeadingRow
                         'subsection_id' => $subId,
                         'title'         => $row['group_title'] ?? null,
                         'instruction'   => $row['group_instruction'] ?? null,
+                        'group_type'    => !empty($row['group_type']) ? strtolower(trim($row['group_type'])) : 'default',
                         'passage_text'  => $row['group_passage'] ?? null,
                         'audio_path'    => !empty($row['group_audio']) ? 'questions/audios/' . $row['group_audio'] : null,
                         'image_path'    => !empty($row['group_image']) ? 'questions/images/' . $row['group_image'] : null,

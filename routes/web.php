@@ -15,6 +15,12 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+Route::view('/courses', 'courses')->name('courses');
+Route::view('/pricing', 'pricing')->name('pricing');
+Route::view('/toefl', 'toefl')->name('toefl');
+Route::view('/toeic', 'toeic')->name('toeic');
+Route::view('/ielts', 'ielts')->name('ielts');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
     Route::get('/dashboard', function () {
@@ -74,6 +80,7 @@ Route::middleware(['auth', 'role:test_taker'])
         Volt::route('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
+        Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
     });
 
 Route::get('/download-template-soal', function () {
