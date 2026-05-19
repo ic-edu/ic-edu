@@ -42,9 +42,6 @@ class CourseForm
                 ->image()
                 ->disk('public')
                 ->directory('courses/thumbnails')
-                ->imagePreviewHeight('200')
-                ->panelAspectRatio('16:9')
-                ->panelLayout('integrated')
                 ->nullable()
                 ->columnSpanFull(),
 

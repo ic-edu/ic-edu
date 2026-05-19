@@ -38,14 +38,22 @@
                 {{-- VIDEO --}}
                 @if($lesson->type === 'video')
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
-                    @if(str_contains($lesson->content_url ?? '', 'youtube.com') || str_contains($lesson->content_url ?? '', 'youtu.be'))
+                    @if(str_contains($lesson->content_url ?? '', 'youtube') || str_contains($lesson->content_url ?? '', 'youtu.be'))
                         @php
-                            preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $lesson->content_url, $matches);
-                            $youtubeId = $matches[1] ?? '';
+                            $youtubeId = '';
+                            if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/\s]{11})%i', $lesson->content_url, $match)) {
+                                $youtubeId = $match[1];
+                            }
                         @endphp
+                        @if($youtubeId)
                         <iframe src="https://www.youtube.com/embed/{{ $youtubeId }}?rel=0" 
                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        @else
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: white;">
+                            <p>Invalid YouTube URL.</p>
+                        </div>
+                        @endif
                     @elseif($lesson->file_path)
                         <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
                             <source src="{{ asset('storage/' . $lesson->file_path) }}">
@@ -119,17 +127,19 @@
 
                 {{-- LINK --}}
                 @if($lesson->type === 'link')
-                <div style="position: relative; height: 600px; background: #f1f5f9;">
-                    <iframe src="{{ $lesson->content_url }}" 
-                            style="width: 100%; height: 100%; border: none;"
-                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
-                    <div style="position: absolute; bottom: 16px; right: 16px;">
-                        <a href="{{ $lesson->content_url }}" target="_blank" rel="noopener"
-                           style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 0.75rem; font-weight: 700; text-decoration: none; backdrop-filter: blur(4px);">
-                            Open in New Tab
-                            <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        </a>
+                <div style="padding: 60px 40px; text-align: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; margin: 20px;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #eff6ff; color: var(--blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <svg style="width:40px;height:40px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                     </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text); margin-bottom: 8px;">External Resource</h3>
+                    <p style="font-size: 0.85rem; color: var(--muted); max-width: 400px; margin: 0 auto 24px; line-height: 1.6;">
+                        This lesson requires you to read or view an external resource. Click the button below to securely open the link in a new tab.
+                    </p>
+                    <a href="{{ $lesson->content_url }}" target="_blank" rel="noopener"
+                       style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px; background: var(--blue); color: white; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+                        Open External Link
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
                 </div>
                 @endif
 
