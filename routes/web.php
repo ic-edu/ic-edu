@@ -3,6 +3,7 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
+use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
 use Illuminate\Support\Facades\Auth;
@@ -92,5 +93,9 @@ Route::middleware(['auth', 'role:test_taker'])
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
 });
+
+Route::get('/admin/geo-map', [MapController::class, 'index'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';
