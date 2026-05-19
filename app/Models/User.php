@@ -24,6 +24,12 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'role',
+        'city',
+        'region',
+        'country',
+        'latitude',
+        'longitude',
+        'last_login_ip',
     ];
 
     /**
@@ -57,6 +63,11 @@ class User extends Authenticatable implements FilamentUser
     public function enrollments()
     {
         return $this->hasMany(ExamEnrollment::class);
+    }
+
+    public function courseEnrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

@@ -3,6 +3,7 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
+use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
 use Illuminate\Support\Facades\Auth;
@@ -74,6 +75,10 @@ Route::middleware(['auth', 'role:test_taker'])
         Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
         Route::post('/courses/{course}/lessons/{lesson}/complete', [TestTakerCourseController::class, 'markComplete'])->name('course.lesson.complete');
         Route::post('/courses/{course}/lessons/{lesson}/quiz', [TestTakerCourseController::class, 'startQuiz'])->name('course.quiz.start');
+        
+        // Course Certificate
+        Route::get('/courses/{course}/certificate', [TestTakerCourseController::class, 'certificatePreview'])->name('course.certificate.preview');
+        Route::get('/courses/{course}/certificate/download', [TestTakerCourseController::class, 'downloadCertificate'])->name('course.certificate.download');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
@@ -88,5 +93,9 @@ Route::middleware(['auth', 'role:test_taker'])
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
 });
+
+Route::get('/admin/geo-map', [MapController::class, 'index'])
+    ->middleware(['web', 'auth'])
+    ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';

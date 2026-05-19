@@ -59,7 +59,26 @@ class CourseController extends Controller
         $totalLessons = $course->modules->sum(fn ($m) => $m->lessons->count());
         $totalDuration = $course->modules->sum(fn ($m) => $m->lessons->sum('duration_minutes'));
 
-        return view('test_taker.courses.show', compact('course', 'isEnrolled', 'totalLessons', 'totalDuration'));
+        $certificate = null;
+
+        if ($isEnrolled && $totalLessons > 0) {
+            $completedLessonsCount = \App\Models\LessonProgress::where('user_id', $userId)
+                ->whereIn('course_lesson_id', $course->modules->flatMap->lessons->pluck('id'))
+                ->where('is_completed', true)
+                ->count();
+                
+            if ($completedLessonsCount >= $totalLessons) {
+                $certificate = \App\Models\Certificate::firstOrCreate(
+                    ['user_id' => $userId, 'course_id' => $course->id],
+                    [
+                        'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
+                        'issued_at' => now(),
+                    ]
+                );
+            }
+        }
+
+        return view('test_taker.courses.show', compact('course', 'isEnrolled', 'totalLessons', 'totalDuration', 'certificate'));
     }
 
     /**
@@ -244,5 +263,25 @@ class CourseController extends Controller
         ]);
 
         return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id, 'course_id' => $course->id, 'lesson_id' => $lesson->id]);
+    }
+    public function certificatePreview(Course $course)
+    {
+        $certificate = \App\Models\Certificate::where('user_id', Auth::id())
+            ->where('course_id', $course->id)
+            ->firstOrFail();
+
+        return view('test_taker.courses.certificate_preview', compact('course', 'certificate'));
+    }
+
+    public function downloadCertificate(Course $course)
+    {
+        $certificate = \App\Models\Certificate::where('user_id', Auth::id())
+            ->where('course_id', $course->id)
+            ->firstOrFail();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('test_taker.courses.certificate_pdf', compact('course', 'certificate'));
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download('Certificate_' . str_replace(' ', '_', $course->title) . '.pdf');
     }
 }

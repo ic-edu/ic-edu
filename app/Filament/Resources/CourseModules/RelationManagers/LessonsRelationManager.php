@@ -27,69 +27,58 @@ class LessonsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Grid::make(2)->schema([
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan(1),
+        return $schema->columns(1)->components([
+            TextInput::make('title')
+                ->required()
+                ->maxLength(255),
 
-                Select::make('type')
-                    ->options(CourseLesson::types())
-                    ->required()
-                    ->reactive()
-                    ->columnSpan(1),
-            ]),
+            Select::make('type')
+                ->options(CourseLesson::types())
+                ->required()
+                ->reactive(),
 
-            Grid::make(1)->schema([
-                TextInput::make('content_url')
-                    ->label('Source URL (Video/Link)')
-                    ->url()
-                    ->visible(fn (Get $get) => in_array($get('type'), ['video', 'link', 'audio']))
-                    ->placeholder('e.g., https://youtube.com/...'),
+            TextInput::make('content_url')
+                ->label('Source URL (Video/Link/Audio)')
+                ->url()
+                ->visible(fn (Get $get) => in_array($get('type'), ['video', 'link', 'audio']))
+                ->placeholder('e.g., https://youtube.com/...'),
 
-                FileUpload::make('file_path')
-                    ->label('Upload File (PDF/Audio/Video)')
-                    ->disk('public')
-                    ->directory('courses/lessons')
-                    ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
-                    ->helperText('Upload local files here.'),
+            FileUpload::make('file_path')
+                ->label('Upload File (PDF/Audio/Video)')
+                ->disk('public')
+                ->directory('courses/lessons')
+                ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
+                ->helperText('Upload local files here.'),
 
-                RichEditor::make('text_content')
-                    ->label('Lesson Content (Text/Article)')
-                    ->visible(fn (Get $get) => $get('type') === 'text')
-                    ->columnSpanFull(),
+            RichEditor::make('text_content')
+                ->label('Lesson Content (Text/Article)')
+                ->visible(fn (Get $get) => $get('type') === 'text'),
 
-                Select::make('exam_id')
-                    ->label('Select Quiz/Exam')
-                    ->relationship('exam', 'title')
-                    ->searchable()
-                    ->preload()
-                    ->visible(fn (Get $get) => $get('type') === 'quiz')
-                    ->required(fn (Get $get) => $get('type') === 'quiz')
-                    ->helperText('Select an Exam to use as a quiz for this lesson.')
-                    ->columnSpan(1),
+            Select::make('exam_id')
+                ->label('Select Quiz/Exam')
+                ->relationship('exam', 'title')
+                ->searchable()
+                ->preload()
+                ->visible(fn (Get $get) => $get('type') === 'quiz')
+                ->required(fn (Get $get) => $get('type') === 'quiz')
+                ->helperText('Select an Exam to use as a quiz for this lesson.'),
 
-                TextInput::make('passing_score')
-                    ->label('Passing Grade')
-                    ->numeric()
-                    ->visible(fn (Get $get) => $get('type') === 'quiz')
-                    ->required(fn (Get $get) => $get('type') === 'quiz')
-                    ->helperText('Minimum score to proceed to the next lesson (0-100).')
-                    ->columnSpan(1),
-            ]),
+            TextInput::make('passing_score')
+                ->label('Passing Grade')
+                ->numeric()
+                ->visible(fn (Get $get) => $get('type') === 'quiz')
+                ->required(fn (Get $get) => $get('type') === 'quiz')
+                ->helperText('Minimum score to proceed (0-100).'),
 
-            Grid::make(3)->schema([
-                TextInput::make('duration_minutes')
-                    ->label('Est. Duration (Min)')
-                    ->numeric()
-                    ->placeholder('15'),
+            TextInput::make('duration_minutes')
+                ->label('Est. Duration (Min)')
+                ->numeric()
+                ->placeholder('15'),
 
-                Toggle::make('is_previewable')
-                    ->label('Previewable')
-                    ->helperText('Can be viewed without enrollment (Free Lesson).')
-                    ->default(false),
-            ]),
+            Toggle::make('is_previewable')
+                ->label('Previewable')
+                ->helperText('Can be viewed without enrollment.')
+                ->default(false),
         ]);
     }
 
