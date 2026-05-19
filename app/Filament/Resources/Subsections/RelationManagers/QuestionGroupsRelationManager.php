@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -29,7 +30,7 @@ class QuestionGroupsRelationManager extends RelationManager
         return $schema
             ->components([
                 Section::make('Group Context (Optional)')
-                    ->description('Provide context for the group of questions, such as a reading passage or listening transcript. This is optional but can help students understand the questions better.')
+                    ->description('Provide context for the group of questions, such as a reading passage or listening transcript.')
                     ->schema([
                         TextInput::make('title')
                             ->label('Group Title (Optional)')
@@ -39,12 +40,28 @@ class QuestionGroupsRelationManager extends RelationManager
                             ->numeric()
                             ->default(1)
                             ->required(),
-                        Textarea::make('instruction')
-                            ->label('Instructions for Group Questions (E.g., "Answer the following questions based on the passage above.")')
+                        Select::make('group_type')
+                            ->label('Layout Type')
+                            ->required()
+                            ->default('default')
+                            ->options([
+                                'default' => 'Default — Stacked (media on top, questions below)',
+                                'split'   => 'Split — Side by Side (passage/image left, questions right)',
+                            ])
+                            ->helperText('Use "Split" for long reading passages (TOEIC Part 7, TOEFL Reading). Use "Default" for everything else.')
                             ->columnSpanFull(),
-                        Textarea::make('passage_text')
-                            ->label('Passage Text (E.g., reading passage, listening transcript)')
-                            ->rows(5)
+                        Textarea::make('instruction')
+                            ->label('Instructions (Optional)')
+                            ->placeholder('E.g., "Answer the following questions based on the passage."')
+                            ->columnSpanFull(),
+                        RichEditor::make('passage_text')
+                            ->label('Passage Text')
+                            ->helperText('Supports basic formatting: Bold, Italic, paragraphs, and bullet lists.')
+                            ->toolbarButtons([
+                                'bold', 'italic', 'underline',
+                                'bulletList', 'orderedList',
+                                'redo', 'undo',
+                            ])
                             ->columnSpanFull(),
                         Grid::make(2)->schema([
                             FileUpload::make('audio_path')

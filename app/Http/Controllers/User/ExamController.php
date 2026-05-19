@@ -87,4 +87,22 @@ class ExamController extends Controller
 
         return view('test_taker.exams.result', compact('attempt'));
     }
+
+    public function scoreReport(\App\Models\ExamAttempt $attempt, \App\Services\ScoreReportService $service)
+    {
+        if ($attempt->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($attempt->status !== ExamAttemptStatus::GRADED->value) {
+            return redirect()->route('test_taker.exam.my_exams')->with('error', 'Score Report hanya tersedia setelah ujian selesai dinilai.');
+        }
+
+        $reportData = $service->generateData($attempt);
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('test_taker.exams.score_report', $reportData);
+        $pdf->setPaper('a4', 'portrait');
+        
+        return $pdf->download('Score_Report_' . str_replace(' ', '_', $attempt->exam->title) . '.pdf');
+    }
 }
