@@ -15,11 +15,13 @@
         @forelse($courses as $course)
         @php
             $levelColors = [
-                'Beginner'     => ['bg' => 'linear-gradient(135deg, #bbf7d0, #86efac)', 'tx' => '#15803d', 'accent' => '#16a34a', 'emoji' => '🌱'],
-                'Intermediate' => ['bg' => 'linear-gradient(135deg, #bfdbfe, #93c5fd)', 'tx' => '#1d4ed8', 'accent' => '#2563eb', 'emoji' => '📚'],
-                'Advanced'     => ['bg' => 'linear-gradient(135deg, #fecaca, #fca5a5)', 'tx' => '#991b1b', 'accent' => '#dc2626', 'emoji' => '🚀'],
+                'Beginner'     => ['bg' => 'linear-gradient(135deg, #dcfce7, #bbf7d0)', 'tx' => '#166534', 'accent' => '#16a34a', 'emoji' => '🟢'],
+                'Intermediate' => ['bg' => 'linear-gradient(135deg, #fef3c7, #fde68a)', 'tx' => '#854d0e', 'accent' => '#d97706', 'emoji' => '🟡'],
+                'Advanced'     => ['bg' => 'linear-gradient(135deg, #fecaca, #fca5a5)', 'tx' => '#991b1b', 'accent' => '#dc2626', 'emoji' => '🔴'],
             ];
-            $c = $levelColors[$course->target_level] ?? $levelColors['Intermediate'];
+            $tl = is_array($course->target_level) ? ($course->target_level[0] ?? 'Intermediate') : ($course->target_level ?? 'Intermediate');
+            $c = $levelColors[$tl] ?? $levelColors['Intermediate'];
+            $displayLevel = is_array($course->target_level) ? implode(' - ', $course->target_level) : ($course->target_level ?? 'Course');
         @endphp
 
         <div class="card anim-in d{{ ($loop->index % 5) + 1 }}" style="display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;"
@@ -40,7 +42,7 @@
 
                 {{-- Level Badge --}}
                 <div style="position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: {{ $c['tx'] }}; backdrop-filter: blur(4px);">
-                    {{ $course->target_level ?? 'Course' }}
+                    {{ $displayLevel }}
                 </div>
 
                 {{-- Module Count Badge --}}

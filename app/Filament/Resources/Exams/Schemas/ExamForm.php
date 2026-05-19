@@ -40,6 +40,11 @@ class ExamForm
             Toggle::make('is_active')
                 ->required()
                 ->default(true),
+
+            Toggle::make('is_public')
+                ->label('Tampilkan di Menu Utama (Standalone)')
+                ->helperText('Matikan jika ujian ini khusus digunakan untuk Kuis di dalam LMS Course.')
+                ->default(true),
         ]);
     }
 }

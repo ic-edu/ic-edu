@@ -39,7 +39,7 @@
 
             <div style="position: relative; z-index: 2;">
                 <span style="display:inline-block;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:0.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:14px;">
-                    📚 {{ $course->target_level ?? 'Course' }}
+                    🎓 {{ is_array($course->target_level) ? implode(' - ', $course->target_level) : ($course->target_level ?? 'Course') }}
                 </span>
                 <h1 style="font-size: 1.8rem; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 10px;">
                     {{ $course->title }}

@@ -13,6 +13,7 @@ class ExamController extends Controller
     public function index()
     {
         $exams = Exam::where('is_active', true)
+            ->where('is_public', true)
             ->with('examType')
             ->latest()
             ->get();

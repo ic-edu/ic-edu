@@ -37,13 +37,22 @@ new #[Layout('layouts.bare')] class extends Component {
     public array $sectionMap = []; // groupIndex => section_id
     public array $subsectionMap = []; // groupIndex => subsection_id
 
+    public ?int $course_id = null;
+    public ?int $lesson_id = null;
+
     public function mount(ExamAttempt $attempt)
     {
         $this->attempt = $attempt;
+        $this->course_id = request()->query('course_id');
+        $this->lesson_id = request()->query('lesson_id');
 
         if ($this->attempt->status === ExamAttemptStatus::FINISHED->value) {
             session()->flash('error', 'Peringatan: Ujian ini sudah selesai dan tidak dapat dikerjakan ulang.');
-            $this->redirectRoute('test_taker.dashboard');
+            if ($this->course_id && $this->lesson_id) {
+                $this->redirectRoute('test_taker.course.lesson', ['course' => $this->course_id, 'lesson' => $this->lesson_id]);
+            } else {
+                $this->redirectRoute('test_taker.dashboard');
+            }
             return;
         }
 
@@ -389,14 +398,20 @@ new #[Layout('layouts.bare')] class extends Component {
         ]);
 
         if (!$hasSubjective) {
-            try {
-                \Illuminate\Support\Facades\Mail::to($this->attempt->user->email)->send(new \App\Mail\ExamGradedMail($this->attempt));
-            } catch (\Exception $e) {
-                // Ignore email error to not break submission
+            if (!$this->course_id) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($this->attempt->user->email)->send(new \App\Mail\ExamGradedMail($this->attempt));
+                } catch (\Exception $e) {
+                    // Ignore email error to not break submission
+                }
             }
-            session()->flash('success', 'Ujian selesai! Karena 100% Pilihan Ganda, ujian Anda telah dinilai otomatis secara real-time dan hasilnya sudah dikirim ke email Anda.');
+            session()->flash('success', 'Quiz/Exam completed! Since it was 100% Multiple Choice, it has been auto-graded.');
         } else {
-            session()->flash('success', 'Ujian berhasil dikumpulkan! Pilihan ganda dinilai otomatis, soal esai/audio sedang menunggu penilaian dari Examiner.');
+            session()->flash('success', 'Quiz/Exam successfully submitted! Multiple choice questions are auto-graded, subjective questions are pending review.');
+        }
+
+        if ($this->course_id && $this->lesson_id) {
+            return redirect()->route('test_taker.course.lesson', ['course' => $this->course_id, 'lesson' => $this->lesson_id]);
         }
 
         return redirect()->route('test_taker.dashboard');

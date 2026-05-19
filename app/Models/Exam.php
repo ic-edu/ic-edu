@@ -19,10 +19,12 @@ class Exam extends Model
         'total_duration',
         'mode',
         'is_active',
+        'is_public',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_public' => 'boolean',
         'total_duration' => 'integer',
     ];
 
