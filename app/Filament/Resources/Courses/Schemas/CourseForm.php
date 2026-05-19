@@ -24,10 +24,11 @@ class CourseForm
             Select::make('target_level')
                 ->label('Target Level')
                 ->options([
-                    'Beginner'     => '🟢 Beginner',
-                    'Intermediate' => '🟡 Intermediate',
-                    'Advanced'     => '🔴 Advanced',
+                    'Beginner'     => 'Beginner',
+                    'Intermediate' => 'Intermediate',
+                    'Advanced'     => 'Advanced',
                 ])
+                ->multiple()
                 ->searchable()
                 ->nullable(),
 

@@ -72,6 +72,8 @@ Route::middleware(['auth', 'role:test_taker'])
         Route::get('/courses/{course}', [TestTakerCourseController::class, 'show'])->name('course.show');
         Route::post('/courses/{course}/enroll', [TestTakerCourseController::class, 'enroll'])->name('course.enroll');
         Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
+        Route::post('/courses/{course}/lessons/{lesson}/complete', [TestTakerCourseController::class, 'markComplete'])->name('course.lesson.complete');
+        Route::post('/courses/{course}/lessons/{lesson}/quiz', [TestTakerCourseController::class, 'startQuiz'])->name('course.quiz.start');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');

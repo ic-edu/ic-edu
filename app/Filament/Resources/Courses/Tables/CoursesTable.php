@@ -36,7 +36,7 @@ class CoursesTable
                 TextColumn::make('target_level')
                     ->label('Level')
                     ->badge()
-                    ->color(fn (string $state): string => match($state) {
+                    ->color(fn (array|string|null $state): string => match(is_array($state) ? ($state[0] ?? '') : $state) {
                         'Beginner'     => 'success',
                         'Intermediate' => 'warning',
                         'Advanced'     => 'danger',

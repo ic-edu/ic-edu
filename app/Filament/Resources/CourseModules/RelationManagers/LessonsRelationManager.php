@@ -42,26 +42,41 @@ class LessonsRelationManager extends RelationManager
             ]),
 
             Grid::make(1)->schema([
-                // Muncul jika tipe Video atau Link
                 TextInput::make('content_url')
                     ->label('Source URL (Video/Link)')
                     ->url()
                     ->visible(fn (Get $get) => in_array($get('type'), ['video', 'link', 'audio']))
-                    ->placeholder('https://youtube.com/watch?v=... atau link file cloud'),
+                    ->placeholder('e.g., https://youtube.com/...'),
 
-                // Muncul jika tipe PDF atau Audio (bisa upload)
                 FileUpload::make('file_path')
                     ->label('Upload File (PDF/Audio/Video)')
                     ->disk('public')
                     ->directory('courses/lessons')
                     ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
-                    ->helperText('Gunakan ini jika ingin upload langsung ke server.'),
+                    ->helperText('Upload local files here.'),
 
-                // Muncul jika tipe Text
                 RichEditor::make('text_content')
                     ->label('Lesson Content (Text/Article)')
                     ->visible(fn (Get $get) => $get('type') === 'text')
                     ->columnSpanFull(),
+
+                Select::make('exam_id')
+                    ->label('Select Quiz/Exam')
+                    ->relationship('exam', 'title')
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn (Get $get) => $get('type') === 'quiz')
+                    ->required(fn (Get $get) => $get('type') === 'quiz')
+                    ->helperText('Select an Exam to use as a quiz for this lesson.')
+                    ->columnSpan(1),
+
+                TextInput::make('passing_score')
+                    ->label('Passing Grade')
+                    ->numeric()
+                    ->visible(fn (Get $get) => $get('type') === 'quiz')
+                    ->required(fn (Get $get) => $get('type') === 'quiz')
+                    ->helperText('Minimum score to proceed to the next lesson (0-100).')
+                    ->columnSpan(1),
             ]),
 
             Grid::make(3)->schema([
@@ -71,8 +86,8 @@ class LessonsRelationManager extends RelationManager
                     ->placeholder('15'),
 
                 Toggle::make('is_previewable')
-                    ->label('Previewable?')
-                    ->helperText('Bisa dilihat tanpa enroll (Free Lesson).')
+                    ->label('Previewable')
+                    ->helperText('Can be viewed without enrollment (Free Lesson).')
                     ->default(false),
             ]),
         ]);
@@ -99,6 +114,7 @@ class LessonsRelationManager extends RelationManager
                         'pdf'   => 'warning',
                         'text'  => 'success',
                         'audio' => 'info',
+                        'quiz'  => 'primary',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => CourseLesson::types()[$state] ?? $state),
