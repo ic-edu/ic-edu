@@ -19,7 +19,7 @@
     <div class="dash-shell">
         @include('components.test_taker.sidebar')
         <div class="dash-main">
-            @include('components.test_taker.topbar')
+            @yield('topbar')
             <div class="page-body">
                 @yield('content')
                 {{ $slot ?? '' }}

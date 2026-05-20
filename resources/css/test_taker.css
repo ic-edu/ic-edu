@@ -406,7 +406,7 @@ h6,
    PAGE COMPONENTS & NEO CARD
    ======================================================== */
 .page-body {
-    padding: 12px 32px 40px;
+    padding: var(--sidebar-gap) 32px 40px;
     flex: 1;
 }
 

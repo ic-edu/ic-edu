@@ -1,6 +1,10 @@
 @extends('layouts.test_taker')
 @section('title', 'Dashboard')
 
+@section('topbar')
+    @include('components.test_taker.topbar')
+@endsection
+
 @section('content')
 {{-- PAGE HEADER --}}
 <div class="greeting-box p-6 sm:p-2 bg-transparent text-black drop-shadow-none shadow-none text-left mb-6 anim-in d1">
