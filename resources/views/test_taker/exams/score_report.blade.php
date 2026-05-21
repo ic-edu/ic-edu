@@ -4,200 +4,346 @@
     <meta charset="UTF-8">
     <title>Score Report - {{ $exam->title }}</title>
     <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
-            color: #0f172a;
+            color: #0d1f35;
+            background: #ffffff;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-size: 12px;
         }
 
-        .header {
-            text-align: center;
-            border-bottom: 2px dashed #e2e8f0;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+        /* ── Page content area ── */
+        .page-body {
+            padding: 26px 44px 40px;
         }
 
-        .header h1 {
-            color: #0f172a;
-            font-size: 28px;
-            margin: 0 0 5px 0;
+        /* ── Section labels ── */
+        .section-label {
+            font-size: 7px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8892a4;
+            border-bottom: 1px solid #e5e8ee;
+            padding-bottom: 7px;
+            margin-bottom: 14px;
         }
 
-        .header p {
-            color: #64748b;
-            font-size: 14px;
-            margin: 0;
-        }
-
+        /* ── Candidate info ── */
         .info-table {
             width: 100%;
-            margin-bottom: 30px;
             border-collapse: collapse;
-        }
-
-        .info-table td {
-            padding: 10px;
-            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 26px;
         }
 
         .info-label {
+            font-size: 7px;
             font-weight: bold;
-            color: #64748b;
-            font-size: 12px;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            color: #8892a4;
+            margin-bottom: 3px;
         }
 
         .info-value {
+            font-size: 10px;
             font-weight: bold;
-            color: #0f172a;
-            font-size: 14px;
+            color: #0d1f35;
         }
 
-        .score-highlight {
-            width: 100%;
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            padding: 20px;
+        /* ── Score panel header strip ── */
+        .score-panel-head {
+            background: #eef0f5;
+            border: 1px solid #c4cad6;
+            border-bottom: none;
+            padding: 8px 16px;
         }
 
-        .score-highlight-table {
-            width: 100%;
-            text-align: center;
-        }
-
-        .score-box h3 {
-            font-size: 12px;
+        .score-panel-head-label {
+            font-size: 7px;
+            font-weight: bold;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            color: #1d4ed8;
-            margin: 0 0 5px 0;
+            color: #8892a4;
         }
 
-        .score-number {
-            font-size: 40px;
+        /* ── Score panel table ── */
+        .score-panel-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #c4cad6;
+            border-top: 3px solid #0d1f35;
+            margin-bottom: 28px;
+        }
+
+        .score-col {
+            text-align: center;
+            vertical-align: middle;
+            padding: 22px 16px;
+        }
+
+        .col-label {
+            font-size: 7px;
             font-weight: bold;
-            color: #2563eb;
-            margin: 0;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #8892a4;
+            margin-bottom: 10px;
         }
 
-        .cefr-badge {
-            background-color: #2563eb;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
+        .score-big {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 48px;
+            font-weight: bold;
+            color: #0d1f35;
+            line-height: 1;
         }
 
-        .cefr-level {
+        .score-raw-num {
+            font-family: 'Georgia', 'Times New Roman', serif;
             font-size: 30px;
             font-weight: bold;
-            margin: 0;
+            color: #0d1f35;
+            line-height: 1;
         }
 
-        .cefr-desc {
-            font-size: 11px;
-            text-transform: uppercase;
-            margin: 0;
+        .score-raw-denom {
+            font-size: 13px;
+            font-weight: normal;
+            color: #b0b8c8;
         }
 
-        .breakdown-title {
-            font-size: 18px;
+        .score-pct {
+            font-size: 10px;
             font-weight: bold;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 5px;
+            color: #5a6478;
+            margin-top: 6px;
+        }
+
+        /* ── CEFR cell ── */
+        .cefr-cell {
+            background: #0d1f35;
+            text-align: center;
+            vertical-align: middle;
+            padding: 22px 16px;
+        }
+
+        .cefr-level-text {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .cefr-desc-text {
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 10px;
+        }
+
+        /* ── Score Breakdown ── */
+        .breakdown-label {
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #0d1f35;
+            margin-bottom: 8px;
+        }
+
+        .breakdown-thick-rule {
+            height: 2px;
+            background: #0d1f35;
+            margin-bottom: 16px;
         }
 
         .section-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
-        .section-header td {
-            background-color: #f8faff;
-            padding: 10px;
+        .section-head td {
+            background: #f0f2f6;
+            padding: 9px 12px;
+            font-size: 10px;
             font-weight: bold;
-            border-bottom: 2px solid #e2e8f0;
+            color: #0d1f35;
+            border-top: 1px solid #c4cad6;
+            border-bottom: 1px solid #c4cad6;
         }
 
-        .subsection-row td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
+        .section-score-right {
+            text-align: right;
         }
 
-        .footer-note {
-            margin-top: 50px;
+        .sub-row td {
+            padding: 7px 12px;
+            font-size: 10px;
+            color: #5a6478;
+            border-bottom: 1px solid #f0f2f4;
+        }
+
+        .sub-name {
+            padding-left: 26px !important;
+        }
+
+        .sub-score {
+            text-align: right;
+            font-weight: bold;
+            color: #0d1f35;
+        }
+
+        /* ── Document footer ── */
+        .doc-footer {
+            margin-top: 36px;
+            border-top: 1px solid #c4cad6;
+            padding-top: 12px;
             text-align: center;
-            font-size: 11px;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 10px;
+        }
+
+        .doc-footer p {
+            font-size: 8px;
+            color: #9aa3b5;
+            line-height: 1.75;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 style="color: #2563eb; margin: 0 0 10px 0;">IC-EDU</h2>
-        <h1>OFFICIAL SCORE REPORT</h1>
-        <p>This is a simulation report and cannot be used as an official credential.</p>
-    </div>
+{{-- Gold accent stripe --}}
+<div style="height: 4px; background: #b89840; margin: 0; padding: 0;"></div>
 
+{{-- Navy header bar --}}
+<div style="background: #0d1f35; margin: 0; padding: 18px 44px;">
+    <table width="100%" style="border-collapse: collapse;">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div style="font-size: 7px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: #b89840; margin-bottom: 8px;">
+                    {{ config('app.name', 'IC-EDU') }}
+                </div>
+                <div style="font-size: 15px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: #ffffff; margin-bottom: 6px;">
+                    Official Score Report
+                </div>
+                <div style="font-size: 8px; color: rgba(255,255,255,0.38); font-style: italic;">
+                    This is a simulation report and cannot be used as an official credential.
+                </div>
+            </td>
+            <td style="vertical-align: middle; text-align: right; width: 110px;">
+                <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(90)->margin(0)->generate(route('test_taker.exam.result', $attempt->id))) !!}"
+                     alt="QR Code"
+                     style="width: 72px; height: 72px; display: block; margin-left: auto; border: 3px solid rgba(255,255,255,0.10);">
+                <div style="font-size: 7px; color: rgba(255,255,255,0.38); text-align: right; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase;">
+                    Scan to Verify
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{{-- Thin gold separator --}}
+<div style="height: 1px; background: #6b5520; margin: 0; padding: 0;"></div>
+
+<div class="page-body">
+
+    {{-- Candidate Information --}}
+    <div class="section-label">Candidate Information</div>
     <table class="info-table">
         <tr>
-            <td width="25%"><div class="info-label">Nama Peserta</div><div class="info-value">{{ $user->name }}</div></td>
-            <td width="25%"><div class="info-label">ID / Email</div><div class="info-value">{{ $user->email }}</div></td>
-            <td width="25%"><div class="info-label">Nama Ujian</div><div class="info-value">{{ $exam->title }}</div></td>
-            <td width="25%"><div class="info-label">Tanggal</div><div class="info-value">{{ $generated_at }}</div></td>
+            <td style="vertical-align: top; padding-right: 16px; width: 25%;">
+                <div class="info-label">Nama Peserta</div>
+                <div class="info-value">{{ $user->name }}</div>
+            </td>
+            <td style="vertical-align: top; padding-right: 16px; width: 25%;">
+                <div class="info-label">ID / Email</div>
+                <div class="info-value">{{ $user->email }}</div>
+            </td>
+            <td style="vertical-align: top; padding-right: 16px; width: 25%;">
+                <div class="info-label">Nama Ujian</div>
+                <div class="info-value">{{ $exam->title }}</div>
+            </td>
+            <td style="vertical-align: top; width: 25%;">
+                <div class="info-label">Tanggal</div>
+                <div class="info-value">{{ $generated_at }}</div>
+            </td>
         </tr>
     </table>
 
-    <div class="score-highlight">
-        <table class="score-highlight-table">
-            <tr>
-                <td width="33%" class="score-box">
-                    <h3>Total Score</h3>
-                    <div class="score-number">{{ $attempt->converted_score }}</div>
-                </td>
-                <td width="34%" class="score-box" style="border-left: 2px solid #bfdbfe; border-right: 2px solid #bfdbfe;">
-                    <h3>Raw Score / Percentage</h3>
-                    <div style="font-size: 28px; font-weight: bold; color: #0f172a;">{{ $total_earned }} <span style="font-size: 16px; color: #60a5fa;">/ {{ $total_max }}</span></div>
-                    <div style="font-size: 12px; font-weight: bold; color: #64748b;">{{ $percentage }}% Accuracy</div>
-                </td>
-                <td width="33%">
-                    <div class="cefr-badge">
-                        <div class="cefr-level">{{ $cefr_level }}</div>
-                        <div class="cefr-desc">{{ $cefr_description }}</div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+    {{-- Score Panel --}}
+    <div class="score-panel-head">
+        <span class="score-panel-head-label">Performance Summary</span>
     </div>
+    <table class="score-panel-table">
+        <tr>
+            {{-- Total Score --}}
+            <td class="score-col" style="width: 32%; background: #f7f8fb; border-right: 1px solid #c4cad6;">
+                <div class="col-label">Total Score</div>
+                <div class="score-big">{{ $attempt->converted_score }}</div>
+            </td>
 
-    <div class="breakdown-title">Score Breakdown</div>
-    
+            {{-- Raw Score / Percentage --}}
+            <td class="score-col" style="width: 36%; background: #f7f8fb; border-right: 1px solid #c4cad6;">
+                <div class="col-label">Raw Score &nbsp;/&nbsp; Percentage</div>
+                <div class="score-raw-num">
+                    {{ $total_earned }}<span class="score-raw-denom"> / {{ $total_max }}</span>
+                </div>
+                <div class="score-pct">{{ $percentage }}% Accuracy</div>
+            </td>
+
+            {{-- CEFR Level --}}
+            <td class="cefr-cell" style="width: 32%;">
+                <div class="cefr-level-text">{{ $cefr_level }}</div>
+                <div style="height: 2px; background: #b89840; width: 36px; margin: 9px auto; font-size: 1px; line-height: 0;">&nbsp;</div>
+                <div class="cefr-desc-text">{{ $cefr_description }}</div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- Score Breakdown --}}
+    <div class="breakdown-label">Score Breakdown</div>
+    <div class="breakdown-thick-rule"></div>
+
     @foreach($sections_data as $sectionName => $sectionData)
     <table class="section-table">
-        <tr class="section-header">
-            <td width="80%">{{ $sectionName }}</td>
-            <td width="20%" align="right" style="color: #2563eb;">{{ $sectionData['earned_points'] }} / {{ $sectionData['max_points'] }}</td>
+        <tr class="section-head">
+            <td>{{ $sectionName }}</td>
+            <td class="section-score-right" style="width: 20%;">
+                {{ $sectionData['earned_points'] }} / {{ $sectionData['max_points'] }}
+            </td>
         </tr>
         @foreach($sectionData['subsections'] as $subName => $subData)
-        <tr class="subsection-row">
-            <td style="padding-left: 20px; color: #64748b;">{{ $subName }}</td>
-            <td align="right"><b>{{ $subData['earned_points'] }}</b> / {{ $subData['max_points'] }}</td>
+        <tr class="sub-row">
+            <td class="sub-name">{{ $subName }}</td>
+            <td class="sub-score" style="width: 20%;">
+                <b>{{ $subData['earned_points'] }}</b> / {{ $subData['max_points'] }}
+            </td>
         </tr>
         @endforeach
     </table>
     @endforeach
 
-    <div class="footer-note">
-        Verifikasi skor digital melalui sistem IC-EDU.<br>
-        Dokumen ini dihasilkan secara otomatis pada {{ $generated_at }}.
+    {{-- Document Footer --}}
+    <div class="doc-footer">
+        <p>
+            Verifikasi skor digital melalui sistem IC-EDU.<br>
+            Dokumen ini dihasilkan secara otomatis pada {{ $generated_at }}.
+        </p>
     </div>
 
+</div>
 </body>
 </html>

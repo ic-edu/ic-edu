@@ -76,7 +76,9 @@
             $isActive = ($exam->status ?? 'active') === 'active';
         @endphp
 
-        <div class="ec__card anim-in d{{ $loop->index % 5 + 1 }}">
+        <div class="ec__card anim-in d{{ $loop->index % 5 + 1 }}"
+             data-type="{{ strtolower($typeName) }}"
+             data-title="{{ strtolower($exam->title) }}">
 
             {{-- Thumbnail (background gradient is dynamic, inline required) --}}
             <div class="ec__thumb" style="background: {{ $gradient }};">
@@ -131,3 +133,71 @@
 
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cards        = Array.from(document.querySelectorAll('#exam-grid-container .ec__card'));
+    const filterTabs   = document.querySelectorAll('.filter-tab');
+    const searchInput  = document.querySelector('.page-search-input');
+    const gridBtn      = document.getElementById('btn-grid-view');
+    const listBtn      = document.getElementById('btn-list-view');
+    const container    = document.getElementById('exam-grid-container');
+    const countEl      = document.querySelector('.ec__count-number');
+
+    let activeFilter = 'all';
+    let searchQuery  = '';
+
+    /* ── apply both search + filter together ── */
+    function applyFilters() {
+        let visible = 0;
+        cards.forEach(card => {
+            const type  = (card.dataset.type  || '').trim();
+            const title = (card.dataset.title || '').trim();
+            const matchFilter = activeFilter === 'all' || type === activeFilter;
+            const matchSearch = title.includes(searchQuery);
+            const show = matchFilter && matchSearch;
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        if (countEl) countEl.textContent = visible;
+    }
+
+    /* ── filter tabs ── */
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            filterTabs.forEach(t => t.classList.remove('active-tab'));
+            this.classList.add('active-tab');
+            const label = this.textContent.trim().toLowerCase();
+            activeFilter = (label === 'all exams' || label === 'latest') ? 'all' : label;
+            applyFilters();
+        });
+    });
+
+    /* ── search ── */
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            searchQuery = this.value.trim().toLowerCase();
+            applyFilters();
+        });
+    }
+
+    /* ── view toggle ── */
+    if (gridBtn && listBtn && container) {
+        gridBtn.addEventListener('click', function () {
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+            container.classList.replace('view-list', 'view-grid');
+            cards.forEach(c => c.classList.remove('ec__card--list'));
+        });
+
+        listBtn.addEventListener('click', function () {
+            listBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+            container.classList.replace('view-grid', 'view-list');
+            cards.forEach(c => c.classList.add('ec__card--list'));
+        });
+    }
+});
+</script>
+@endpush
