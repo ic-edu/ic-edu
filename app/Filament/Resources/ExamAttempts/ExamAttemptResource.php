@@ -25,7 +25,7 @@ class ExamAttemptResource extends Resource
     protected static ?string $navigationLabel = 'Exam Assignments';
     protected static ?string $modelLabel = 'Exam Assignment';
     protected static ?string $pluralModelLabel = 'Exam Assignments';
-    protected static string|\UnitEnum|null $navigationGroup = 'Operational';
+    protected static string|\UnitEnum|null $navigationGroup = 'Operations';
 
     protected static ?string $recordTitleAttribute = 'id';
 

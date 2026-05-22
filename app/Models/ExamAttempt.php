@@ -18,6 +18,7 @@ class ExamAttempt extends Model
         'exam_id',
         'status',
         'started_at',
+        'submitted_at',
         'finished_at',
         'raw_score',
         'converted_score',
@@ -29,6 +30,7 @@ class ExamAttempt extends Model
 
     protected $casts = [
         'started_at'      => 'datetime',
+        'submitted_at'    => 'datetime',
         'finished_at'     => 'datetime',
         'raw_score'       => 'integer',
         'converted_score' => 'decimal:1',
