@@ -341,11 +341,7 @@
         let dropTimer;
 
         function applyScroll() {
-            const scrolled = window.scrollY > 60;
-            navbar.classList.toggle('bg-white/95', scrolled);
-            navbar.classList.toggle('backdrop-blur-xl', scrolled);
-            navbar.classList.toggle('border-slate-200', scrolled);
-            navbar.classList.toggle('shadow-sm', scrolled);
+            const scrolled = window.scrollY > 50;
             navbar.classList.toggle('scrolled-nav', scrolled);
             navbar.classList.toggle('bg-transparent', !scrolled);
             navbar.classList.toggle('border-transparent', !scrolled);
@@ -399,17 +395,5 @@
                 if (doc) doc.style.borderColor = '';
             });
         });
-
-        function applyScroll() {
-            const scrolled = window.scrollY > 50;
-            if (scrolled) {
-                navbar.classList.add('scrolled-nav');
-                navbar.classList.remove('bg-transparent', 'border-transparent', 'py-4');
-                navbar.classList.add('py-2');
-            } else {
-                navbar.classList.remove('scrolled-nav', 'py-2');
-                navbar.classList.add('bg-transparent', 'border-transparent', 'py-4');
-            }
-        }
     })();
 </script>
