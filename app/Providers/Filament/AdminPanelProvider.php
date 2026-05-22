@@ -99,6 +99,74 @@ class AdminPanelProvider extends PanelProvider
                         ::-webkit-scrollbar-track { background: transparent; }
                         ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 10px; }
                         ::-webkit-scrollbar-thumb:hover { background: rgba(107, 114, 128, 0.8); }
+
+                        /* Login Page Enhancements (Static Mascot) */
+                        .fi-simple-layout {
+                            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%) !important;
+                            perspective: 1200px;
+                        }
+                        .fi-simple-layout::before {
+                            display: none; 
+                        }
+                        .fi-simple-layout > * { position: relative; z-index: 10; }
+                        
+                        /* The Login Card itself (Transparent Wrapper) */
+                        .fi-simple-main {
+                            position: relative;
+                            background-color: transparent !important; /* Hapus warna latar belakang asli */
+                            border: 1px solid rgba(255, 255, 255, 0.9) !important;
+                            border-radius: 1.5rem !important;
+                            box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.15) !important;
+                        }
+
+                        /* Layer Kaca (Glassmorphism) terpisah agar maskot bisa diletakkan di belakangnya */
+                        .fi-simple-main::after {
+                            content: \'\';
+                            position: absolute;
+                            inset: 0;
+                            background: rgba(255, 255, 255, 0.8) !important;
+                            backdrop-filter: blur(24px) !important;
+                            -webkit-backdrop-filter: blur(24px) !important;
+                            border-radius: 1.5rem !important;
+                            z-index: -1; 
+                            pointer-events: none;
+                        }
+
+                        /* Maskot Diam Mengintip (Berada paling belakang) */
+                        .fi-simple-main::before {
+                            content: \'\';
+                            position: absolute;
+                            top: -115px; 
+                            left: 50%;
+                            transform: translateX(-50%); 
+                            width: 150px;
+                            height: 150px;
+                            background: url(\'/assets/maskot/login%20maskot.png\') bottom center / contain no-repeat;
+                            z-index: -2; /* Di bawah layer kaca */
+                            pointer-events: none;
+                        }
+
+                        /* Pastikan isi form login berada di paling atas */
+                        .fi-simple-main > * {
+                            position: relative;
+                            z-index: 10;
+                        }
+
+                        /* Sembunyikan logo IC-EDU di halaman login agar maskot menjadi fokus utama */
+                        .fi-simple-main .fi-logo {
+                            display: none !important;
+                        }
+
+                        .dark .fi-simple-layout {
+                            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+                        }
+                        .dark .fi-simple-main {
+                            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+                        }
+                        .dark .fi-simple-main::after {
+                            background: rgba(15, 23, 42, 0.8) !important;
+                        }
                     </style>'
                 )
             );
