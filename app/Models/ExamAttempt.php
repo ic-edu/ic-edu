@@ -24,6 +24,7 @@ class ExamAttempt extends Model
         'section_scores',
         'is_passed',
         'current_question_id',
+        'examiner_id',
     ];
 
     protected $casts = [
@@ -56,5 +57,10 @@ class ExamAttempt extends Model
     public function currentQuestion()
     {
         return $this->belongsTo(Question::class, 'current_question_id');
+    }
+
+    public function examiner()
+    {
+        return $this->belongsTo(User::class, 'examiner_id');
     }
 }
