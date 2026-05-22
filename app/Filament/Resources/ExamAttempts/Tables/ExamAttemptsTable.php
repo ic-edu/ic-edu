@@ -14,6 +14,11 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\ExamAttemptExporter;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Table;
 use App\Models\User;
@@ -84,6 +89,23 @@ class ExamAttemptsTable
                     ])
                     ->default(ExamAttemptStatus::FINISHED->value),
                 TrashedFilter::make(),
+            ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(ExamAttemptExporter::class)
+                    ->columnMapping(false)
+                    ->form([
+                        DatePicker::make('started_from')->label('Started From'),
+                        DatePicker::make('started_until')->label('Started Until'),
+                    ])
+                    ->modifyQueryUsing(function (Builder $query, array $data) {
+                        if (!empty($data['started_from'])) {
+                            $query->whereDate('started_at', '>=', $data['started_from']);
+                        }
+                        if (!empty($data['started_until'])) {
+                            $query->whereDate('started_at', '<=', $data['started_until']);
+                        }
+                    }),
             ])
             ->recordActions([
                 // Removed EditAction

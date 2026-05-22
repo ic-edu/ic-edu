@@ -10,6 +10,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\ExamAttemptExporter;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
@@ -69,13 +75,32 @@ class AttemptsRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('status')
+                    ->label('Filter Status')
+                    ->options([
+                        ExamAttemptStatus::FINISHED->value => 'Waiting for Grading',
+                        ExamAttemptStatus::GRADED->value => 'Graded',
+                    ]),
             ])
             ->headerActions([
-                //
+                ExportAction::make()
+                    ->exporter(ExamAttemptExporter::class)
+                    ->columnMapping(false)
+                    ->form([
+                        DatePicker::make('started_from')->label('Started From'),
+                        DatePicker::make('started_until')->label('Started Until'),
+                    ])
+                    ->modifyQueryUsing(function (Builder $query, array $data) {
+                        if (!empty($data['started_from'])) {
+                            $query->whereDate('started_at', '>=', $data['started_from']);
+                        }
+                        if (!empty($data['started_until'])) {
+                            $query->whereDate('started_at', '<=', $data['started_until']);
+                        }
+                    }),
             ])
             ->actions([
-                ViewAction::make()->label('Detail'),
+                ViewAction::make()->label('View Details'),
                 DeleteAction::make()->label('Delete Attempt'),
             ])
             ->bulkActions([
