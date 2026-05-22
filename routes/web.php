@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Route Examiner
-Route::middleware(['auth', 'role:examiner'])
+Route::middleware(['auth', 'verified', 'role:examiner'])
     ->prefix('examiner')
     ->group(function () {
 
@@ -59,7 +59,7 @@ Route::middleware(['auth', 'role:examiner'])
     });
 
 // Route Test-Taker
-Route::middleware(['auth', 'role:test_taker'])
+Route::middleware(['auth', 'verified', 'role:test_taker'])
     ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
