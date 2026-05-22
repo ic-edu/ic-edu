@@ -15,6 +15,11 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\ExportAction;
+use App\Filament\Exports\CourseEnrollmentExporter;
 
 class EnrollmentsRelationManager extends RelationManager
 {
@@ -83,6 +88,21 @@ class EnrollmentsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
+                ExportAction::make()
+                    ->exporter(CourseEnrollmentExporter::class)
+                    ->columnMapping(false)
+                    ->form([
+                        DatePicker::make('enrolled_from')->label('Enrolled From'),
+                        DatePicker::make('enrolled_until')->label('Enrolled Until'),
+                    ])
+                    ->modifyQueryUsing(function (Builder $query, array $data) {
+                        if (!empty($data['enrolled_from'])) {
+                            $query->whereDate('enrolled_at', '>=', $data['enrolled_from']);
+                        }
+                        if (!empty($data['enrolled_until'])) {
+                            $query->whereDate('enrolled_at', '<=', $data['enrolled_until']);
+                        }
+                    }),
                 CreateAction::make()->label('Enroll Student'),
             ])
             ->recordActions([

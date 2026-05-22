@@ -38,8 +38,10 @@ new class extends Component {
     // Menggunakan method with() agar data di-load secara dinamis per halaman (Pagination)
     public function with()
     {
-        // 1. Ambil HANYA ujian yang statusnya 'finished' (sudah dikumpulkan)
-        $query = ExamAttempt::with(['user', 'exam'])->where('status', ExamAttemptStatus::FINISHED->value);
+        // 1. Ambil HANYA ujian yang statusnya 'finished' dan examiner_id sesuai dengan ID penguji yang login
+        $query = ExamAttempt::with(['user', 'exam'])
+            ->where('status', ExamAttemptStatus::FINISHED->value)
+            ->where('examiner_id', auth()->id());
 
         // 2. Filter berdasarkan nama peserta
         if (!empty($this->search)) {
