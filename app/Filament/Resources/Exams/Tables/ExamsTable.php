@@ -38,6 +38,10 @@ class ExamsTable
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),
+                
+                IconColumn::make('is_public')
+                    ->label('Public (Standalone)')
+                    ->boolean(),
             ])
             ->filters([
                 TrashedFilter::make(),

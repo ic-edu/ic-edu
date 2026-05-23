@@ -39,7 +39,7 @@
 
             <div style="position: relative; z-index: 2;">
                 <span style="display:inline-block;background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);font-size:0.65rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:14px;">
-                    📚 {{ $course->target_level ?? 'Course' }}
+                    🎓 {{ is_array($course->target_level) ? implode(' - ', $course->target_level) : ($course->target_level ?? 'Course') }}
                 </span>
                 <h1 style="font-size: 1.8rem; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 10px;">
                     {{ $course->title }}
@@ -153,7 +153,15 @@
     </div>
 
     {{-- CTA --}}
-    <div class="anim-in d4" style="text-align: right; margin-bottom: 40px;">
+    <div class="anim-in d4" style="text-align: right; margin-bottom: 40px; display: flex; justify-content: flex-end; gap: 12px;">
+        @if(isset($certificate) && $certificate)
+        <a href="{{ route('test_taker.course.certificate.preview', $course->id) }}"
+           style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: #f0fdf4; color: #16a34a; border: 2px solid #16a34a; text-decoration: none; box-shadow: 0 4px 14px rgba(22,163,74,0.1); transition: all .2s;"
+           onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+            🏅 View Certificate
+        </a>
+        @endif
+
         @if($isEnrolled)
             @php
                 $firstLesson = $course->modules->first()?->lessons->first();
@@ -163,7 +171,7 @@
                style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, var(--blue), var(--indigo)); color: white; text-decoration: none; box-shadow: 0 6px 20px rgba(37,99,235,0.3); transition: all .2s;"
                onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                 <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Start Learning
+                {{ isset($certificate) && $certificate ? 'Review Course' : 'Start Learning' }}
             </a>
             @endif
         @else

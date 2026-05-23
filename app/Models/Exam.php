@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\ExamAttempt;
+use App\Models\Question;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,10 +20,12 @@ class Exam extends Model
         'total_duration',
         'mode',
         'is_active',
+        'is_public',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_public' => 'boolean',
         'total_duration' => 'integer',
     ];
 
@@ -48,11 +51,8 @@ class Exam extends Model
 
     public function getTotalQuestionsAttribute(): int
     {
-        return DB::table('questions')
-            ->join('question_groups', 'questions.question_group_id', '=', 'question_groups.id')
-            ->join('subsections', 'question_groups.subsection_id', '=', 'subsections.id')
-            ->join('sections', 'subsections.section_id', '=', 'sections.id')
-            ->where('sections.exam_id', $this->id)
-            ->count();
+        return Question::whereHas('questionGroup.subsection.section', function ($query) {
+            $query->where('exam_id', $this->id);
+        })->count();
     }
 }

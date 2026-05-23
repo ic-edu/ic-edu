@@ -9,6 +9,8 @@ class CourseLesson extends Model
 {
     protected $fillable = [
         'module_id',
+        'exam_id',
+        'passing_score',
         'title',
         'type',
         'content_url',
@@ -23,6 +25,7 @@ class CourseLesson extends Model
         'duration_minutes' => 'integer',
         'order_position'   => 'integer',
         'is_previewable'   => 'boolean',
+        'passing_score'    => 'decimal:1',
     ];
 
     protected static function booted(): void
@@ -40,18 +43,23 @@ class CourseLesson extends Model
         return $this->belongsTo(CourseModule::class, 'module_id');
     }
 
+    public function exam(): BelongsTo
+    {
+        return $this->belongsTo(Exam::class, 'exam_id');
+    }
+
     /**
      * Human-readable label for each lesson type.
      */
     public static function types(): array
     {
         return [
-            'video'     => '🎬 Video',
-            'pdf'       => '📄 PDF',
-            'text'      => '📝 Text / Article',
-            'audio'     => '🎧 Audio',
-            'link'      => '🔗 External Link',
-            'quiz'      => '🧩 Quiz / Practice',
+            'video'     => 'Video',
+            'pdf'       => 'PDF',
+            'text'      => 'Text / Article',
+            'audio'     => 'Audio',
+            'link'      => 'External Link',
+            'quiz'      => 'Quiz / Practice',
         ];
     }
 }

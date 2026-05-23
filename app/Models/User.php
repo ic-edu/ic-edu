@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -24,6 +24,12 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'role',
+        'city',
+        'region',
+        'country',
+        'latitude',
+        'longitude',
+        'last_login_ip',
     ];
 
     /**
@@ -57,6 +63,11 @@ class User extends Authenticatable implements FilamentUser
     public function enrollments()
     {
         return $this->hasMany(ExamEnrollment::class);
+    }
+
+    public function courseEnrollments()
+    {
+        return $this->hasMany(CourseEnrollment::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

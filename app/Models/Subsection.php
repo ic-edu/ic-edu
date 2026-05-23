@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subsection extends Model
@@ -40,5 +41,10 @@ class Subsection extends Model
     public function questionGroups(): HasMany
     {
         return $this->hasMany(QuestionGroup::class, 'subsection_id');
+    }
+
+    public function questions(): HasManyThrough
+    {
+        return $this->hasManyThrough(Question::class, QuestionGroup::class);
     }
 }

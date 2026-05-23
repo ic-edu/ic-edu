@@ -3,6 +3,7 @@
 use App\Models\ExamAttempt;
 use App\Models\AttemptAnswer;
 use App\Enums\ExamAttemptStatus;
+use App\Services\ExamNotificationService;
 use Livewire\Component;
 
 new class extends Component
@@ -113,8 +114,12 @@ new class extends Component
     {
         // Pastikan skor akhir dihitung ulang sebelum finalisasi
         $this->recalculateScore();
+
         // Ubah status jadi graded
         $this->attempt->update(['status' => ExamAttemptStatus::GRADED->value]);
+
+        // Kirim notifikasi email ke test taker
+        app(ExamNotificationService::class)->notifyTestTakerGraded($this->attempt);
 
         session()->flash('success', 'Penilaian selesai! Skor akhir berhasil disimpan.');
         return redirect()->route('examiner.exam-manage'); // Kembali ke antrean ujian
@@ -149,11 +154,11 @@ new class extends Component
         {{-- Looping Jawaban Peserta --}}
         <div class="space-y-6">
             @foreach($answers as $index => $ans)
-            @php
-            $q = $ans->question;
-            $type = strtolower(trim(str_replace(' ', '_', $q->type)));
-            $maxPoints = $q->points ?? 10;
-            @endphp
+                @php
+                    $q = $ans->question;
+                    $type = strtolower(trim(str_replace(' ', '_', $q->type)));
+                    $maxPoints = $q->points ?? 1;
+                @endphp
 
             <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
 

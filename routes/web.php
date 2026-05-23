@@ -3,6 +3,7 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
+use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,12 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
+
+Route::view('/courses', 'courses')->name('courses');
+Route::view('/pricing', 'pricing')->name('pricing');
+Route::view('/toefl', 'toefl')->name('toefl');
+Route::view('/toeic', 'toeic')->name('toeic');
+Route::view('/ielts', 'ielts')->name('ielts');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
@@ -34,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Route Examiner
-Route::middleware(['auth', 'role:examiner'])
+Route::middleware(['auth', 'verified', 'role:examiner'])
     ->prefix('examiner')
     ->group(function () {
 
@@ -52,7 +59,7 @@ Route::middleware(['auth', 'role:examiner'])
     });
 
 // Route Test-Taker
-Route::middleware(['auth', 'role:test_taker'])
+Route::middleware(['auth', 'verified', 'role:test_taker'])
     ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
@@ -64,20 +71,31 @@ Route::middleware(['auth', 'role:test_taker'])
         Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');
         Route::get('/my-courses', [TestTakerCourseController::class, 'myCourses'])->name('course.my_courses');
         Route::get('/courses/{course}', [TestTakerCourseController::class, 'show'])->name('course.show');
-        Route::post('/courses/{course}/enroll', [TestTakerCourseController::class, 'enroll'])->name('course.enroll');
+        Route::post('/courses/{course}/enroll', [TestTakerCourseController::class, 'enroll'])->middleware('throttle:5,1')->name('course.enroll');
         Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
+        Route::post('/courses/{course}/lessons/{lesson}/complete', [TestTakerCourseController::class, 'markComplete'])->name('course.lesson.complete');
+        Route::post('/courses/{course}/lessons/{lesson}/quiz', [TestTakerCourseController::class, 'startQuiz'])->middleware('throttle:5,1')->name('course.quiz.start');
+        
+        // Course Certificate
+        Route::get('/courses/{course}/certificate', [TestTakerCourseController::class, 'certificatePreview'])->name('course.certificate.preview');
+        Route::get('/courses/{course}/certificate/download', [TestTakerCourseController::class, 'downloadCertificate'])->name('course.certificate.download');
 
         // Exam Routes
         Route::get('/exams', [ExamController::class, 'index'])->name('exam.index');
         Route::get('/my-exams', [ExamController::class, 'myExams'])->name('exam.my_exams');
-        Route::post('/exams/{exam}/start', [ExamController::class, 'startExam'])->name('exam.start');
+        Route::post('/exams/{exam}/start', [ExamController::class, 'startExam'])->middleware('throttle:5,1')->name('exam.start');
         Volt::route('/exams/{exam}/detail', 'user.exam-detail')->name('exam.detail');
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
+        Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
     });
 
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
-});
+})->middleware(['auth', 'role:examiner']);
+
+Route::get('/admin/geo-map', [MapController::class, 'index'])
+    ->middleware(['web', 'auth', 'role:admin'])
+    ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';

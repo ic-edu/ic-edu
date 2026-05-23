@@ -2,108 +2,202 @@
 @section('title', 'Browse Exams')
 
 @section('content')
-<div style="max-width: 1200px; margin: 0 auto; width: 100%;">
-    
-    {{-- HEADER SECTION --}}
-    <div style="margin-bottom: 32px;">
-        <h1 style="font-size: 1.8rem; font-weight: 900; color: var(--text); letter-spacing: -0.02em;">Browse Exams</h1>
-        <p style="font-size: 0.85rem; color: var(--muted); margin-top: 6px;">Discover and enroll in available simulation exams and tryouts.</p>
+<div class="ec__page-wrapper">
+
+    {{-- PAGE HEADER --}}
+    <div class="ec__page-header">
+        <div>
+            <div class="ec__breadcrumb">
+                <span class="ec__breadcrumb-root">Portal</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M4.5 3L7.5 6L4.5 9" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="ec__breadcrumb-current">Browse Exams</span>
+            </div>
+            <h1 class="ec__page-title">Browse Exams</h1>
+            <p class="ec__page-subtitle">Discover and enroll in available simulation exams and tryouts.</p>
+        </div>
+
+        {{-- Search --}}
+        <div class="ec__search-wrap">
+            <svg class="ec__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" class="page-search-input" placeholder="Search exams...">
+        </div>
     </div>
 
-    {{-- FILTER TABS --}}
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px;">
-        <button style="padding: 10px 20px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; background: var(--text); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(15,23,42,0.15);">
-            All Exams
-        </button>
-        <button style="padding: 10px 20px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; background: white; color: var(--muted); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s;"
-                onmouseover="this.style.borderColor='var(--blue)'; this.style.color='var(--blue)';"
-                onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)';">
-            Latest
-        </button>
-        <button style="padding: 10px 20px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; background: white; color: var(--muted); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s;"
-                onmouseover="this.style.borderColor='var(--blue)'; this.style.color='var(--blue)';"
-                onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)';">
-            Popular
-        </button>
+    {{-- FILTER + COUNT ROW --}}
+    <div class="ec__filter-row">
+        <div class="ec__filter-tabs">
+            <button class="filter-tab active-tab">All Exams</button>
+            <button class="filter-tab">IELTS</button>
+            <button class="filter-tab">TOEIC</button>
+            <button class="filter-tab">TOEFL</button>
+            <button class="filter-tab">Latest</button>
+        </div>
+        <div class="ec__filter-right">
+            <span class="ec__count-text">
+                <span class="ec__count-number">{{ count($exams) }}</span> exam{{ count($exams) !== 1 ? 's' : '' }} available
+            </span>
+            <div class="ec__view-toggle">
+                <button class="view-toggle-btn active" id="btn-grid-view" title="Grid View" aria-label="Grid View">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+                <button class="view-toggle-btn" id="btn-list-view" title="List View" aria-label="List View">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="2" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                        <rect x="1" y="6.75" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                        <rect x="1" y="11.5" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </div>
 
     {{-- EXAMS GRID --}}
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 24px;">
+    <div class="ec__grid view-grid" id="exam-grid-container">
         @forelse($exams as $exam)
         @php
-            $bgColors = [
-                ['bg' => 'linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%)', 'tx' => '#1d4ed8', 'accent' => '#3b82f6', 'emoji' => '🎧'],
-                ['bg' => 'linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%)', 'tx' => '#6d28d9', 'accent' => '#7c3aed', 'emoji' => '🗣️'],
-                ['bg' => 'linear-gradient(135deg, #bbf7d0 0%, #86efac 100%)', 'tx' => '#15803d', 'accent' => '#16a34a', 'emoji' => '📖'],
-                ['bg' => 'linear-gradient(135deg, #fef08a 0%, #fde047 100%)', 'tx' => '#a16207', 'accent' => '#ca8a04', 'emoji' => '✍️'],
-                ['bg' => 'linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 100%)', 'tx' => '#9d174d', 'accent' => '#db2777', 'emoji' => '📝'],
+            $typeName = $exam->examType->name ?? 'Exam';
+
+            $gradients = [
+                'TOEIC' => 'linear-gradient(135deg, #0f3460 0%, #1A456C 60%, #16637a 100%)',
+                'IELTS' => 'linear-gradient(135deg, #1a3a5c 0%, #1e4d6b 60%, #1a5276 100%)',
+                'TOEFL' => 'linear-gradient(135deg, #0d3b4f 0%, #1A456C 60%, #117a65 100%)',
             ];
-            $color = $bgColors[$loop->index % count($bgColors)];
+            $gradient = $gradients[$typeName] ?? 'linear-gradient(135deg, #1A456C 0%, #2c6b8a 100%)';
+
+            $isActive = ($exam->status ?? 'active') === 'active';
         @endphp
-        
-        <div class="card anim-in d{{ ($loop->index % 5) + 1 }}" style="display: flex; flex-direction: column; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;"
-             onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(37,99,235,0.1)';"
-             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-            
-            {{-- Illustration Area --}}
-            <div style="height: 180px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: {{ $color['bg'] }};">
-                
-                {{-- Category Badge --}}
-                <div style="position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: {{ $color['tx'] }}; backdrop-filter: blur(4px);">
-                    {{ $exam->examType->name ?? 'Exam' }}
-                </div>
-                
-                {{-- Duration Badge --}}
-                <div style="position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; color: #334155; backdrop-filter: blur(4px);">
-                    ⏱️ {{ $exam->duration }} Mins
-                </div>
 
-                {{-- Emoji Icon --}}
-                <div style="font-size: 4rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.1)); user-select: none; transition: transform 0.3s;"
-                     onmouseover="this.style.transform='scale(1.1) rotate(5deg)';"
-                     onmouseout="this.style.transform='scale(1) rotate(0)';">
-                    {{ $color['emoji'] }}
-                </div>
+        <div class="ec__card anim-in d{{ $loop->index % 5 + 1 }}"
+             data-type="{{ strtolower($typeName) }}"
+             data-title="{{ strtolower($exam->title) }}">
 
-                <div style="position: absolute; bottom: -30px; right: -30px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.2; background: {{ $color['accent'] }}; filter: blur(20px);"></div>
+            {{-- Thumbnail (background gradient is dynamic, inline required) --}}
+            <div class="ec__thumb" style="background: {{ $gradient }};">
+                <div class="ec__thumb-circle-lg"></div>
+                <div class="ec__thumb-circle-sm"></div>
+                <div class="ec__thumb-dots"></div>
+                <div class="ec__thumb-line"></div>
+                <span class="ec__thumb-watermark">{{ $typeName }}</span>
+                <span class="ec__thumb-badge-type">{{ $typeName }}</span>
+                @if($isActive)
+                    <span class="ec__thumb-badge-dur ec__thumb-badge-dur--active">Active</span>
+                @else
+                    <span class="ec__thumb-badge-dur ec__thumb-badge-dur--inactive">Inactive</span>
+                @endif
             </div>
 
-            {{-- Content Area --}}
-            <div style="padding: 24px; display: flex; flex-direction: column; flex: 1;">
-                <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 8px;">
-                    {{ $exam->title }}
-                </h3>
-                <p style="font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ $exam->description ?? 'A comprehensive exam simulation to test your skills and readiness. Start now to evaluate your performance.' }}
-                </p>
-
-                {{-- Meta Info --}}
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); margin-bottom: 20px;">
-                    <div>
-                        <p style="font-size: 0.65rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Status</p>
-                        <span style="display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.65rem; font-weight: 800; background: #ecfdf5; color: #16a34a;">
-                            ● Active
-                        </span>
-                    </div>
-                </div>
-
-                {{-- Action Button --}}
-                <a href="{{ route('test_taker.exam.detail', $exam->id) }}" 
-                   style="display: block; width: 100%; text-align: center; padding: 12px; border-radius: 12px; background: {{ $color['accent'] }}; color: white; font-size: 0.85rem; font-weight: 800; text-decoration: none; transition: background 0.2s;"
-                   onmouseover="this.style.filter='brightness(1.1)';"
-                   onmouseout="this.style.filter='brightness(1)';">
-                    View Details
-                </a>
+            {{-- Body --}}
+            <div class="ec__body">
+                <h3 class="ec__title">{{ $exam->title }}</h3>
+                <p class="ec__desc">{{ $exam->description ?? 'A comprehensive simulation exam to test your skills and readiness.' }}</p>
             </div>
+
+            {{-- Footer --}}
+            <a href="{{ route('test_taker.exam.detail', $exam->id) }}" class="ec__footer">
+                <span class="ec__footer-text">View Details</span>
+                <span class="ec__footer-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                    </svg>
+                </span>
+            </a>
+
         </div>
         @empty
-        <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; background: white; border: 1.5px dashed var(--border); border-radius: 20px;">
-            <div style="font-size: 3rem; margin-bottom: 16px;">📭</div>
-            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text);">No Exams Available</h3>
-            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 8px;">Check back later or contact your administrator when new exams are published.</p>
+
+        {{-- Empty State --}}
+        <div class="ec__empty-state">
+            <div class="ec__empty-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1A456C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+            </div>
+            <h3 class="ec__empty-title">No Exams Available</h3>
+            <p class="ec__empty-text">Check back later or contact your administrator when new exams are published.</p>
         </div>
+
         @endforelse
     </div>
-    
+
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cards        = Array.from(document.querySelectorAll('#exam-grid-container .ec__card'));
+    const filterTabs   = document.querySelectorAll('.filter-tab');
+    const searchInput  = document.querySelector('.page-search-input');
+    const gridBtn      = document.getElementById('btn-grid-view');
+    const listBtn      = document.getElementById('btn-list-view');
+    const container    = document.getElementById('exam-grid-container');
+    const countEl      = document.querySelector('.ec__count-number');
+
+    let activeFilter = 'all';
+    let searchQuery  = '';
+
+    /* ── apply both search + filter together ── */
+    function applyFilters() {
+        let visible = 0;
+        cards.forEach(card => {
+            const type  = (card.dataset.type  || '').trim();
+            const title = (card.dataset.title || '').trim();
+            const matchFilter = activeFilter === 'all' || type === activeFilter;
+            const matchSearch = title.includes(searchQuery);
+            const show = matchFilter && matchSearch;
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        if (countEl) countEl.textContent = visible;
+    }
+
+    /* ── filter tabs ── */
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            filterTabs.forEach(t => t.classList.remove('active-tab'));
+            this.classList.add('active-tab');
+            const label = this.textContent.trim().toLowerCase();
+            activeFilter = (label === 'all exams' || label === 'latest') ? 'all' : label;
+            applyFilters();
+        });
+    });
+
+    /* ── search ── */
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            searchQuery = this.value.trim().toLowerCase();
+            applyFilters();
+        });
+    }
+
+    /* ── view toggle ── */
+    if (gridBtn && listBtn && container) {
+        gridBtn.addEventListener('click', function () {
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+            container.classList.replace('view-list', 'view-grid');
+            cards.forEach(c => c.classList.remove('ec__card--list'));
+        });
+
+        listBtn.addEventListener('click', function () {
+            listBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+            container.classList.replace('view-grid', 'view-list');
+            cards.forEach(c => c.classList.add('ec__card--list'));
+        });
+    }
+});
+</script>
+@endpush

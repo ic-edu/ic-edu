@@ -69,6 +69,10 @@
                 </div>
             </div>
 
+            <a href="{{ route('test_taker.exam.score_report', $attempt->id) }}" class="btn btn-primary">
+                Download Score Report
+            </a>
+
             {{-- Back Button --}}
             <div style="margin-top: 32px;">
                 <a href="{{ route('test_taker.exam.my_exams') }}"

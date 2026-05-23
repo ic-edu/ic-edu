@@ -20,6 +20,7 @@ class Course extends Model
 
     protected $casts = [
         'is_published' => 'boolean',
+        'target_level' => 'array',
     ];
 
     public function modules(): HasMany
