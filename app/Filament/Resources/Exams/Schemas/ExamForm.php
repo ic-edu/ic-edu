@@ -40,6 +40,11 @@ class ExamForm
             Toggle::make('is_active')
                 ->required()
                 ->default(true),
+
+            Toggle::make('is_public')
+                ->label('Show in Main Menu (Standalone)')
+                ->helperText('Disable if this exam is intended only for Quizzes within an LMS Course.')
+                ->default(true),
         ]);
     }
 }

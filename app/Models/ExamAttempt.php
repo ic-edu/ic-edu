@@ -18,16 +18,19 @@ class ExamAttempt extends Model
         'exam_id',
         'status',
         'started_at',
+        'submitted_at',
         'finished_at',
         'raw_score',
         'converted_score',
         'section_scores',
         'is_passed',
         'current_question_id',
+        'examiner_id',
     ];
 
     protected $casts = [
         'started_at'      => 'datetime',
+        'submitted_at'    => 'datetime',
         'finished_at'     => 'datetime',
         'raw_score'       => 'integer',
         'converted_score' => 'decimal:1',
@@ -56,5 +59,10 @@ class ExamAttempt extends Model
     public function currentQuestion()
     {
         return $this->belongsTo(Question::class, 'current_question_id');
+    }
+
+    public function examiner()
+    {
+        return $this->belongsTo(User::class, 'examiner_id');
     }
 }

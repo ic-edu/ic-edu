@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Subsections;
 
-use App\Filament\Resources\SubsectionResource\RelationManagers\QuestionGroupsRelationManager;
+use App\Filament\Resources\Subsections\RelationManagers\QuestionGroupsRelationManager;
 use App\Filament\Resources\Subsections\Pages\CreateSubsection;
 use App\Filament\Resources\Subsections\Pages\EditSubsection;
 use App\Filament\Resources\Subsections\Pages\ListSubsections;

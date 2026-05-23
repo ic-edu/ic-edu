@@ -24,10 +24,11 @@ class CourseForm
             Select::make('target_level')
                 ->label('Target Level')
                 ->options([
-                    'Beginner'     => '🟢 Beginner',
-                    'Intermediate' => '🟡 Intermediate',
-                    'Advanced'     => '🔴 Advanced',
+                    'Beginner'     => 'Beginner',
+                    'Intermediate' => 'Intermediate',
+                    'Advanced'     => 'Advanced',
                 ])
+                ->multiple()
                 ->searchable()
                 ->nullable(),
 
@@ -41,9 +42,6 @@ class CourseForm
                 ->image()
                 ->disk('public')
                 ->directory('courses/thumbnails')
-                ->imagePreviewHeight('200')
-                ->panelAspectRatio('16:9')
-                ->panelLayout('integrated')
                 ->nullable()
                 ->columnSpanFull(),
 

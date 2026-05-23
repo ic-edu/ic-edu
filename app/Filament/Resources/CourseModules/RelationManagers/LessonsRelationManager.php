@@ -27,54 +27,58 @@ class LessonsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Grid::make(2)->schema([
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(255)
-                    ->columnSpan(1),
+        return $schema->columns(1)->components([
+            TextInput::make('title')
+                ->required()
+                ->maxLength(255),
 
-                Select::make('type')
-                    ->options(CourseLesson::types())
-                    ->required()
-                    ->reactive()
-                    ->columnSpan(1),
-            ]),
+            Select::make('type')
+                ->options(CourseLesson::types())
+                ->required()
+                ->reactive(),
 
-            Grid::make(1)->schema([
-                // Muncul jika tipe Video atau Link
-                TextInput::make('content_url')
-                    ->label('Source URL (Video/Link)')
-                    ->url()
-                    ->visible(fn (Get $get) => in_array($get('type'), ['video', 'link', 'audio']))
-                    ->placeholder('https://youtube.com/watch?v=... atau link file cloud'),
+            TextInput::make('content_url')
+                ->label('Source URL (Video/Link/Audio)')
+                ->url()
+                ->visible(fn (Get $get) => in_array($get('type'), ['video', 'link', 'audio']))
+                ->placeholder('e.g., https://youtube.com/...'),
 
-                // Muncul jika tipe PDF atau Audio (bisa upload)
-                FileUpload::make('file_path')
-                    ->label('Upload File (PDF/Audio/Video)')
-                    ->disk('public')
-                    ->directory('courses/lessons')
-                    ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
-                    ->helperText('Gunakan ini jika ingin upload langsung ke server.'),
+            FileUpload::make('file_path')
+                ->label('Upload File (PDF/Audio/Video)')
+                ->disk('public')
+                ->directory('courses/lessons')
+                ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
+                ->helperText('Upload local files here.'),
 
-                // Muncul jika tipe Text
-                RichEditor::make('text_content')
-                    ->label('Lesson Content (Text/Article)')
-                    ->visible(fn (Get $get) => $get('type') === 'text')
-                    ->columnSpanFull(),
-            ]),
+            RichEditor::make('text_content')
+                ->label('Lesson Content (Text/Article)')
+                ->visible(fn (Get $get) => $get('type') === 'text'),
 
-            Grid::make(3)->schema([
-                TextInput::make('duration_minutes')
-                    ->label('Est. Duration (Min)')
-                    ->numeric()
-                    ->placeholder('15'),
+            Select::make('exam_id')
+                ->label('Select Quiz/Exam')
+                ->relationship('exam', 'title')
+                ->searchable()
+                ->preload()
+                ->visible(fn (Get $get) => $get('type') === 'quiz')
+                ->required(fn (Get $get) => $get('type') === 'quiz')
+                ->helperText('Select an Exam to use as a quiz for this lesson.'),
 
-                Toggle::make('is_previewable')
-                    ->label('Previewable?')
-                    ->helperText('Bisa dilihat tanpa enroll (Free Lesson).')
-                    ->default(false),
-            ]),
+            TextInput::make('passing_score')
+                ->label('Passing Grade')
+                ->numeric()
+                ->visible(fn (Get $get) => $get('type') === 'quiz')
+                ->required(fn (Get $get) => $get('type') === 'quiz')
+                ->helperText('Minimum score to proceed (0-100).'),
+
+            TextInput::make('duration_minutes')
+                ->label('Est. Duration (Min)')
+                ->numeric()
+                ->placeholder('15'),
+
+            Toggle::make('is_previewable')
+                ->label('Previewable')
+                ->helperText('Can be viewed without enrollment.')
+                ->default(false),
         ]);
     }
 
@@ -99,6 +103,7 @@ class LessonsRelationManager extends RelationManager
                         'pdf'   => 'warning',
                         'text'  => 'success',
                         'audio' => 'info',
+                        'quiz'  => 'primary',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => CourseLesson::types()[$state] ?? $state),
