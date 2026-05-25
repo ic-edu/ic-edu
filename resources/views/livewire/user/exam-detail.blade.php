@@ -62,13 +62,17 @@ class extends Component {
 <div x-data="{ showConfirm: false }">
 <div class="ed__page-wrapper">
 
-    {{-- BACK BUTTON --}}
-    <a href="{{ route('test_taker.exam.index') }}" class="ed__back-btn">
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-        </svg>
-        Back to Browse Exams
-    </a>
+    {{-- BREADCRUMB --}}
+    <div class="ed__breadcrumb">
+        <a href="{{ route('test_taker.exam.index') }}" class="ed__back">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 12H5m7-7-7 7 7 7"/>
+            </svg>
+            Browse Exams
+        </a>
+        <span class="ed__breadcrumb-sep">/</span>
+        <span class="ed__breadcrumb-current">{{ Str::limit($exam->title, 40) }}</span>
+    </div>
 
     {{-- EXAM HEADER CARD --}}
     <div class="ed__header-card anim-in d1">

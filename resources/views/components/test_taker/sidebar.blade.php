@@ -12,36 +12,36 @@
     <nav class="sidebar-nav">
         {{-- MAIN --}}
         <p class="nav-label font-heading">Main Menu</p>
-        <a href="{{ route('test_taker.dashboard') }}" class="s-btn {{ request()->routeIs('test_taker.dashboard') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.dashboard') }}" data-tour="dashboard" class="s-btn {{ request()->routeIs('test_taker.dashboard') ? 'active' : '' }}">
             <x-lucide-layout-dashboard class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Dashboard</span>
         </a>
 
         {{-- LEARN --}}
         <p class="nav-label font-heading">Learning</p>
-        <a href="{{ route('test_taker.course.index') }}" class="s-btn {{ request()->routeIs('test_taker.course.index') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.course.index') }}" data-tour="browse-courses" class="s-btn {{ request()->routeIs('test_taker.course.index') ? 'active' : '' }}">
             <x-lucide-book-open class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Browse Courses</span>
         </a>
-        <a href="{{ route('test_taker.course.my_courses') }}" class="s-btn {{ request()->routeIs('test_taker.course.my_courses') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.course.my_courses') }}" data-tour="my-courses" class="s-btn {{ request()->routeIs('test_taker.course.my_courses') ? 'active' : '' }}">
             <x-lucide-library class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">My Courses</span>
         </a>
 
         {{-- EXAMS --}}
         <p class="nav-label font-heading">Exams</p>
-        <a href="{{ route('test_taker.exam.index') }}" class="s-btn {{ request()->routeIs('test_taker.exam.index') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.exam.index') }}" data-tour="browse-exams" class="s-btn {{ request()->routeIs('test_taker.exam.index') ? 'active' : '' }}">
             <x-lucide-file-text class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Browse Exams</span>
         </a>
-        <a href="{{ route('test_taker.exam.my_exams') }}" class="s-btn {{ request()->routeIs('test_taker.exam.my_exams') ? 'active' : '' }}">
+        <a href="{{ route('test_taker.exam.my_exams') }}" data-tour="my-exams" class="s-btn {{ request()->routeIs('test_taker.exam.my_exams') ? 'active' : '' }}">
             <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">My Exams</span>
         </a>
 
         {{-- ACCOUNT --}}
         <p class="nav-label font-heading">Account</p>
-        <a href="{{ route('profile.edit') }}" class="s-btn {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+        <a href="{{ route('profile.show') }}" data-tour="settings" class="s-btn {{ request()->routeIs('profile.show') ? 'active' : '' }}">
             <x-lucide-settings class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Settings</span>
         </a>
