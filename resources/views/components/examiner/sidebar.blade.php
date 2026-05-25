@@ -36,13 +36,13 @@
 
         </a>
 
-        {{-- EXAM MANAGEMENT --}}
-        <p class="nav-label font-heading">Exam Management</p>
+        {{-- EXAM REVIEWS --}}
+        <p class="nav-label font-heading">Assesment Center</p>
 
-        <a href="{{ route('examiner.exam-manage') }}"
+        <a href="{{ route('examiner.exam-reviews') }}"
             class="s-btn {{
-        request()->routeIs('examiner.exam-manage') &&
-        !request()->routeIs('examiner.exam-manage.type')
+        request()->routeIs('examiner.exam-reviews') &&
+        !request()->routeIs('examiner.exam-reviews.type')
             ? 'active'
             : ''
     }}">
@@ -50,14 +50,14 @@
             <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
 
             <span class="s-label font-heading">
-                Exam Manage
+                Exams Reviews
             </span>
 
         </a>
 
-        <a href="{{ route('examiner.exam-manage.type', 'ielts') }}"
+        <a href="{{ route('examiner.course-reviews') }}"
             class="s-btn {{
-        request()->route('type') === 'ielts'
+        request()->routeIs('examiner.course-reviews')
             ? 'active'
             : ''
     }}">
@@ -65,39 +65,16 @@
             <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
 
             <span class="s-label font-heading">
-                IELTS Reviews
+                Courses Reviews
             </span>
         </a>
 
-        <a href="{{ route('examiner.exam-manage.type', 'toefl') }}"
-            class="s-btn {{
-        request()->route('type') === 'toefl'
-            ? 'active'
-            : ''
-    }}">
-            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
-            <span class="s-label font-heading">
-                TOEFL Reviews
-            </span>
-        </a>
-
-        <a href="{{ route('examiner.exam-manage.type', 'toeic') }}"
-            class="s-btn {{
-        request()->route('type') === 'toeic'
-            ? 'active'
-            : ''
-    }}">
-            <x-lucide-clipboard-check class="w-5 h-5 min-w-[20px]" />
-            <span class="s-label font-heading">
-                TOEIC Reviews
-            </span>
-        </a>
 
         {{-- ACCOUNT --}}
         <p class="nav-label font-heading">Account</p>
 
-        <a href="{{ route('profile.edit') }}"
-            class="s-btn {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+        <a href="{{ route('examiner.settings') }}"
+            class="s-btn {{ request()->routeIs('examiner.settings') ? 'active' : '' }}">
 
             <x-lucide-settings class="w-5 h-5 min-w-[20px]" />
 

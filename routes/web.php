@@ -51,11 +51,14 @@ Route::middleware(['auth', 'verified', 'role:examiner'])
         })->name('examiner.dashboard');
 
         Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
+        Volt::route('/exam-reviews', 'examiner.exam-reviews')->name('examiner.exam-reviews');
         Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
-
-        // Exam manage per type
-        Volt::route('/exam-manage/{type}', 'examiner.exam-manage')
-            ->name('examiner.exam-manage.type');
+        Volt::route('/course-reviews', 'examiner.course-reviews')->name('examiner.course-reviews');
+        Route::get('/settings', function () {
+            return view('profile.examiner-edit', [
+                'user' => Auth::user(),
+            ]);
+        })->name('examiner.settings');
     });
 
 // Route Test-Taker
@@ -75,7 +78,7 @@ Route::middleware(['auth', 'verified', 'role:test_taker'])
         Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
         Route::post('/courses/{course}/lessons/{lesson}/complete', [TestTakerCourseController::class, 'markComplete'])->name('course.lesson.complete');
         Route::post('/courses/{course}/lessons/{lesson}/quiz', [TestTakerCourseController::class, 'startQuiz'])->middleware('throttle:5,1')->name('course.quiz.start');
-        
+
         // Course Certificate
         Route::get('/courses/{course}/certificate', [TestTakerCourseController::class, 'certificatePreview'])->name('course.certificate.preview');
         Route::get('/courses/{course}/certificate/download', [TestTakerCourseController::class, 'downloadCertificate'])->name('course.certificate.download');
