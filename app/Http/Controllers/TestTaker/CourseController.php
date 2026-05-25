@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\CourseLesson;
+use App\Models\LessonProgress;
+use App\Models\Certificate;
+use App\Models\ExamAttempt;
+use App\Enums\ExamAttemptStatus;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
@@ -62,19 +67,15 @@ class CourseController extends Controller
         $certificate = null;
 
         if ($isEnrolled && $totalLessons > 0) {
-            $completedLessonsCount = \App\Models\LessonProgress::where('user_id', $userId)
+            $completedLessonsCount = LessonProgress::where('user_id', $userId)
                 ->whereIn('course_lesson_id', $course->modules->flatMap->lessons->pluck('id'))
                 ->where('is_completed', true)
                 ->count();
                 
             if ($completedLessonsCount >= $totalLessons) {
-                $certificate = \App\Models\Certificate::firstOrCreate(
-                    ['user_id' => $userId, 'course_id' => $course->id],
-                    [
-                        'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
-                        'issued_at' => now(),
-                    ]
-                );
+                $certificate = Certificate::where('user_id', $userId)
+                    ->where('course_id', $course->id)
+                    ->first();
             }
         }
 
@@ -132,7 +133,7 @@ class CourseController extends Controller
 
         // --- ENFORCED PROGRESSION ---
         if ($isEnrolled && $prevLesson) {
-            $prevProgress = \App\Models\LessonProgress::where('user_id', $userId)
+            $prevProgress = LessonProgress::where('user_id', $userId)
                 ->where('course_lesson_id', $prevLesson->id)
                 ->first();
 
@@ -143,26 +144,42 @@ class CourseController extends Controller
         }
 
         // --- GET CURRENT PROGRESS ---
-        $currentProgress = \App\Models\LessonProgress::where('user_id', $userId)
+        $currentProgress = LessonProgress::where('user_id', $userId)
             ->where('course_lesson_id', $lesson->id)
             ->first();
         $isCompleted = $currentProgress ? $currentProgress->is_completed : false;
 
         // Auto-complete check for quizzes
         if ($isEnrolled && $lesson->type === 'quiz' && $lesson->exam_id && !$isCompleted) {
-            $attempt = \App\Models\ExamAttempt::where('user_id', $userId)
+            $attempt = ExamAttempt::where('user_id', $userId)
                 ->where('exam_id', $lesson->exam_id)
                 ->latest()
                 ->first();
 
-            if ($attempt && $attempt->status === \App\Enums\ExamAttemptStatus::GRADED->value) {
+            if ($attempt && $attempt->status === ExamAttemptStatus::GRADED->value) {
                 $passingGrade = $lesson->passing_score ?? 0;
                 if ($attempt->converted_score >= $passingGrade) {
-                    \App\Models\LessonProgress::updateOrCreate(
+                    LessonProgress::updateOrCreate(
                         ['user_id' => $userId, 'course_lesson_id' => $lesson->id],
                         ['is_completed' => true, 'last_accessed_at' => now()]
                     );
                     $isCompleted = true;
+                    
+                    // Generate certificate if all lessons are complete
+                    $completedLessonsCount = LessonProgress::where('user_id', $userId)
+                        ->whereIn('course_lesson_id', $allLessons->pluck('id'))
+                        ->where('is_completed', true)
+                        ->count();
+                        
+                    if ($completedLessonsCount >= $allLessons->count()) {
+                        Certificate::firstOrCreate(
+                            ['user_id' => $userId, 'course_id' => $course->id],
+                            [
+                                'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
+                                'issued_at' => now(),
+                            ]
+                        );
+                    }
                 }
             }
         }
@@ -173,7 +190,7 @@ class CourseController extends Controller
         $totalLessons = $allLessons->count();
         
         if ($isEnrolled) {
-            $completedLessonIds = \App\Models\LessonProgress::where('user_id', $userId)
+            $completedLessonIds = LessonProgress::where('user_id', $userId)
                 ->whereIn('course_lesson_id', $allLessons->pluck('id'))
                 ->where('is_completed', true)
                 ->pluck('course_lesson_id')
@@ -204,7 +221,7 @@ class CourseController extends Controller
             return redirect()->back()->with('error', 'Quizzes are graded automatically.');
         }
 
-        \App\Models\LessonProgress::updateOrCreate(
+        LessonProgress::updateOrCreate(
             ['user_id' => $userId, 'course_lesson_id' => $lesson->id],
             ['is_completed' => true, 'last_accessed_at' => now()]
         );
@@ -217,6 +234,22 @@ class CourseController extends Controller
         if ($nextLesson) {
             return redirect()->route('test_taker.course.lesson', [$course->id, $nextLesson->id])
                 ->with('success', 'Lesson completed! Proceeding to the next lesson.');
+        }
+
+        // Generate certificate if all lessons are complete
+        $completedLessonsCount = LessonProgress::where('user_id', $userId)
+            ->whereIn('course_lesson_id', $allLessons->pluck('id'))
+            ->where('is_completed', true)
+            ->count();
+            
+        if ($completedLessonsCount >= $allLessons->count()) {
+            Certificate::firstOrCreate(
+                ['user_id' => $userId, 'course_id' => $course->id],
+                [
+                    'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
+                    'issued_at' => now(),
+                ]
+            );
         }
 
         // If it was the last lesson, redirect to course overview and show certificate (to be implemented)
@@ -245,9 +278,9 @@ class CourseController extends Controller
         }
 
         // Resume ongoing attempt if any
-        $existingAttempt = \App\Models\ExamAttempt::where('user_id', $userId)
+        $existingAttempt = ExamAttempt::where('user_id', $userId)
             ->where('exam_id', $lesson->exam_id)
-            ->where('status', \App\Enums\ExamAttemptStatus::ONGOING->value)
+            ->where('status', ExamAttemptStatus::ONGOING->value)
             ->first();
 
         if ($existingAttempt) {
@@ -255,18 +288,18 @@ class CourseController extends Controller
         }
 
         // Create new attempt
-        $newAttempt = \App\Models\ExamAttempt::create([
+        $newAttempt = ExamAttempt::create([
             'user_id'  => $userId,
             'exam_id'  => $lesson->exam_id,
             'started_at' => now(),
-            'status'   => \App\Enums\ExamAttemptStatus::ONGOING->value,
+            'status'   => ExamAttemptStatus::ONGOING->value,
         ]);
 
         return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id, 'course_id' => $course->id, 'lesson_id' => $lesson->id]);
     }
     public function certificatePreview(Course $course)
     {
-        $certificate = \App\Models\Certificate::where('user_id', Auth::id())
+        $certificate = Certificate::where('user_id', Auth::id())
             ->where('course_id', $course->id)
             ->firstOrFail();
 
@@ -275,11 +308,11 @@ class CourseController extends Controller
 
     public function downloadCertificate(Course $course)
     {
-        $certificate = \App\Models\Certificate::where('user_id', Auth::id())
+        $certificate = Certificate::where('user_id', Auth::id())
             ->where('course_id', $course->id)
             ->firstOrFail();
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('test_taker.courses.certificate_pdf', compact('course', 'certificate'));
+        $pdf = Pdf::loadView('test_taker.courses.certificate_pdf', compact('course', 'certificate'));
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download('Certificate_' . str_replace(' ', '_', $course->title) . '.pdf');

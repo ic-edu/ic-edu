@@ -42,8 +42,8 @@ class ExamForm
                 ->default(true),
 
             Toggle::make('is_public')
-                ->label('Tampilkan di Menu Utama (Standalone)')
-                ->helperText('Matikan jika ujian ini khusus digunakan untuk Kuis di dalam LMS Course.')
+                ->label('Show in Main Menu (Standalone)')
+                ->helperText('Disable if this exam is intended only for Quizzes within an LMS Course.')
                 ->default(true),
         ]);
     }

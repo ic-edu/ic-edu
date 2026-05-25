@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('exam_types', function (Blueprint $table) {
-            //
+        Schema::table('exam_attempts', function (Blueprint $table) {
+            $table->foreignId('examiner_id')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 
@@ -21,8 +21,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('exam_types', function (Blueprint $table) {
-            //
+        Schema::table('exam_attempts', function (Blueprint $table) {
+            $table->dropForeign(['examiner_id']);
+            $table->dropColumn('examiner_id');
         });
     }
 };

@@ -567,7 +567,7 @@
                     <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
                         <span class="counter" data-target="98">0</span>%
                     </div>
-                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Face Rate</div>
+                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Pass Rate</div>
                 </div>
                 <div class="flex flex-col items-center">
                     <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
@@ -603,7 +603,7 @@
             Unlock English Skills <br> Anytime, Anywhere
         </h2>
         <a href="{{ route('register') }}" class="inline-block bg-[#1a3a5a] hover:bg-[#2c4e7a] text-white px-12 py-4 rounded-full font-bold text-xl transition-all shadow-xl shadow-blue-100">
-            Get Started – Its Free Trial
+            Get Started – It's Free Trial
         </a>
     </div>
     
