@@ -55,4 +55,9 @@ class Exam extends Model
             $query->where('exam_id', $this->id);
         })->count();
     }
+
+    public function courseLessons()
+    {
+        return $this->hasMany(CourseLesson::class, 'exam_id');
+    }
 }

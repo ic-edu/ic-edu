@@ -160,19 +160,12 @@ new class extends Component
                     $maxPoints = $q->points ?? 1;
                 @endphp
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
-                    
-                    {{-- Soal --}}
-                    <div class="flex gap-4 mb-4">
-                        <div class="flex-shrink-0 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold">
-                            {{ $index + 1 }}
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold uppercase px-2 py-1 bg-gray-100 rounded-md mb-2 inline-block">
-                                {{ str_replace('_', ' ', $type) }}
-                            </span>
-                            <div class="prose max-w-none text-gray-800">{!! $q->question_text !!}</div>
-                        </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
+
+                {{-- Soal --}}
+                <div class="flex gap-4 mb-4">
+                    <div class="flex-shrink-0 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold">
+                        {{ $index + 1 }}
                     </div>
                 </div>
 
