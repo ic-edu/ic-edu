@@ -106,10 +106,10 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
 
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
-})->middleware(['auth', 'role:examiner']);
+})->middleware(['auth', 'role:admin']);
 
 Route::get('/admin/geo-map', [MapController::class, 'index'])
-    ->middleware(['web', 'auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin'])
     ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';
