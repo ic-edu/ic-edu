@@ -116,67 +116,58 @@
                 </div>
 
                 @if($isEnrolled)
-                {{-- Tab bar --}}
-                <div class="cd__tabs" id="module-tabs" data-color="#1A456C">
+                <div class="cd__accordion" style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
                     @foreach($course->modules as $idx => $module)
-                    <button class="cd__tab {{ $idx === 0 ? 'cd__tab--active' : '' }}"
-                            onclick="switchTab({{ $idx }})"
-                            style="{{ $idx === 0 ? 'border-bottom-color:#1A456C; color:#1A456C;' : '' }}">
-                        <span class="cd__tab-num">{{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                        <span class="cd__tab-label">{{ Str::limit($module->title, 35) }}</span>
-                    </button>
-                    @endforeach
-                </div>
-
-                {{-- Tab panels --}}
-                @foreach($course->modules as $idx => $module)
-                <div class="cd__tab-panel {{ $idx === 0 ? 'cd__tab-panel--active' : '' }}" id="panel-{{ $idx }}">
-
-                    {{-- Panel header --}}
-                    <div class="cd__panel-head">
-                        <div>
-                            <span class="cd__panel-step">
-                                Module {{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}
-                            </span>
-                            <p class="cd__panel-title">{{ $module->title }}</p>
-                        </div>
-                        <span class="cd__panel-meta">
-                            {{ $module->lessons->count() }} lessons
-                            @if($module->lessons->sum('duration_minutes'))
-                                · {{ $module->lessons->sum('duration_minutes') }} min
-                            @endif
-                        </span>
-                    </div>
-
-                    {{-- Lessons --}}
-                    <div class="cd__panel-lessons">
-                        @foreach($module->lessons as $lesson)
-                        @php $typeIcon = $typeIconMap[$lesson->type] ?? 'file'; @endphp
-                        <a href="{{ route('test_taker.course.lesson', [$course->id, $lesson->id]) }}"
-                           class="cd__lesson">
-
-                            <div class="cd__lesson-icon">
-                                <x-dynamic-component :component="'lucide-' . $typeIcon" style="width:12px;height:12px;" />
-                            </div>
-
-                            <div class="cd__lesson-info">
-                                <span class="cd__lesson-title">{{ $lesson->title }}</span>
-                                <div class="cd__lesson-meta">
-                                    <span>{{ ucfirst($lesson->type) }}</span>
-                                    @if($lesson->duration_minutes)
-                                        <span class="cd__dot"></span>
-                                        <span>{{ $lesson->duration_minutes }} min</span>
-                                    @endif
+                    <div class="cd__accordion-item" style="border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: white;">
+                        
+                        {{-- Accordion Header --}}
+                        <button type="button" class="cd__accordion-btn" data-target="acc-{{ $idx }}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: var(--base); border: none; cursor: pointer; text-align: left; transition: background 0.2s;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(26,69,108,0.1); color: #1A456C; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;">
+                                    {{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}
+                                </div>
+                                <div>
+                                    <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0 0 3px;">{{ $module->title }}</h3>
+                                    <p style="font-size: 0.75rem; color: var(--muted); margin: 0;">
+                                        {{ $module->lessons->count() }} lessons
+                                        @if($module->lessons->sum('duration_minutes'))
+                                            · {{ $module->lessons->sum('duration_minutes') }} min
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
+                            <svg class="cd__accordion-icon" id="icon-{{ $idx }}" style="width: 18px; height: 18px; color: var(--muted); transition: transform 0.3s; transform: {{ $idx === 0 ? 'rotate(180deg)' : 'rotate(0deg)' }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
 
-                            <x-lucide-chevron-right class="cd__lesson-arrow" />
-                        </a>
-                        @endforeach
+                        {{-- Accordion Body --}}
+                        <div class="cd__accordion-body" id="acc-{{ $idx }}" style="display: {{ $idx === 0 ? 'block' : 'none' }}; border-top: 1px solid var(--border);">
+                            <div class="cd__panel-lessons" style="padding: 8px 20px 20px;">
+                                @foreach($module->lessons as $lesson)
+                                @php $typeIcon = $typeIconMap[$lesson->type] ?? 'file'; @endphp
+                                <a href="{{ route('test_taker.course.lesson', [$course->id, $lesson->id]) }}"
+                                   class="cd__lesson" style="margin: 0; padding: 12px 8px; border-bottom: 1px solid var(--border); border-radius: 0;">
+                                    <div class="cd__lesson-icon">
+                                        <x-dynamic-component :component="'lucide-' . $typeIcon" style="width:12px;height:12px;" />
+                                    </div>
+                                    <div class="cd__lesson-info">
+                                        <span class="cd__lesson-title">{{ $lesson->title }}</span>
+                                        <div class="cd__lesson-meta">
+                                            <span>{{ ucfirst($lesson->type) }}</span>
+                                            @if($lesson->duration_minutes)
+                                                <span class="cd__dot"></span>
+                                                <span>{{ $lesson->duration_minutes }} min</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <x-lucide-chevron-right class="cd__lesson-arrow" />
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+
                     </div>
-
+                    @endforeach
                 </div>
-                @endforeach
 
                 @else
                 {{-- Enrollment gate --}}
@@ -744,21 +735,24 @@
 
 @push('scripts')
 <script>
-function switchTab(idx) {
-    const tabs   = document.querySelectorAll('.cd__tab');
-    const panels = document.querySelectorAll('.cd__tab-panel');
-    const color  = document.getElementById('module-tabs').dataset.color;
-
-    tabs.forEach((t, i) => {
-        t.classList.toggle('cd__tab--active', i === idx);
-        t.style.borderBottomColor = i === idx ? color : 'transparent';
-        t.style.color = i === idx ? color : '';
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.cd__accordion-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetBody = document.getElementById(targetId);
+            const icon = this.querySelector('.cd__accordion-icon');
+            
+            if (targetBody.style.display === 'none' || targetBody.style.display === '') {
+                targetBody.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                targetBody.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        });
     });
-
-    panels.forEach((p, i) => {
-        p.classList.toggle('cd__tab-panel--active', i === idx);
-    });
-}
+});
 </script>
 @endpush
 

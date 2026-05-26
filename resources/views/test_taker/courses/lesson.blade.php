@@ -267,7 +267,15 @@
                     </a>
                     @endif
                 @else
-                <div></div>
+                <a href="{{ route('test_taker.course.show', $course->id) }}"
+                   style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; text-decoration: none; transition: all .2s; flex: 1; max-width: 50%; text-align: right; justify-content: flex-end; box-shadow: 0 4px 12px rgba(16,185,129,0.3);"
+                   onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='brightness(1)'">
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.8); text-transform: uppercase;">Course Finished</p>
+                        <p style="font-size: 0.88rem; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Complete Course</p>
+                    </div>
+                    <svg style="width:20px;height:20px;color:white;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </a>
                 @endif
             </div>
         </div>

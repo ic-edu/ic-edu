@@ -76,6 +76,14 @@ class CourseController extends Controller
                 $certificate = Certificate::where('user_id', $userId)
                     ->where('course_id', $course->id)
                     ->first();
+
+                // Failsafe: automatically update status if they somehow completed it but it's still active
+                $currentEnrollment = CourseEnrollment::where('user_id', $userId)
+                    ->where('course_id', $course->id)
+                    ->first();
+                if ($currentEnrollment && $currentEnrollment->status === 'active') {
+                    $currentEnrollment->update(['status' => 'graduated']);
+                }
             }
         }
 
@@ -171,15 +179,19 @@ class CourseController extends Controller
                         ->where('is_completed', true)
                         ->count();
                         
-                    if ($completedLessonsCount >= $allLessons->count()) {
-                        Certificate::firstOrCreate(
-                            ['user_id' => $userId, 'course_id' => $course->id],
-                            [
-                                'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
-                                'issued_at' => now(),
-                            ]
-                        );
-                    }
+                        if ($completedLessonsCount >= $allLessons->count()) {
+                            Certificate::firstOrCreate(
+                                ['user_id' => $userId, 'course_id' => $course->id],
+                                [
+                                    'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
+                                    'issued_at' => now(),
+                                ]
+                            );
+                            
+                            CourseEnrollment::where('user_id', $userId)
+                                ->where('course_id', $course->id)
+                                ->update(['status' => 'graduated']);
+                        }
                 }
             }
         }
@@ -250,6 +262,10 @@ class CourseController extends Controller
                     'issued_at' => now(),
                 ]
             );
+
+            CourseEnrollment::where('user_id', $userId)
+                ->where('course_id', $course->id)
+                ->update(['status' => 'graduated']);
         }
 
         // If it was the last lesson, redirect to course overview and show certificate (to be implemented)
