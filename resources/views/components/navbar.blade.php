@@ -181,26 +181,27 @@
         display: none;
     }
 
-    .scrolled-nav {
-        top: 15px !important;
-        width: 90% !important;
-        max-width: 1200px;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(226, 232, 240, 0.7);
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-        padding: 0px 10px !important;
-    }
-
     #navbar {
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        --scroll-p: 0;
+        top: calc(var(--scroll-p) * 20px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - (var(--scroll-p) * 8%));
+        max-width: calc(100% - (var(--scroll-p) * 100%) + (var(--scroll-p) * 1200px));
+        border-radius: calc(var(--scroll-p) * 100px);
+        
+        /* Pewarnaan dan Kaca berdasarkan persentase scroll */
+        background: rgba(255, 255, 255, calc(var(--scroll-p) * 0.85));
+        backdrop-filter: blur(calc(var(--scroll-p) * 16px));
+        -webkit-backdrop-filter: blur(calc(var(--scroll-p) * 16px));
+        border: 1px solid rgba(226, 232, 240, calc(var(--scroll-p) * 0.7));
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, calc(var(--scroll-p) * 0.08));
+        
+        /* Sengaja tidak diberi transition agar gerakannya 100% lengket dengan scroll wheel */
     }
 </style>
 
-<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-transparent">
+<nav id="navbar" class="fixed z-50">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
         <a href="{{ url('/') }}" class="flex-shrink-0">
             <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-15">
@@ -276,16 +277,27 @@
                     d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </button>
-        <a href="{{ route('login') }}" id="btn-signin"
-            class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
-                      border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
-            Sign In
-        </a>
-        <a href="{{ route('register') }}"
-            class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
-                      btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
-            Get Started
-        </a>
+        @auth
+            <a href="{{ url('/dashboard') }}"
+                class="inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
+                          border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all bg-white/80 backdrop-blur-sm">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-inner">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
+                <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
+            </a>
+        @else
+            <a href="{{ route('login') }}" id="btn-signin"
+                class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
+                          border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
+                Sign In
+            </a>
+            <a href="{{ route('register') }}"
+                class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
+                          btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
+                Get Started
+            </a>
+        @endauth
     </div>
     </div>
 </nav>
@@ -340,19 +352,20 @@
         const chevron = document.getElementById('tests-chevron');
         let dropTimer;
 
+        let ticking = false;
         function applyScroll() {
-            const scrolled = window.scrollY > 60;
-            navbar.classList.toggle('bg-white/95', scrolled);
-            navbar.classList.toggle('backdrop-blur-xl', scrolled);
-            navbar.classList.toggle('border-slate-200', scrolled);
-            navbar.classList.toggle('shadow-sm', scrolled);
-            navbar.classList.toggle('scrolled-nav', scrolled);
-            navbar.classList.toggle('bg-transparent', !scrolled);
-            navbar.classList.toggle('border-transparent', !scrolled);
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    let scrollY = window.scrollY;
+                    // Proses transformasi diubah menjadi jarak scroll sejauh 200px agar lebih cepat selesai
+                    let progress = Math.min(Math.max(scrollY / 200, 0), 1);
+                    navbar.style.setProperty('--scroll-p', progress);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         }
-        window.addEventListener('scroll', applyScroll, {
-            passive: true
-        });
+        window.addEventListener('scroll', applyScroll, { passive: true });
         applyScroll();
 
         function openDrop() {
@@ -399,17 +412,5 @@
                 if (doc) doc.style.borderColor = '';
             });
         });
-
-        function applyScroll() {
-            const scrolled = window.scrollY > 50;
-            if (scrolled) {
-                navbar.classList.add('scrolled-nav');
-                navbar.classList.remove('bg-transparent', 'border-transparent', 'py-4');
-                navbar.classList.add('py-2');
-            } else {
-                navbar.classList.remove('scrolled-nav', 'py-2');
-                navbar.classList.add('bg-transparent', 'border-transparent', 'py-4');
-            }
-        }
     })();
 </script>

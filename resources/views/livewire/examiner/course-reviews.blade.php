@@ -1,70 +1,57 @@
 <?php
 
 use App\Models\ExamAttempt;
-use App\Models\Exam;
+use App\Models\Course;
 use App\Enums\ExamAttemptStatus;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-
-new class extends Component {
+return new class extends Component {
     use WithPagination;
 
-    // Properti untuk filter pencarian
     public $search = '';
-    public $selectedExam = '';
-    public $type = null;
-
-    public function mount($type = null)
-    {
-        $this->type = $type;
-    }
+    public $selectedCourse = '';
 
     public function rendering($view)
     {
         $view->layout('layouts.examiner');
     }
 
-    // Reset halaman ke 1 setiap kali user mengetik pencarian
     public function updatingSearch()
     {
         $this->resetPage();
     }
-    public function updatingSelectedExam()
+
+    public function updatingSelectedCourse()
     {
         $this->resetPage();
     }
 
-    // Menggunakan method with() agar data di-load secara dinamis per halaman (Pagination)
     public function with()
     {
-        // 1. Ambil HANYA ujian yang statusnya 'finished' (sudah dikumpulkan)
-        $query = ExamAttempt::with(['user', 'exam'])->where('status', ExamAttemptStatus::FINISHED->value);
+        $query = ExamAttempt::with([
+            'user',
+            'exam.courseLessons.module.course',
+        ])
+            ->where('status', ExamAttemptStatus::FINISHED->value)
+            ->whereHas('exam.courseLessons');
 
-        // 2. Filter berdasarkan nama peserta
         if (!empty($this->search)) {
             $query->whereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('email', 'like', '%' . $this->search . '%');
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
             });
         }
 
-        // 3. Filter berdasarkan Ujian tertentu
-        if (!empty($this->selectedExam)) {
-            $query->where('exam_id', $this->selectedExam);
-        }
-
-        if (!empty($this->type)) {
-            $query->whereHas('exam.examType', function ($q) {
-                $q->whereRaw('LOWER(name) = ?', [strtolower($this->type)]);
+        if (!empty($this->selectedCourse)) {
+            $query->whereHas('exam.courseLessons.module.course', function ($q) {
+                $q->where('id', $this->selectedCourse);
             });
         }
 
         return [
-            // Urutkan dari yang paling baru dikumpulkan
             'attempts' => $query->latest('submitted_at')->paginate(10),
-
-            // Untuk dropdown filter pilihan ujian
-            'exams' => Exam::orderBy('title')->get(),
+            'courses' => Course::orderBy('title')->get(),
         ];
     }
 };
@@ -75,9 +62,8 @@ new class extends Component {
 
         {{-- Header --}}
         <div class="mb-6 anim-in d1">
-            <h1 class="text-3xl font-bold font-dmSans tracking-tight text-slate-900">Antrean Penilaian Ujian</h1>
-            <p class="text-slate-500 mt-2 text-sm font-poppins">Pilih peserta yang telah menyelesaikan ujian untuk memberikan skor manual pada
-                esai atau rekaman suara.</p>
+            <h1 class="text-3xl font-bold font-dmSans tracking-tight text-slate-900">Antrean Penilaian Course</h1>
+            <p class="text-slate-500 mt-2 text-sm font-poppins">Pilih peserta yang telah menyelesaikan latihan atau tes course untuk diberikan penilaian manual.</p>
         </div>
 
         {{-- Filter & Search Bar --}}
@@ -99,11 +85,13 @@ new class extends Component {
             </div>
 
             <div class="w-full md:w-1/3">
-                <select wire:model.live="selectedExam"
+                <select wire:model.live="selectedCourse"
                     class="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-                    <option value="">-- Semua Ujian --</option>
-                    @foreach ($exams as $ex)
-                    <option value="{{ $ex->id }}">{{ $ex->title }}</option>
+
+                    <option value="">-- Semua Course --</option>
+
+                    @foreach ($courses as $course)
+                    <option value="{{ $course->id }}">{{ $course->title }}</option>
                     @endforeach
                 </select>
             </div>
@@ -136,10 +124,12 @@ new class extends Component {
                                 <div class="text-sm text-slate-500 mt-0.5">{{ $att->user->email ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-5">
-                                <div class="font-semibold text-gray-700">{{ $att->exam->title ?? 'Ujian Dihapus' }}
+                                <div class="font-semibold text-gray-700">
+                                    {{ $att->exam->courseLessons->first()?->module?->course?->title ?? 'Course Tidak Diketahui' }}
                                 </div>
-                                <div class="text-xs text-gray-400">ID Sesi: <span
-                                        class="font-mono">{{ substr($att->id, 0, 8) }}...</span></div>
+                                <div class="text-xs text-gray-400">
+                                    Lesson: {{ $att->exam->courseLessons->first()?->title ?? '-' }}
+                                </div>
                             </td>
                             <td class="px-6 py-5 text-center">
                                 <div class="text-sm text-gray-700">

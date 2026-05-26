@@ -1,16 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\Exams\RelationManagers;
+namespace App\Filament\Resources\ExamAttempts\Tables;
 
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Columns\SelectColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,69 +21,74 @@ use Filament\Actions\ExportAction;
 use App\Filament\Exports\ExamAttemptExporter;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use App\Models\User;
 use App\Enums\ExamAttemptStatus;
 
-class AttemptsRelationManager extends RelationManager
+class ExamAttemptsTable
 {
-    protected static string $relationship = 'attempts';
-    protected static ?string $title = 'Exam Attempts (Test Takers)';
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextInput::make('converted_score')
-                    ->label('Final Score')
-                    ->numeric(),
-                TextInput::make('status'),
-            ]);
-    }
-
-    public function table(Table $table): Table
+    public static function configure(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id')
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Test Taker')
-                    ->searchable(),
-                TextColumn::make('user.email')
-                    ->label('Email')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('exam.title')
+                    ->label('Exam')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('started_at')
+                    ->label('Started At')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('submitted_at')
+                    ->label('Submitted At')
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('status')
+                    ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         ExamAttemptStatus::FINISHED->value => 'warning',
                         ExamAttemptStatus::GRADED->value => 'success',
                         default => 'gray',
-                    }),
+                    })
+                    ->searchable(),
+                TextColumn::make('converted_score')
+                    ->label('Final Score')
+                    ->numeric()
+                    ->sortable(),
                 SelectColumn::make('examiner_id')
                     ->label('Assign Examiner')
                     ->options(fn () => User::where('role', 'examiner')->pluck('name', 'id'))
                     ->disabled(fn ($record) => $record->status === ExamAttemptStatus::GRADED->value)
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('converted_score')
-                    ->label('Final Score')
-                    ->sortable(),
-                TextColumn::make('started_at')
-                    ->label('Started At')
-                    ->dateTime('d M Y, H:i')
-                    ->sortable(),
-                TextColumn::make('submitted_at')
-                    ->label('Submitted At')
-                    ->dateTime('d M Y, H:i')
-                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('deleted_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->label('Filter Status')
                     ->options([
-                        ExamAttemptStatus::FINISHED->value => 'Waiting for Grading',
+                        ExamAttemptStatus::FINISHED->value => 'Waiting for Grading (FINISHED)',
                         ExamAttemptStatus::GRADED->value => 'Graded',
-                    ]),
+                    ])
+                    ->default(ExamAttemptStatus::FINISHED->value),
+                TrashedFilter::make(),
             ])
             ->headerActions([
                 ExportAction::make()
@@ -99,12 +107,11 @@ class AttemptsRelationManager extends RelationManager
                         }
                     }),
             ])
-            ->actions([
-                ViewAction::make()->label('View Details'),
-                DeleteAction::make()->label('Delete Attempt'),
+            ->recordActions([
+                // Removed EditAction
             ])
             ->bulkActions([
-                \Filament\Actions\BulkActionGroup::make([
+                BulkActionGroup::make([
                     BulkAction::make('assign_examiner')
                         ->label('Assign Examiner (Bulk)')
                         ->icon('heroicon-o-user-plus')
@@ -117,13 +124,14 @@ class AttemptsRelationManager extends RelationManager
                         ])
                         ->action(function (Collection $records, array $data): void {
                             foreach ($records as $record) {
+                                // Only assign if it's FINISHED (Waiting for Grading)
                                 if ($record->status === ExamAttemptStatus::FINISHED->value) {
                                     $record->update(['examiner_id' => $data['examiner_id']]);
                                 }
                             }
                         })
                         ->deselectRecordsAfterCompletion(),
-                    \Filament\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

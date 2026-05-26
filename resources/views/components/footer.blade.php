@@ -10,7 +10,7 @@
                      alt="IC.edu" 
                      class="h-[50px] mb-4">
                 <p class="text-sm leading-relaxed max-w-[280px] font-medium">
-                    IC.IDU is a global online learning platform that helps you gain in-demand language skills to advance in your career.
+                    IC.EDU is a global online learning platform that helps you gain in-demand language skills to advance in your career.
                 </p>
             </div>
 
@@ -28,7 +28,7 @@
             {{-- Contact Section --}}
 <div>
     <h5 class="text-lg font-bold mb-4">Contact</h5>
-    <p class="text-sm mb-6">icidu.gmail.com</p>
+    <p class="text-sm mb-6">icedu@gmail.com</p>
     <div class="flex items-center gap-4">
         {{-- WhatsApp --}}
         <a href="#" class="hover:opacity-80 transition-opacity">
@@ -77,7 +77,7 @@
         {{-- Bottom Bar --}}
         <div class="pt-8 border-t border-white/30 text-center">
             <p class="text-sm font-semibold tracking-wide">
-                &copy; 2026 IC.IDU Copyright
+                &copy; 2026 IC.EDU Copyright
             </p>    
         </div>
 
