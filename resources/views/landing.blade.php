@@ -4,44 +4,6 @@
 
 @push('styles')
 <style>
-<<<<<<< HEAD
-    /* ── Hero doodle decorations ── */
-    .hero-doodle {
-        position: absolute;
-        opacity: 0.18;
-        pointer-events: none;
-    }
-
-    /* ── Topic pills (Did you know? card) ── */
-    .topic-pill {
-        transition: all .2s ease;
-    }
-
-    .topic-pill {
-        transition: all .2s ease;
-    }
-
-    .topic-pill:hover {
-        background: #2563eb;
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
-    }
-
-    /* ── Marquee scroll ── */
-    .marquee-track {
-        animation: marquee 28s linear infinite;
-    }
-    .marquee-track {
-        animation: marquee 28s linear infinite;
-    }
-
-    @keyframes marquee {
-        from { transform: translateX(0); }
-        to { transform: translateX(-50%); }
-        to { transform: translateX(-50%); }
-=======
     /* ─────────────────────────────────────────
        MARQUEE
     ───────────────────────────────────────── */
@@ -51,7 +13,6 @@
     @keyframes marquee {
         from { transform: translateX(0); }
         to   { transform: translateX(-50%); }
->>>>>>> 786b917 (feat: landing edit)
     }
 
     /* ─────────────────────────────────────────
@@ -62,11 +23,6 @@
         mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
         -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
     }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 786b917 (feat: landing edit)
     .testi-track {
         display: flex;
         flex-direction: column;
@@ -74,51 +30,11 @@
         animation-timing-function: linear;
         animation-iteration-count: infinite;
     }
-<<<<<<< HEAD
-
-    .testi-track-up {
-        animation: testiScrollUp 30s linear infinite;
-    }
-
-    .testi-track-down {
-        animation: testiScrollDown 35s linear infinite;
-    }
-
-    .testi-col-wrap:hover .testi-track {
-        animation-play-state: paused;
-    }
-
-
-    .testi-track-up {
-        animation: testiScrollUp 30s linear infinite;
-    }
-
-    .testi-track-down {
-        animation: testiScrollDown 35s linear infinite;
-    }
-
-    .testi-col-wrap:hover .testi-track {
-        animation-play-state: paused;
-    }
-
-    @keyframes testiScrollUp {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(-50%); }
-    }
-
-
-    @keyframes testiScrollDown {
-        0% { transform: translateY(-50%); }
-        0% { transform: translateY(-50%); }
-        100% { transform: translateY(0); }
-    }
-=======
     .testi-track-up   { animation: testiScrollUp   30s linear infinite; }
     .testi-track-down { animation: testiScrollDown 35s linear infinite; }
     .testi-col-wrap:hover .testi-track { animation-play-state: paused; }
     @keyframes testiScrollUp   { 0% { transform: translateY(0);    } 100% { transform: translateY(-50%); } }
     @keyframes testiScrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0);    } }
->>>>>>> 786b917 (feat: landing edit)
 
     .testi-item {
         background: #fff;
@@ -129,11 +45,6 @@
         transition: box-shadow .25s ease, transform .25s ease;
         cursor: default;
     }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 786b917 (feat: landing edit)
     .testi-item:hover {
         box-shadow: 0 16px 48px rgba(37, 99, 235, 0.10);
         box-shadow: 0 16px 48px rgba(37, 99, 235, 0.10);
@@ -707,40 +618,6 @@
             <p class="text-sm lg:text-base text-slate-300 leading-relaxed mb-7 max-w-[580px] text-center lg:text-left">
                 IC Edu is an English education platform operated by <strong class="text-white">PT Edukasi Persada Indonesia</strong>, providing tailored language training programs for students, professionals, universities, and companies.
             </p>
-<<<<<<< HEAD
-            <div class="space-y-6 max-w-[500px] mx-auto lg:mx-0">
-                {{-- Point 1 --}}
-                <div class="flex items-start gap-4">
-                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
-                    <div>
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">Interactive Practice</h4>
-                        <p class="text-sm text-slate-300">Engaging modules and real test simulations</p>
-        <div class="w-full lg:w-[55%] text-white" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-            <div class="mb-6 flex justify-center lg:justify-start">
-                <span class="inline-block bg-white/10 backdrop-blur-md text-white text-xs font-semibold px-4 py-1.5 rounded-full uppercase tracking-wider">
-                    Who we are - Who we are
-                </span>
-            </div>
-            
-            <h2 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight mb-6 tracking-tight text-center lg:text-left">
-                Your Trusted Platform for <br class="hidden sm:block">
-                English Learning and Test Preparation
-            </h2>
-            
-            <p class="text-sm lg:text-base text-slate-300 leading-relaxed mb-8 max-w-[580px] text-center lg:text-left">
-                IC Edu is an English education platform operated by <strong class="text-white">PT Edukasi Persada Indonesia</strong>, providing tailored language training programs for students, professionals, universities, and companies.
-            </p>
-            <div class="space-y-6 max-w-[500px] mx-auto lg:mx-0">
-                {{-- Point 1 --}}
-                <div class="flex items-start gap-4">
-                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
-                    <div>
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">Interactive Practice</h4>
-                        <p class="text-sm text-slate-300">Engaging modules and real test simulations</p>
-                    </div>
-                </div>
-=======
->>>>>>> 786b917 (feat: landing edit)
 
             <div class="space-y-5 max-w-[500px] mx-auto lg:mx-0">
                 @foreach([
@@ -751,33 +628,8 @@
                 <div class="flex items-start gap-4">
                     <span class="text-[#55b6bb] text-2xl leading-none mt-0.5 flex-shrink-0">•</span>
                     <div>
-<<<<<<< HEAD
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">International Preparation</h4>
-                        <p class="text-sm text-slate-300">Programs for IELTS, TOEFL, and TOEIC success.</p>
-                <div class="flex items-start gap-4">
-                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
-                    <div>
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">International Preparation</h4>
-                        <p class="text-sm text-slate-300">Programs for IELTS, TOEFL, and TOEIC success.</p>
-                    </div>
-                </div>
-
-                <div class="flex items-start gap-4">
-                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
-                    <div>
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">Flexible Learning</h4>
-                        <p class="text-sm text-slate-300">Study anytime through our digital platform.</p>
-                </div>
-
-                <div class="flex items-start gap-4">
-                    <span class="text-[#55b6bb] text-2xl leading-none mt-0.5">•</span>
-                    <div>
-                        <h4 class="text-base font-bold text-white leading-tight mb-1">Flexible Learning</h4>
-                        <p class="text-sm text-slate-300">Study anytime through our digital platform.</p>
-=======
                         <h4 class="text-base font-bold text-white leading-tight mb-1">{{ $point[0] }}</h4>
                         <p class="text-sm text-slate-300">{{ $point[1] }}</p>
->>>>>>> 786b917 (feat: landing edit)
                     </div>
                 </div>
                 @endforeach
@@ -787,17 +639,10 @@
     </div>
 </section>
 
-<<<<<<< HEAD
-
-{{-- MARQUEE STRIP --}}
-{{-- MARQUEE STRIP --}}
-<div class="marquee-strip overflow-hidden py-5 bg-blue-50 border-y border-blue-100">
-=======
 {{-- ═══════════════════════════════════════════
      MARQUEE STRIP
 ════════════════════════════════════════════ --}}
 <div class="overflow-hidden py-4 bg-blue-50 border-y border-blue-100">
->>>>>>> 786b917 (feat: landing edit)
     <div class="marquee-track flex gap-10 w-max">
         @php
         $marqueeItems = [
@@ -839,15 +684,8 @@
             <span class="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold mb-6 inline-block uppercase tracking-widest">
                 Why Choose Us
             </span>
-<<<<<<< HEAD
-            <h2 class="text-4xl lg:text-5xl font-extrabold text-[#1a3a5a] mb-6 leading-[1.1]">
-                All-in-one platform for English <br class="hidden md:block"> learning and test preparation 
-            <h2 class="text-4xl lg:text-5xl font-extrabold text-[#1a3a5a] mb-6 leading-[1.1]">
-                All-in-one platform for English <br class="hidden md:block"> learning and test preparation 
-=======
             <h2 class="text-3xl lg:text-5xl font-extrabold text-[#1a3a5a] mb-4 leading-[1.1]">
                 All-in-one platform for English <br class="hidden md:block"> learning and test preparation
->>>>>>> 786b917 (feat: landing edit)
             </h2>
         </div>
     </div>
@@ -936,20 +774,7 @@
     </div>
 </section>
 
-<<<<<<< HEAD
-{{-- SECTION 7 — TESTIMONIALS + STATISTIC BAR --}}
-<section class="testi-section py-24 overflow-hidden bg-white" id="testimonials">
-{{-- SECTION 7 — TESTIMONIALS + STATISTIC BAR --}}
-<section class="testi-section py-24 overflow-hidden bg-white" id="testimonials">
-    <div class="max-w-[1200px] mx-auto px-[5%]">
-        @php
-        $displayColA = [
-        ['name' => 'Arran Douglas', 'achievement' => 'IELTS Score: 7.5 → 8.0', 'quote' => 'The modules at IC.EDU were very easy to understand. The LMS monitored my progress every day.'],
-        ['name' => 'Jeffrey Avery', 'achievement' => 'TOEFL iBT: 89 → 107', 'quote' => 'I really enjoyed the online test platform. The interface has a simple, fast, and the UI/UX is comfortable.']
-        ];
-=======
 <x-landing.courses-card/>
->>>>>>> 786b917 (feat: landing edit)
 
 {{-- ═══════════════════════════════════════════
      SECTION 4 — TESTIMONIALS
@@ -966,24 +791,10 @@
         $displayColA = array_slice($testimonials, 0, 2);
         $displayColB = array_slice($testimonials, 2, 1);
         @endphp
-<<<<<<< HEAD
-        @php
-        $displayColA = [
-        ['name' => 'Arran Douglas', 'achievement' => 'IELTS Score: 7.5 → 8.0', 'quote' => 'The modules at IC.EDU were very easy to understand. The LMS monitored my progress every day.'],
-        ['name' => 'Jeffrey Avery', 'achievement' => 'TOEFL iBT: 89 → 107', 'quote' => 'I really enjoyed the online test platform. The interface has a simple, fast, and the UI/UX is comfortable.']
-        ];
-
-        $displayColB = [
-        ['name' => 'Amanda Banks', 'achievement' => 'Business English Certified', 'quote' => 'This platform made my English preparation more effective. The results were beyond my expectations.']
-        ];
-        @endphp
-        <div class="grid lg:grid-cols-[400px_1fr] gap-16 items-center">
-=======
 
         <div class="grid lg:grid-cols-[400px_1fr] gap-12 lg:gap-16 items-center">
 
             {{-- Left: heading --}}
->>>>>>> 786b917 (feat: landing edit)
             <div>
                 <div class="mb-5">
                     <svg width="60" height="45" viewBox="0 0 80 60" fill="none">
@@ -1000,12 +811,7 @@
                 <h2 class="testi-title text-4xl lg:text-5xl mb-6">
                     Stories from<br>IC.EDU<br>Learners
                 </h2>
-<<<<<<< HEAD
-                <p class="text-slate-500 text-lg max-w-[320px]">Read what our students have to say about their journey.</p>
-                <p class="text-slate-500 text-lg max-w-[320px]">Read what our students have to say about their journey.</p>
-=======
                 <p class="text-slate-500 text-base lg:text-lg max-w-[320px]">Read what our students have to say about their journey.</p>
->>>>>>> 786b917 (feat: landing edit)
             </div>
 
             {{-- Desktop: animated columns --}}
@@ -1109,73 +915,14 @@
                     <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
                         <span class="counter" data-target="{{ $stat[0] }}">0</span>{{ $stat[1] }}
                     </div>
-<<<<<<< HEAD
-                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Premium Courses</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
-                        <span class="counter" data-target="500">0</span>K+
-                    </div>
-                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Active Learner</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
-                        <span class="counter" data-target="98">0</span>%
-                    </div>
-                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Face Rate</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl lg:text-3xl font-extrabold text-[#1a3a5a] mb-1">
-                        <span class="counter" data-target="100">0</span>K+
-                    </div>
-                    <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">Certificates Issued</div>
-=======
                     <div class="text-[10px] lg:text-[11px] font-bold text-[#1a3a5a] uppercase tracking-widest opacity-70">{{ $stat[2] }}</div>
->>>>>>> 786b917 (feat: landing edit)
                 </div>
                 @endforeach
             </div>
         </div>
     </div>
 </section>
-<<<<<<< HEAD
-
-{{-- SECTION: UNLOCK ENGLISH SKILLS --}}
-<section class="relative bg-white pt-32 pb-0 overflow-hidden text-center">
-    <div class="absolute top-[10%] left-[8%] floating-cloud" style="animation-delay: 0s;">
-        <img src="{{ asset('assets/maskot/awan 1.png') }}" alt="Cloud" class="w-24 lg:w-32">
-    </div>
-    <div class="absolute bottom-[15%] left-[5%] floating-cloud" style="animation-delay: 3s;">
-        <img src="{{ asset('assets/maskot/awan 3.png') }}" alt="Cloud" class="w-20 lg:w-28">
-    </div>
-    <div class="absolute bottom-[35%] left-[25%] floating-cloud" style="animation-delay: 1.3s;">
-        <img src="{{ asset('assets/maskot/awan 2.png') }}" alt="Cloud" class="w-24 lg:w-28">
-    </div>
-    <div class="absolute top-[15%] right-[12%] floating-cloud" style="animation-delay: 2s;">
-        <img src="{{ asset('assets/maskot/awan 5.png') }}" alt="Cloud" class="w-24 lg:w-32">
-    </div>
-    <div class="absolute bottom-[25%] right-[5%] floating-cloud" style="animation-delay: 4.5s;">
-        <img src="{{ asset('assets/maskot/awan 4.png') }}" alt="Cloud" class="w-24 lg:w-32">
-    </div>
-    
-    <div class="relative z-10 px-[5%] mb-16">
-        <h2 class="text-4xl lg:text-6xl font-extrabold mb-10 leading-tight text-[#1a3a5a]">
-            Unlock English Skills <br> Anytime, Anywhere
-        </h2>
-        <a href="{{ route('register') }}" class="inline-block bg-[#1a3a5a] hover:bg-[#2c4e7a] text-white px-12 py-4 rounded-full font-bold text-xl transition-all shadow-xl shadow-blue-100">
-            Get Started – Its Free Trial
-        </a>
-    </div>
-    
-    <div class="flex justify-center relative">
-        <div class="w-[300px] lg:w-[500px] -mb-64 lg:-mb-80">
-            <img src="{{ asset('assets/maskot/bumi.png') }}" class="rotating-earth w-full h-auto opacity-90" alt="World Map">
-        </div>
-    </div>
-</section>
-=======
 <x-landing.unlock/>
->>>>>>> 786b917 (feat: landing edit)
 
 <script>
 (function () {

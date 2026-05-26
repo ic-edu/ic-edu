@@ -349,18 +349,6 @@ $tests = [
                     d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </button>
-<<<<<<< HEAD
-        <a href="{{ route('login') }}" id="btn-signin"
-            class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
-                      border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
-            Sign In
-        </a>
-        <a href="{{ route('register') }}"
-            class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
-                      btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
-            Get Started
-        </a>
-=======
         
         <div class="hidden md:flex items-center gap-3">
             @auth
@@ -394,7 +382,6 @@ $tests = [
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
->>>>>>> 786b917 (feat: landing edit)
     </div>
     </div>
 
