@@ -99,6 +99,7 @@ Route::middleware(['auth', 'role:test_taker', 'onboarding'])
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
         Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
+        Route::get('/exams/{attempt}/sections/{section}/review', [ExamController::class, 'sectionReview'])->name('exam.section.review');
     });
 
 Route::get('/download-template-soal', function () {
