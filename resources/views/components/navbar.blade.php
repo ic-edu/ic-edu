@@ -1,3 +1,11 @@
+@php
+$tests = [
+    ['id'=>'ielts', 'label'=>"IELTS\nAcademic", 'name'=>'IELTS', 'sub'=>'Academic', 'orb'=>'#dbeafe', 'accent'=>'#2563eb', 'desc'=>'International standard, accepted worldwide', 'link' => route('ielts')],
+    ['id'=>'toefl', 'label'=>"TOEFL\niBT", 'name'=>'TOEFL', 'sub'=>'iBT', 'orb'=>'#ede9fe', 'accent'=>'#7c3aed', 'desc'=>'Required for US university admissions', 'link' => route('toefl')],
+    ['id'=>'toeic', 'label'=>"TOEIC\nListening",'name'=>'TOEIC', 'sub'=>'L&R', 'orb'=>'#fef9c3', 'accent'=>'#d97706', 'desc'=>'Gold standard for workplace English', 'link' => route('toeic')],
+];
+@endphp
+
 <style>
     .test-card {
         position: relative;
@@ -198,6 +206,23 @@
     #navbar {
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    #mobile-menu.open {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+
+    [data-theme="dark"] #mobile-btn-signin {
+        color: var(--text-primary) !important;
+        border-color: var(--border-default) !important;
+    }
+    
+    [data-theme="dark"] #mobile-btn-signin:hover {
+        border-color: var(--brand-blue) !important;
+        color: var(--brand-blue) !important;
+    }
 </style>
 
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-transparent">
@@ -206,65 +231,113 @@
             <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-15">
         </a>
         <div class="hidden md:flex items-center gap-7">
-            <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
-            <a href="{{ route('courses') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Courses</a>
-            <div class="relative" id="tests-menu">
-                <button id="tests-btn" type="button"
-                    class="nav-link nav-pill inline-flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors select-none">
-                    Our Tests
-                    <svg id="tests-chevron" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform .25s ease;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                <div id="tests-dropdown"
-                    class="absolute top-[calc(100%+18px)] left-0 w-[520px] bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-100 shadow-[0_32px_80px_rgba(0,0,0,0.14)] p-6 opacity-0 invisible pointer-events-none"
-                    style="transform: translateY(10px); transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.2,.64,1), visibility .25s;">
-                    <div class="absolute -top-[7px] left-8 w-3.5 h-3.5 bg-white border-l border-t border-slate-100 rotate-45 rounded-tl-sm"></div>
-                    <div class="mb-5 px-1">
-                        <p class="text-[0.68rem] font-bold text-slate-400 uppercase tracking-[0.12em]">Pick Your Test</p>
-                        <p class="text-xs text-slate-500 mt-0.5">Choose the exam you need and start achieving your goals</p>
-                    </div>
 
-                    <div class="flex items-end justify-between gap-2 px-1" id="test-cards-row">
-                        @php
-                        // Tambahkan key 'link' pada masing-masing item
-                        $tests = [
-                        ['id'=>'ielts', 'label'=>"IELTS\nAcademic", 'name'=>'IELTS', 'sub'=>'Academic', 'orb'=>'#dbeafe', 'accent'=>'#2563eb', 'desc'=>'International standard, accepted worldwide', 'link' => route('ielts')],
-                        ['id'=>'toefl', 'label'=>"TOEFL\niBT", 'name'=>'TOEFL', 'sub'=>'iBT', 'orb'=>'#ede9fe', 'accent'=>'#7c3aed', 'desc'=>'Required for US university admissions', 'link' => route('toefl')],
-                        ['id'=>'toeic', 'label'=>"TOEIC\nListening",'name'=>'TOEIC', 'sub'=>'L&R', 'orb'=>'#fef9c3', 'accent'=>'#d97706', 'desc'=>'Gold standard for workplace English', 'link' => route('toeic')],
-                        ];
-                        @endphp
-                        @foreach($tests as $t)
-                        <a href="{{ $t['link'] }}"
-                            class="test-card flex-1 flex flex-col items-center gap-3 pt-4 pb-3 rounded-2xl transition-all duration-200 hover:bg-slate-50 group"
-                            data-id="{{ $t['id'] }}" data-accent="{{ $t['accent'] }}" data-orb="{{ $t['orb'] }}">
-                            <div class="relative w-[130px] h-[150px] flex items-center justify-center">
-                                <div class="test-orb w-[110px] h-[110px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                                    style="background: {{ $t['orb'] }};"></div>
-                                <div class="test-doc-back"></div>
-                                <div class="test-doc">
-                                    <div class="test-doc-label">{{ str_replace('\n', '<br>', e($t['label'])) }}</div>
-                                    @for($r=0;$r<3;$r++)
-                                        <div class="flex items-center mb-1.5">
-                                        <span class="test-doc-dot"></span>
-                                        <div class="test-doc-line flex-1" style="width:{{ [70,55,80][$r] }}%;"></div>
+    {{-- Home --}}
+    <a href="{{ url('/') }}"
+        class="nav-link nav-pill text-sm font-semibold transition-colors
+        {{ request()->is('/') ? 'active text-blue-600' : 'text-slate-700 hover:text-blue-600' }}">
+        Home
+    </a>
+
+    {{-- Courses --}}
+    <a href="{{ route('courses') }}"
+        class="nav-link nav-pill text-sm font-semibold transition-colors
+        {{ request()->routeIs('courses') ? 'active text-blue-600' : 'text-slate-700 hover:text-blue-600' }}">
+        Courses
+    </a>
+
+    {{-- Our Tests --}}
+    <div class="relative" id="tests-menu">
+        <button id="tests-btn" type="button"
+            class="nav-link nav-pill inline-flex items-center gap-1.5 text-sm font-semibold transition-colors select-none
+            {{ request()->routeIs('ielts') || request()->routeIs('toefl') || request()->routeIs('toeic') ? 'active text-blue-600' : 'text-slate-700 hover:text-blue-600' }}">
+            Our Tests
+
+            <svg id="tests-chevron"
+                width="13"
+                height="13"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
+                style="transition:transform .25s ease;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+
+        <div id="tests-dropdown"
+            class="absolute top-[calc(100%+18px)] left-0 w-[520px] bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-100 shadow-[0_32px_80px_rgba(0,0,0,0.14)] p-6 opacity-0 invisible pointer-events-none"
+            style="transform: translateY(10px); transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.2,.64,1), visibility .25s;">
+
+            <div class="absolute -top-[7px] left-8 w-3.5 h-3.5 bg-white border-l border-t border-slate-100 rotate-45 rounded-tl-sm"></div>
+
+            <div class="mb-5 px-1">
+                <p class="text-[0.68rem] font-bold text-slate-400 uppercase tracking-[0.12em]">
+                    Pick Your Test
+                </p>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Choose the exam you need and start achieving your goals
+                </p>
+            </div>
+
+            <div class="flex items-end justify-between gap-2 px-1" id="test-cards-row">
+                @foreach($tests as $t)
+                    <a href="{{ $t['link'] }}"
+                        class="test-card flex-1 flex flex-col items-center gap-3 pt-4 pb-3 rounded-2xl transition-all duration-200 hover:bg-slate-50 group"
+                        data-id="{{ $t['id'] }}"
+                        data-accent="{{ $t['accent'] }}"
+                        data-orb="{{ $t['orb'] }}">
+
+                        <div class="relative w-[130px] h-[150px] flex items-center justify-center">
+
+                            <div class="test-orb w-[110px] h-[110px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                                style="background: {{ $t['orb'] }};">
+                            </div>
+
+                            <div class="test-doc-back"></div>
+
+                            <div class="test-doc">
+                                <div class="test-doc-label">
+                                    {!! nl2br(e($t['label'])) !!}
                                 </div>
+
+                                @for($r=0;$r<3;$r++)
+                                    <div class="flex items-center mb-1.5">
+                                        <span class="test-doc-dot"></span>
+                                        <div class="test-doc-line flex-1"
+                                            style="width:{{ [70,55,80][$r] }}%;">
+                                        </div>
+                                    </div>
                                 @endfor
                             </div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
-                            {{ $t['name'] }} <span class="font-normal text-slate-400">{{ $t['sub'] }}</span>
                         </div>
-                        <div class="text-[0.68rem] text-slate-400 mt-0.5 leading-tight px-1">{{ $t['desc'] }}</div>
-                    </div>
+
+                        <div class="text-center">
+                            <div class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">
+                                {{ $t['name'] }}
+                                <span class="font-normal text-slate-400">
+                                    {{ $t['sub'] }}
+                                </span>
+                            </div>
+
+                            <div class="text-[0.68rem] text-slate-400 mt-0.5 leading-tight px-1">
+                                {{ $t['desc'] }}
+                            </div>
+                        </div>
                     </a>
-                    @endforeach
-                </div>
+                @endforeach
             </div>
         </div>
-        <a href="{{ route('pricing') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Pricing</a>
     </div>
+
+    {{-- Pricing --}}
+    <a href="{{ route('pricing') }}"
+        class="nav-link nav-pill text-sm font-semibold transition-colors
+        {{ request()->routeIs('pricing') ? 'active text-blue-600' : 'text-slate-700 hover:text-blue-600' }}">
+        Pricing
+    </a>
+
+</div>
     <div class="flex items-center gap-3">
         <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Switch theme">
             <svg class="icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -276,6 +349,7 @@
                     d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </button>
+<<<<<<< HEAD
         <a href="{{ route('login') }}" id="btn-signin"
             class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
                       border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
@@ -286,7 +360,105 @@
                       btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
             Get Started
         </a>
+=======
+        
+        <div class="hidden md:flex items-center gap-3">
+            @auth
+                <a href="{{ url('/dashboard') }}"
+                    class="inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
+                              border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all bg-white/80 backdrop-blur-sm">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-inner">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                    <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
+                </a>
+            @else
+                <a href="{{ route('login') }}" id="btn-signin"
+                    class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
+                              border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
+                    Sign In
+                </a>
+                <a href="{{ route('register') }}"
+                    class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
+                              btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
+                    Get Started
+                </a>
+            @endauth
+        </div>
+
+        <button id="mobile-menu-toggle" type="button" class="flex md:hidden items-center justify-center w-10 h-10 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Toggle Menu">
+            <svg id="hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+>>>>>>> 786b917 (feat: landing edit)
     </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu"
+        class="absolute top-[calc(100%+12px)] left-0 right-0 max-h-[calc(100vh-100px)] overflow-y-auto bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-100 shadow-[0_32px_80px_rgba(0,0,0,0.15)] p-6 opacity-0 invisible pointer-events-none md:hidden"
+        style="transform: translateY(10px); transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.2,.64,1), visibility .25s;">
+        <div class="flex flex-col gap-2">
+            <a href="{{ url('/') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Home</a>
+            <a href="{{ route('courses') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Courses</a>
+            
+            <!-- Our Tests Accordion for Mobile -->
+            <div class="flex flex-col">
+                <button id="mobile-tests-btn" type="button" class="flex items-center justify-between w-full text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 text-left">
+                    <span>Our Tests</span>
+                    <svg id="mobile-tests-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform .25s ease;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="mobile-tests-dropdown" class="hidden flex-col gap-2 pl-4 mt-2">
+                    @foreach($tests as $t)
+                        <a href="{{ $t['link'] }}" class="flex items-center gap-3.5 p-3 rounded-2xl hover:bg-slate-100 transition-colors">
+                            <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-xs font-extrabold" style="background: {{ $t['orb'] }}; color: {{ $t['accent'] }};">
+                                {{ $t['name'] }}
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-slate-800 leading-tight">
+                                    {{ $t['name'] }} <span class="font-normal text-slate-400">{{ $t['sub'] }}</span>
+                                </div>
+                                <div class="text-[0.7rem] text-slate-400 mt-0.5 leading-tight">{{ $t['desc'] }}</div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <a href="{{ route('pricing') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Pricing</a>
+            
+            <hr class="border-slate-100 my-2">
+
+            <!-- Mobile Auth/Action Buttons -->
+            <div class="flex flex-col gap-3 mt-2">
+                @auth
+                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-100 border border-slate-200">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center text-white text-sm font-bold shadow-inner">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-bold text-slate-800 truncate">{{ Auth::user()->name }}</div>
+                            <div class="text-xs text-slate-400">Go to Dashboard</div>
+                        </div>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" id="mobile-btn-signin"
+                        class="flex items-center justify-center w-full py-3 rounded-full text-sm font-bold text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
+                        Sign In
+                    </a>
+                    <a href="{{ route('register') }}"
+                        class="flex items-center justify-center w-full py-3 rounded-full text-sm font-bold text-white btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
+                        Get Started
+                    </a>
+                @endauth
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -373,8 +545,61 @@
             clearTimeout(dropTimer);
         });
         dropdown.addEventListener('mouseleave', closeDrop);
+        // Mobile Menu Toggling
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        function toggleMobileMenu() {
+            const isOpen = mobileMenu.classList.contains('open');
+            if (isOpen) {
+                mobileMenu.classList.remove('open');
+                if (hamburgerIcon) hamburgerIcon.classList.remove('hidden');
+                if (closeIcon) closeIcon.classList.add('hidden');
+            } else {
+                mobileMenu.classList.add('open');
+                if (hamburgerIcon) hamburgerIcon.classList.add('hidden');
+                if (closeIcon) closeIcon.classList.remove('hidden');
+            }
+        }
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+        }
+
+        // Mobile Tests Accordion
+        const mobileTestsBtn = document.getElementById('mobile-tests-btn');
+        const mobileTestsDropdown = document.getElementById('mobile-tests-dropdown');
+        const mobileTestsChevron = document.getElementById('mobile-tests-chevron');
+
+        if (mobileTestsBtn) {
+            mobileTestsBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = mobileTestsDropdown.classList.contains('hidden');
+                if (isHidden) {
+                    mobileTestsDropdown.classList.remove('hidden');
+                    mobileTestsDropdown.classList.add('flex');
+                    if (mobileTestsChevron) mobileTestsChevron.style.transform = 'rotate(180deg)';
+                } else {
+                    mobileTestsDropdown.classList.add('hidden');
+                    mobileTestsDropdown.classList.remove('flex');
+                    if (mobileTestsChevron) mobileTestsChevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+
+        // Close dropdown and mobile menu on outside click
         document.addEventListener('click', function(e) {
-            if (!testsMenu.contains(e.target)) closeDrop();
+            if (testsMenu && !testsMenu.contains(e.target)) closeDrop();
+            if (mobileMenu && !mobileMenu.contains(e.target) && mobileMenuToggle && !mobileMenuToggle.contains(e.target)) {
+                mobileMenu.classList.remove('open');
+                if (hamburgerIcon) hamburgerIcon.classList.remove('hidden');
+                if (closeIcon) closeIcon.classList.add('hidden');
+            }
         });
         document.querySelectorAll('.test-card').forEach(function(card) {
             var accent = card.dataset.accent;
