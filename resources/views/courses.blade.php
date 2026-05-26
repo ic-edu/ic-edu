@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Courses')
+@section('title', 'Home')
 
 @push('styles')
 <style>
@@ -9,10 +9,12 @@
     }
 
     @keyframes floatCloud {
+
         0%,
         100% {
             transform: translateY(0);
         }
+
         50% {
             transform: translateY(-10px);
         }
@@ -21,137 +23,190 @@
 @endpush
 
 @section('content')
-<x-landing.hero/>
-<x-landing.strip/>
+<section class="w-full relative pt-40 pb-32 flex items-center overflow-hidden select-none bg-gradient-to-br from-slate-50 via-slate-100 via-40% to-[#1A456C]">
+    <div class="max-w-[1300px] mx-auto px-[5%] w-full relative min-h-[500px] md:min-h-[440px] flex flex-col justify-center">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-4 items-center w-full">
+            <div class="text-center lg:text-left pr-0 lg:pr-6" data-aos="fade-right" data-aos-duration="1000">
+                <h1 class="font-sans font-extrabold text-4xl md:text-5xl lg:text-[3.2rem] text-[#1a3a5a] mb-6 leading-tight lg:leading-[1.2] tracking-tight">
+                    Master English Fluency with Our Smart Learning Management System.
+                </h1>
+                <p class="font-sans text-sm md:text-base text-[#1a3a5a]/90 leading-relaxed font-medium max-w-[640px] mx-auto lg:mx-0 mb-10">
+                    Boost your English skills with IC EDU through interactive learning designed for speaking confidence, grammar mastery, IELTS & TOEFL preparation, and professional communication to help you succeed in academics and global careers.
+                </p>
+                <div>
+                    <a href="#" class="inline-block bg-[#1a3a5a] text-white font-bold px-8 py-3.5 rounded-xl hover:bg-[#152e4a] transition-all shadow-lg text-sm md:text-base">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+            <div class="relative flex justify-center lg:justify-end items-center order-first lg:order-none h-[420px] w-full" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                <img src="{{ asset('assets/maskot/awan 7.png') }}"
+                    class="absolute top-6 right-[-20px] lg:right-[-40px] w-[70px] md:w-[90px] opacity-85 pointer-events-none select-none floating-cloud"
+                    style="animation-delay: 0.5s;"
+                    alt="Cloud Top">
 
-<div class="bg-white min-h-screen pt-8 md:pt-16 pb-16">
-    <div class="max-w-[1400px] mx-auto px-[5%] md:px-[4%] w-full">
+                <img src="{{ asset('assets/maskot/pen maskot.png') }}"
+                    class="w-[300px] md:w-[380px] lg:w-[450px] lg:mr-[-30px] drop-shadow-[0_15px_30px_rgba(0,0,0,0.15)] transition-transform duration-300 hover:scale-105 relative z-10"
+                    alt="Owl Pencil Mascot">
 
-        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8 items-start w-full">
+                <img src="{{ asset('assets/maskot/awan 6.png') }}"
+                    class="absolute bottom-2 left-[15%] lg:left-[0px] w-[90px] md:w-[120px] opacity-90 pointer-events-none select-none floating-cloud"
+                    alt="Cloud Bottom">
+            </div>
+        </div>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+        <svg class="relative block w-[calc(100%+1.3px)] h-[50px] md:h-[80px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C59.71,118.06,155.43,109.84,233.15,92.83c83.15-18.17,159.95-46.06,242.21-59.5Z" fill="#f8fafc"></path>
+        </svg>
+    </div>
+</section>
 
-            <aside class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm relative lg:sticky lg:top-40 z-30 w-full mb-2 lg:mb-0">
+
+<div class="bg-[#f8fafc] min-h-screen pt-25 pb-16">
+    <div class="max-w-[1400px] mx-auto px-[4%] w-full">
+
+        <div class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 items-start w-full">
+
+            <aside class="bg-[#f1f5f9] p-6 rounded-2xl border border-slate-100 shadow-sm sticky top-28 z-30">
+                <h2 class="text-xl font-extrabold text-[#1a456c] mb-1">Filters</h2>
+                <p class="text-xs font-semibold text-slate-400 mb-6 uppercase tracking-wider">Refine your search</p>
+
+                <div class="space-y-5">
+                    <div onclick="sortCards('price', this)" class="border-b border-slate-200 pb-3 flex items-center justify-between cursor-pointer group select-none">
+                        <span class="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">Price</span>
+                        <div class="flex items-center gap-2">
+                            <span class="sort-indicator text-[10px] font-bold text-blue-600 hidden"></span>
+                            <svg class="sort-icon w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div onclick="sortCards('duration', this)" class="border-b border-slate-200 pb-3 flex items-center justify-between cursor-pointer group select-none">
+                        <span class="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">Duration</span>
+                        <div class="flex items-center gap-2">
+                            <span class="sort-indicator text-[10px] font-bold text-blue-600 hidden"></span>
+                            <svg class="sort-icon w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="w-full flex flex-col">
                 
-                <div class="mb-6">
-                    <h2 class="text-xl font-extrabold text-[#1a456c] mb-1">Search</h2>
-                    <p class="text-xs font-semibold text-slate-400 mb-4 uppercase tracking-wider">Find your course</p>
-                    
-                    <div class="relative w-full">
+                <div class="sticky top-28 z-40 bg-[#f8fafc] pb-6 mb-2 w-full pt-2">
+                    <div class="relative w-full mb-6">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </span>
                         <input type="text"
-                            placeholder="Search courses..."
-                            class="w-full pl-11 pr-4 py-3 bg-slate-100 text-slate-700 placeholder-slate-400 rounded-full border-0 focus:outline-none focus:ring-0 focus:border-0 text-base md:text-sm transition-all shadow-sm">
+                            placeholder="Search for courses, instructors, or skills..."
+                            class="w-full pl-12 pr-4 py-3.5 bg-[#e2e8f0] text-slate-700 placeholder-slate-500 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm md:text-base transition-all">
                     </div>
-                </div>
-                
-                <hr class="border-slate-100 mb-6">
-                
-                <div>
-                    <h2 class="text-xl font-extrabold text-[#1a456c] mb-1">Filters</h2>
-                    <p class="text-xs font-semibold text-slate-400 mb-5 uppercase tracking-wider">Refine search</p>
 
-                    <div class="space-y-4">
-                        
-                        <div class="border-b border-slate-100 pb-3">
-                            <div onclick="toggleCategories()" class="flex items-center justify-between cursor-pointer group select-none mb-2">
-                                <span class="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">Categories</span>
-                                <div class="flex items-center gap-2">
-                                    <svg id="categoryIcon" class="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            
-                            <ul id="categoryList" class="space-y-3 pl-2 hidden transition-all duration-300 mt-3">
-                                <li>
-                                    <a href="#" class="flex items-center justify-between text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
-                                        <span>All Courses</span>
-                                        <span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-0.5 rounded-full">120</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="flex items-center justify-between text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                                        <span>Grammar</span>
-                                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full">45</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="flex items-center justify-between text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                                        <span>Speaking</span>
-                                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full">32</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="flex items-center justify-between text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                                        <span>Listening</span>
-                                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full">28</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" class="flex items-center justify-between text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                                        <span>Writing</span>
-                                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full">15</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div onclick="sortCards('price', this)" class="border-b border-slate-100 pb-3 flex items-center justify-between cursor-pointer group select-none">
-                            <span class="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">Price</span>
-                            <div class="flex items-center gap-2">
-                                <span class="sort-indicator text-[10px] font-bold text-blue-600 hidden"></span>
-                                <svg class="sort-icon w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div onclick="sortCards('duration', this)" class="border-b border-slate-100 pb-3 flex items-center justify-between cursor-pointer group select-none">
-                            <span class="text-sm font-bold text-slate-600 group-hover:text-blue-600 transition-colors">Duration</span>
-                            <div class="flex items-center gap-2">
-                                <span class="sort-indicator text-[10px] font-bold text-blue-600 hidden"></span>
-                                <svg class="sort-icon w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
-                                </svg>
-                            </div>
-                        </div>
+                    <div class="flex flex-wrap items-center justify-start gap-3 w-full">
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">IELTS</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">TOEFL</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">Grammar</button>
+                        <button class="px-5 py-2 rounded-full text-sm font-medium bg-[#e2e8f0] text-slate-600 hover:bg-slate-300 transition-all">Speaking</button>
+                        <button class="px-6 py-2 rounded-full text-sm font-bold bg-[#1a456c] text-white shadow-sm transition-all">All Courses</button>
                     </div>
                 </div>
 
-            </aside>
-
-            <div class="w-full flex flex-col">
                 <main id="courseContainer" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 w-full">
-                    </main>
+
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="49.99" data-duration="12">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <span class="absolute top-3 left-3 bg-lime-500 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Best Seller</span>
+                            <img src="{{ asset('assets/instructor-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.8</span> <span class="text-slate-400 font-normal">(315 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Advanced English Grammar</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">John Smith</p>
+
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 12 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Advanced</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-slate-800">$49.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="0" data-duration="5">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <span class="absolute top-3 left-3 bg-indigo-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider z-10">Popular</span>
+                            <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.5</span> <span class="text-slate-400 font-normal">(120 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Speaking Basics</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">Sarah Jane</p>
+
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 5 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 Beginner</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-indigo-700">Free</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="course-card bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full group"
+                        data-price="29.99" data-duration="24">
+                        <div class="relative overflow-hidden aspect-video bg-slate-100">
+                            <img src="{{ asset('assets/course-demo.png') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Course Cover">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <div class="flex items-center gap-1 mb-2 text-amber-500 font-bold text-xs">
+                                <span>★ 4.9</span> <span class="text-slate-400 font-normal">(500 students)</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 leading-tight mb-1 group-hover:text-blue-600 transition-colors">Complete TOEFL Prep</h3>
+                            <p class="text-xs font-semibold text-slate-400 mb-6">Mike Ross</p>
+
+                            <div class="mt-auto mb-6 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">🕒 24 hours</span>
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">📊 All Levels</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                                <span class="text-xl font-black text-slate-800">$29.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
             </div>
         </div>
     </div>
 </div>
- <x-landing.unlock/>
 
 @push('scripts')
 <script>
-    function toggleCategories() {
-        const list = document.getElementById('categoryList');
-        const icon = document.getElementById('categoryIcon');
-        
-        list.classList.toggle('hidden');
-        if (list.classList.contains('hidden')) {
-            icon.style.transform = 'rotate(0deg)';
-        } else {
-            icon.style.transform = 'rotate(180deg)';
-        }
-    }
-
-    let currentSort = { column: null, direction: 'asc' };
+    // Menyimpan state/kondisi sorting saat ini
+    let currentSort = {
+        column: null,
+        direction: 'asc' // asc atau desc
+    };
 
     function sortCards(type, element) {
         const container = document.getElementById('courseContainer');
         const cards = Array.from(container.getElementsByClassName('course-card'));
         
+        // Atur arah sorting (toggle asc/desc)
         if (currentSort.column === type) {
             currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
         } else {
@@ -159,28 +214,35 @@
             currentSort.direction = 'asc';
         }
 
+        // Proses sorting array berdasarkan data attribute
         cards.sort((a, b) => {
+            // Ambil angka dari data attribute (misal: data-price="49.99")
             let valA = parseFloat(a.getAttribute(`data-${type}`));
             let valB = parseFloat(b.getAttribute(`data-${type}`));
 
             if (currentSort.direction === 'asc') {
-                return valA - valB;
+                return valA - valB; // Ascending: Kecil ke Besar
             } else {
-                return valB - valA;
+                return valB - valA; // Descending: Besar ke Kecil
             }
         });
 
+        // Kosongkan container lalu masukkan kembali card yang sudah diurutkan
         container.innerHTML = '';
         cards.forEach(card => container.appendChild(card));
+
+        // Update UI (Teks dan Ikon)
         updateUI(element, type);
     }
 
     function updateUI(activeElement, type) {
+        // Reset semua indikator
         document.querySelectorAll('.sort-indicator').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.sort-icon').forEach(el => {
-            el.style.transform = 'rotate(0deg)';
+            el.style.transform = 'rotate(0deg)'; // Kembalikan ikon panah ke semula
         });
 
+        // Set teks untuk elemen yang aktif
         const indicator = activeElement.querySelector('.sort-indicator');
         const icon = activeElement.querySelector('.sort-icon');
         
@@ -192,6 +254,7 @@
             indicator.textContent = currentSort.direction === 'asc' ? 'Shortest' : 'Longest';
         }
 
+        // Putar ikon panah 180 derajat jika descending
         if (currentSort.direction === 'desc') {
             icon.style.transform = 'rotate(180deg)';
         }
