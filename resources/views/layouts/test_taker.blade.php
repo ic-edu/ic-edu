@@ -20,12 +20,16 @@
         @include('components.test_taker.sidebar')
         <div class="dash-main">
             @yield('topbar')
+            @include('components.test_taker.notification')
             <div class="page-body">
                 @yield('content')
                 {{ $slot ?? '' }}
             </div>
         </div>
     </div>
+    @auth
+        @include('components.test_taker.walkthrough')
+    @endauth
     @stack('scripts')
 </body>
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\User\ExamController;
 use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
+use App\Livewire\Onboarding\OnboardingWizard;
+use App\Livewire\TestTaker\ProfilePage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -34,10 +36,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('dashboard');
 
-    // Profile Routes
+    // Profile Routes (Breeze — kept for examiner/admin)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // New Profile Page for test_taker
+    Route::get('/settings', ProfilePage::class)->name('profile.show');
+    Route::redirect('/settings-old', '/settings');
 });
 
 // Route Examiner
@@ -51,15 +57,23 @@ Route::middleware(['auth', 'verified', 'role:examiner'])
         })->name('examiner.dashboard');
 
         Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
+        Volt::route('/exam-reviews', 'examiner.exam-reviews')->name('examiner.exam-reviews');
         Volt::route('/grading/{attempt}', 'examiner.grading')->name('examiner.grading');
-
-        // Exam manage per type
-        Volt::route('/exam-manage/{type}', 'examiner.exam-manage')
-            ->name('examiner.exam-manage.type');
+        Volt::route('/course-reviews', 'examiner.course-reviews')->name('examiner.course-reviews');
+        Route::get('/settings', function () {
+            return view('profile.examiner-edit', [
+                'user' => Auth::user(),
+            ]);
+        })->name('examiner.settings');
     });
 
+// Onboarding Route
+Route::middleware(['auth'])
+     ->get('/onboarding', OnboardingWizard::class)
+     ->name('onboarding.index');
+
 // Route Test-Taker
-Route::middleware(['auth', 'verified', 'role:test_taker'])
+Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
     ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
@@ -75,7 +89,7 @@ Route::middleware(['auth', 'verified', 'role:test_taker'])
         Route::get('/courses/{course}/lessons/{lesson}', [TestTakerCourseController::class, 'lesson'])->name('course.lesson');
         Route::post('/courses/{course}/lessons/{lesson}/complete', [TestTakerCourseController::class, 'markComplete'])->name('course.lesson.complete');
         Route::post('/courses/{course}/lessons/{lesson}/quiz', [TestTakerCourseController::class, 'startQuiz'])->middleware('throttle:5,1')->name('course.quiz.start');
-        
+
         // Course Certificate
         Route::get('/courses/{course}/certificate', [TestTakerCourseController::class, 'certificatePreview'])->name('course.certificate.preview');
         Route::get('/courses/{course}/certificate/download', [TestTakerCourseController::class, 'downloadCertificate'])->name('course.certificate.download');
@@ -88,6 +102,7 @@ Route::middleware(['auth', 'verified', 'role:test_taker'])
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
         Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
+        Route::get('/exams/{attempt}/sections/{section}/review', [ExamController::class, 'sectionReview'])->name('exam.section.review');
     });
 
 Route::get('/download-template-soal', function () {

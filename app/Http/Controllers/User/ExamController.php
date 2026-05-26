@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\Exam;
+use App\Models\Section;
 use App\Models\ExamEnrollment;
+use App\Models\AttemptAnswer;
 use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -87,6 +89,59 @@ class ExamController extends Controller
         }
 
         return view('test_taker.exams.result', compact('attempt'));
+    }
+
+    public function sectionReview(\App\Models\ExamAttempt $attempt, Section $section)
+    {
+        if ($attempt->user_id !== Auth::id()) abort(403);
+
+        if ($attempt->status !== ExamAttemptStatus::GRADED->value) {
+            return redirect()->route('test_taker.exam.result', $attempt->id)
+                ->with('error', 'Ujian belum selesai dinilai.');
+        }
+
+        if ($section->exam_id !== $attempt->exam_id) abort(404);
+
+        $section->load([
+            'subsections'                                         => fn($q) => $q->orderBy('order_position'),
+            'subsections.questionGroups'                          => fn($q) => $q->orderBy('order_position'),
+            'subsections.questionGroups.questions'                => fn($q) => $q->orderBy('order_position'),
+            'subsections.questionGroups.questions.options'        => fn($q) => $q->orderBy('id'),
+        ]);
+
+        $allQuestionIds = $section->subsections
+            ->flatMap(fn($s) => $s->questionGroups)
+            ->flatMap(fn($g) => $g->questions)
+            ->pluck('id');
+
+        $answers = AttemptAnswer::where('exam_attempt_id', $attempt->id)
+            ->whereIn('question_id', $allQuestionIds)
+            ->with('selectedOption')
+            ->get()
+            ->keyBy('question_id');
+
+        // Build flat question list for sidebar
+        $flatQuestions = collect();
+        $num = 0;
+        foreach ($section->subsections as $sub) {
+            foreach ($sub->questionGroups as $group) {
+                foreach ($group->questions as $q) {
+                    $num++;
+                    $ans = $answers->get($q->id);
+                    $flatQuestions->push([
+                        'id'     => $q->id,
+                        'number' => $num,
+                        'type'   => $q->type,
+                        'points' => $q->points,
+                        'answer' => $ans,
+                    ]);
+                }
+            }
+        }
+
+        return view('test_taker.exams.section_review', compact(
+            'attempt', 'section', 'answers', 'flatQuestions'
+        ));
     }
 
     public function scoreReport(\App\Models\ExamAttempt $attempt, \App\Services\ScoreReportService $service)
