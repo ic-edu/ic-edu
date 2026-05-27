@@ -47,7 +47,7 @@ new #[Layout('layouts.bare')] class extends Component {
         $this->lesson_id = request()->query('lesson_id');
 
         if ($this->attempt->status === ExamAttemptStatus::FINISHED->value) {
-            session()->flash('error', 'Peringatan: Ujian ini sudah selesai dan tidak dapat dikerjakan ulang.');
+            session()->flash('error', 'Warning: This exam is already completed and cannot be retaken.');
             if ($this->course_id && $this->lesson_id) {
                 $this->redirectRoute('test_taker.course.lesson', ['course' => $this->course_id, 'lesson' => $this->lesson_id]);
             } else {
@@ -521,8 +521,8 @@ new #[Layout('layouts.bare')] class extends Component {
                 <div style="width:64px;height:64px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
                     <svg style="width:32px;height:32px;color:#dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <h2 style="font-size:1.4rem;font-weight:900;color:#0f172a;margin-bottom:8px;">Waktu Habis!</h2>
-                <p style="font-size:0.875rem;color:#64748b;margin-bottom:24px;">Ujian Anda sedang dikumpulkan secara otomatis...</p>
+                <h2 style="font-size:1.4rem;font-weight:900;color:#0f172a;margin-bottom:8px;">Time's Up!</h2>
+                <p style="font-size:0.875rem;color:#64748b;margin-bottom:24px;">Your exam is being submitted automatically...</p>
                 <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
                     <div style="width:10px;height:10px;border-radius:50%;background:#2563eb;animation:timeup-dot 1.2s ease-in-out infinite;"></div>
                     <div style="width:10px;height:10px;border-radius:50%;background:#2563eb;animation:timeup-dot 1.2s ease-in-out 0.4s infinite;"></div>
@@ -533,7 +533,7 @@ new #[Layout('layouts.bare')] class extends Component {
 
         {{-- Section time-up toast (strict mode) --}}
         <div id="section-timeup-toast" style="display:none;position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:9990;background:#f97316;color:white;border-radius:14px;padding:14px 28px;font-size:0.88rem;font-weight:800;box-shadow:0 8px 24px rgba(249,115,22,0.4);">
-            ⏰ Waktu section habis! Pindah ke section berikutnya...
+            ⏰ Section time's up! Moving to the next section...
         </div>
 
         <style>@keyframes timeup-dot { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }</style>
@@ -629,14 +629,14 @@ new #[Layout('layouts.bare')] class extends Component {
             
             @if($isFirstSubsection && $section->description)
             <div style="font-size: 0.85rem; color: #475569; line-height: 1.8; margin-bottom: 16px; text-align: left; background: var(--base); padding: 20px; border-radius: 14px; border-left: 4px solid var(--blue);">
-                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:0.75rem;text-transform:uppercase;">ℹ️ Informasi Section</strong>
+                <strong style="display:block;margin-bottom:8px;color:var(--text);font-size:0.75rem;text-transform:uppercase;">ℹ️ Section Information</strong>
                 {!! $section->description !!}
             </div>
             @endif
 
             @if($subsection->instructions)
             <div style="font-size: 0.85rem; color: #78350f; line-height: 1.8; margin-bottom: 24px; text-align: left; background: #fffbeb; padding: 20px; border-radius: 14px; border-left: 4px solid #f59e0b;">
-                <strong style="display:block;margin-bottom:8px;color:#b45309;font-size:0.75rem;text-transform:uppercase;">📋 Instruksi Soal (Subsection)</strong>
+                <strong style="display:block;margin-bottom:8px;color:#b45309;font-size:0.75rem;text-transform:uppercase;">📋 Question Instructions (Subsection)</strong>
                 {!! $subsection->instructions !!}
             </div>
             @endif
@@ -666,7 +666,7 @@ new #[Layout('layouts.bare')] class extends Component {
 
             <button wire:click="dismissInstruction"
                     style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 14px; font-size: 0.88rem; font-weight: 800; background: var(--blue); color: white; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,0.3); transition: all .2s;">
-                Mulai Kerjakan
+                Start
                 <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </button>
         </div>
@@ -743,7 +743,7 @@ new #[Layout('layouts.bare')] class extends Component {
                             </div>
                             @endif
                             @if($this->currentGroup->passage_text)
-                            <div class="passage-content">
+                            <div class="passage-content prose prose-sm max-w-none prose-slate">
                                 {!! $this->currentGroup->passage_text !!}
                             </div>
                             @endif
@@ -757,7 +757,7 @@ new #[Layout('layouts.bare')] class extends Component {
                             <div wire:key="q-wrap-{{ $question->id }}" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;">
                                 <div style="display:flex;gap:10px;margin-bottom:14px;">
                                     <div class="q-number">@php echo collect($flatQuestions)->firstWhere('id',$question->id)['number'] ?? '?'; @endphp</div>
-                                    <div style="font-size:0.9rem;color:var(--text);line-height:1.7;padding-top:3px;">{!! $question->question_text !!}</div>
+                                    <div class="prose prose-sm max-w-none prose-slate" style="font-size:0.9rem;color:var(--text);line-height:1.7;padding-top:3px;">{!! $question->question_text !!}</div>
                                 </div>
                                 <div style="margin-left:44px;">
                                     @if($question->type === 'multiple_choice')
@@ -799,7 +799,7 @@ new #[Layout('layouts.bare')] class extends Component {
                                 <svg x-show="!playing&&!played" style="width:20px;height:20px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
                                 <svg x-show="playing" style="width:20px;height:20px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
                                 <svg x-show="played" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span x-text="played?'Audio Selesai Diputar':(playing?'Playing Audio...':'▶ Putar Audio (Hanya 1x)')"></span>
+                                <span x-text="played?'Audio Finished':(playing?'Playing Audio...':'▶ Play Audio (1x only)')"></span>
                             </button>
                         </div>
                         @else
@@ -829,7 +829,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 {{-- Passage Text --}}
                 @if($this->currentGroup->passage_text)
                 <div style="background:#fefce8;padding:20px;border-radius:14px;border:1px solid #fde68a;margin-bottom:24px;">
-                    <div class="passage-content">{!! $this->currentGroup->passage_text !!}</div>
+                    <div class="passage-content prose prose-sm max-w-none prose-slate">{!! $this->currentGroup->passage_text !!}</div>
                 </div>
                 @endif
 
@@ -842,7 +842,7 @@ new #[Layout('layouts.bare')] class extends Component {
                                 @php $qNumber = collect($flatQuestions)->firstWhere('id', $question->id)['number'] ?? '?'; @endphp
                                 {{ $qNumber }}
                             </div>
-                            <div style="font-size:0.92rem;color:var(--text);line-height:1.7;padding-top:4px;">
+                            <div class="prose prose-sm max-w-none prose-slate" style="font-size:0.92rem;color:var(--text);line-height:1.7;padding-top:4px;">
                                 {!! $question->question_text !!}
                             </div>
                         </div>
@@ -871,7 +871,7 @@ new #[Layout('layouts.bare')] class extends Component {
                                     <svg x-show="!playing&&!played" style="width:16px;height:16px;" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
                                     <svg x-show="playing" style="width:16px;height:16px;animation:pulse 1s infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M8 12L5 9m0 0l-3 3m3-3v6M5 9v3"/></svg>
                                     <svg x-show="played" style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    <span x-text="played?'Audio Selesai Diputar':(playing?'Playing Audio...':'▶ Putar Audio (Hanya 1x)')"></span>
+                                    <span x-text="played?'Audio Finished':(playing?'Playing Audio...':'▶ Play Audio (1x only)')"></span>
                                 </button>
                             </div>
                             @else

@@ -118,7 +118,7 @@ class QuestionGroupsRelationManager extends RelationManager
                                             ->maxSize(10048),
                                     ]),
 
-                                Textarea::make('question_text')->label('Question Text')->required()->columnSpanFull(),
+                                RichEditor::make('question_text')->label('Question Text')->required()->columnSpanFull(),
 
                                 Repeater::make('options')
                                     ->relationship()

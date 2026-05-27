@@ -103,14 +103,28 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
         Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
         Route::get('/exams/{attempt}/sections/{section}/review', [ExamController::class, 'sectionReview'])->name('exam.section.review');
+
+        // Notification Routes
+        Route::post('/notifications/mark-all-read', function() {
+            auth()->user()->unreadNotifications->markAsRead();
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_all_read');
+
+        Route::post('/notifications/{id}/mark-as-read', function($id) {
+            $notif = auth()->user()->notifications()->find($id);
+            if ($notif) {
+                $notif->markAsRead();
+            }
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_as_read');
     });
 
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
-})->middleware(['auth', 'role:examiner']);
+})->middleware(['auth', 'role:admin']);
 
 Route::get('/admin/geo-map', [MapController::class, 'index'])
-    ->middleware(['web', 'auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin'])
     ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';

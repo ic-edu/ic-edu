@@ -167,12 +167,6 @@ new class extends Component
                     <div class="flex-shrink-0 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold">
                         {{ $index + 1 }}
                     </div>
-                    <div>
-                        <span class="text-xs font-bold uppercase px-2 py-1 bg-gray-100 rounded-md mb-2 inline-block">
-                            {{ str_replace('_', ' ', $type) }}
-                        </span>
-                        <div class="prose max-w-none text-gray-800">{!! $q->question_text !!}</div>
-                    </div>
                 </div>
 
                 {{-- Jawaban Peserta --}}
@@ -230,7 +224,6 @@ new class extends Component
                     </div>
                 </div>
 
-            </div>
             @endforeach
         </div>
 

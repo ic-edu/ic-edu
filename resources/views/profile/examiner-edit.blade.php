@@ -52,21 +52,21 @@
             {{-- Profile Information --}}
             <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 anim-in d1">
                 <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
+                    @include('test_taker.profile.partials.update-profile-information-form')
                 </div>
             </div>
 
             {{-- Update Password --}}
             <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 anim-in d2">
                 <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
+                    @include('test_taker.profile.partials.update-password-form')
                 </div>
             </div>
 
             {{-- Delete Account --}}
             <div class="bg-white rounded-[2rem] border border-red-200 shadow-sm p-6 anim-in d3">
                 <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
+                    @include('test_taker.profile.partials.delete-user-form')
                 </div>
             </div>
 

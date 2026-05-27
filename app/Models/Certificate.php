@@ -21,6 +21,24 @@ class Certificate extends Model
         'issued_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($certificate) {
+            $user = $certificate->user;
+            if ($user) {
+                $course = $certificate->course;
+                $user->notify(new \App\Notifications\GeneralNotification([
+                    'title' => 'Certificate issued for <strong>' . $course->title . '</strong> 🎉',
+                    'desc' => 'Congratulations! You completed the course and earned your certificate. Click below to view and download it.',
+                    'type' => 'course',
+                    'category' => 'Certificate Earned',
+                    'action_url' => route('test_taker.course.certificate.download', $course->id),
+                    'action_text' => 'Download Certificate →'
+                ]));
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

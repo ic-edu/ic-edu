@@ -20,6 +20,8 @@
     'resources/css/test_taker.css',
     'resources/js/app.js'
     ])
+
+    @stack('styles')
 </head>
 
 <body>
@@ -46,6 +48,7 @@
 
     </div>
 
+    @stack('scripts')
 </body>
 
 </html>
