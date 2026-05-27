@@ -1,8 +1,8 @@
-{{-- ============================================================
-     NOTIFICATION PANEL — Test Taker
-     Usage: <x-test-taker.notification />
-     Opened/closed by notif-btn in topbar.blade.php
-     ============================================================ --}}
+@php
+    $user = auth()->user();
+    $unreadCount = $user ? $user->unreadNotifications->count() : 0;
+    $notifications = $user ? $user->notifications()->take(20)->get() : collect();
+@endphp
 
 {{-- ── OVERLAY (closes panel on click-outside) ── --}}
 <div id="notif-overlay" class="notif-overlay" onclick="closeNotifPanel()"></div>
@@ -22,11 +22,13 @@
             </div>
             <div>
                 <h3 class="np__title">Notifications</h3>
-                <p class="np__subtitle">4 unread messages</p>
+                <p class="np__subtitle">{{ $unreadCount > 0 ? $unreadCount . ' unread message' . ($unreadCount > 1 ? 's' : '') : 'All caught up!' }}</p>
             </div>
         </div>
         <div class="np__header-actions">
-            <button class="np__mark-all-btn" onclick="markAllRead()">Mark all read</button>
+            @if($unreadCount > 0)
+                <button class="np__mark-all-btn" onclick="markAllRead()">Mark all read</button>
+            @endif
             <button class="np__close-btn" onclick="closeNotifPanel()" aria-label="Close notifications">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -39,196 +41,83 @@
     {{-- Filter Tabs --}}
     <div class="np__tabs">
         <button class="np__tab np__tab--active" onclick="filterNotif(this, 'all')">All</button>
-        <button class="np__tab" onclick="filterNotif(this, 'unread')">Unread <span class="np__tab-badge">4</span></button>
+        <button class="np__tab" onclick="filterNotif(this, 'unread')">
+            Unread 
+            @if($unreadCount > 0)
+                <span class="np__tab-badge" id="notif-badge-count">{{ $unreadCount }}</span>
+            @endif
+        </button>
         <button class="np__tab" onclick="filterNotif(this, 'exam')">Exams</button>
         <button class="np__tab" onclick="filterNotif(this, 'course')">Courses</button>
     </div>
 
     {{-- Notifications List --}}
     <div class="np__list" id="notif-list">
-
-        {{-- 1. Course Enrollment --}}
-        <div class="np__item np__item--unread" data-type="course">
-            <div class="np__item-icon np__item-icon--teal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">Course Enrolled</span>
-                    <div class="np__unread-dot"></div>
+        @forelse($notifications as $notif)
+            @php
+                $notifData = $notif->data;
+                $isUnread = $notif->unread();
+                $type = $notifData['type'] ?? 'course';
+                
+                // Icon styling based on category
+                $category = $notifData['category'] ?? 'Notification';
+                $color = 'blue';
+                if (str_contains(strtolower($category), 'enroll') || str_contains(strtolower($category), 'course')) {
+                    $color = 'teal';
+                } elseif (str_contains(strtolower($category), 'cert')) {
+                    $color = 'gold';
+                } elseif (str_contains(strtolower($category), 'score') || str_contains(strtolower($category), 'grade')) {
+                    $color = 'green';
+                } elseif (str_contains(strtolower($category), 'submit')) {
+                    $color = 'purple';
+                }
+            @endphp
+            <div class="np__item {{ $isUnread ? 'np__item--unread' : '' }}" data-id="{{ $notif->id }}" data-type="{{ $type }}">
+                <div class="np__item-icon np__item-icon--{{ $color }}">
+                    @if($color === 'teal')
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    @elseif($color === 'gold')
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                    @elseif($color === 'green')
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+                    @elseif($color === 'purple')
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    @endif
                 </div>
-                <p class="np__item-title">Successfully enrolled in <strong>IELTS General Training</strong></p>
-                <p class="np__item-desc">You've been successfully enrolled. Start your first lesson anytime — your progress is saved automatically.</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        2 hours ago
-                    </span>
-                    <a href="#" class="np__item-action">Go to Course →</a>
-                </div>
-            </div>
-        </div>
-
-        {{-- 2. Exam Feedback --}}
-        <div class="np__item np__item--unread" data-type="exam">
-            <div class="np__item-icon np__item-icon--blue">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">Exam Feedback</span>
-                    <div class="np__unread-dot"></div>
-                </div>
-                <p class="np__item-title">Your <strong>TOEFL Writing Task 2</strong> has been reviewed</p>
-                <p class="np__item-desc">Your instructor left detailed feedback on your essay. Score: <span class="np__score-chip">24 / 30</span> — Check the full report for improvement tips.</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        5 hours ago
-                    </span>
-                    <a href="#" class="np__item-action">View Feedback →</a>
-                </div>
-            </div>
-        </div>
-
-        {{-- 3. Score Report Ready --}}
-        <div class="np__item np__item--unread" data-type="exam">
-            <div class="np__item-icon np__item-icon--green">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">Score Report</span>
-                    <div class="np__unread-dot"></div>
-                </div>
-                <p class="np__item-title">Score report is ready for <strong>TOEIC Listening & Reading</strong></p>
-                <p class="np__item-desc">Your full score breakdown is now available. You scored <span class="np__score-chip np__score-chip--high">870 / 990</span> — excellent performance!</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        Yesterday
-                    </span>
-                    <a href="#" class="np__item-action">View Report →</a>
+                <div class="np__item-body">
+                    <div class="np__item-header-row">
+                        <span class="np__item-category">{{ $category }}</span>
+                        @if($isUnread)
+                            <div class="np__unread-dot"></div>
+                        @endif
+                    </div>
+                    <p class="np__item-title">{!! $notifData['title'] ?? '' !!}</p>
+                    <p class="np__item-desc">{!! $notifData['desc'] ?? '' !!}</p>
+                    <div class="np__item-meta">
+                        <span class="np__item-time">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            {{ $notif->created_at->diffForHumans() }}
+                        </span>
+                        @if(!empty($notifData['action_url']))
+                            <a href="{{ $notifData['action_url'] }}" class="np__item-action" onclick="markAsRead('{{ $notif->id }}', this)">{{ $notifData['action_text'] ?? 'Go →' }}</a>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </div>
-
-        {{-- 4. New Exam Available --}}
-        <div class="np__item np__item--unread" data-type="exam">
-            <div class="np__item-icon np__item-icon--orange">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">New Exam</span>
-                    <div class="np__unread-dot"></div>
+        @empty
+            <div class="text-center py-12 px-4">
+                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="m2 2 20 20"/></svg>
                 </div>
-                <p class="np__item-title">New mock exam added: <strong>IELTS Academic Reading — Set 12</strong></p>
-                <p class="np__item-desc">A new practice set is now available in your enrolled course. Test your reading comprehension with authentic passages.</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        2 days ago
-                    </span>
-                    <a href="#" class="np__item-action">Start Exam →</a>
-                </div>
+                <p class="text-sm font-semibold text-slate-500 mb-1">All caught up!</p>
+                <p class="text-xs text-slate-400">No new notifications at this time.</p>
             </div>
-        </div>
-
-        {{-- 5. Exam Reminder (read) --}}
-        <div class="np__item" data-type="exam">
-            <div class="np__item-icon np__item-icon--purple">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">Reminder</span>
-                </div>
-                <p class="np__item-title">Don't forget — your <strong>TOEFL Mock Exam</strong> is still in progress</p>
-                <p class="np__item-desc">You haven't completed the Speaking section yet. Resume anytime before the deadline on May 28.</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        3 days ago
-                    </span>
-                    <a href="#" class="np__item-action">Resume Exam →</a>
-                </div>
-            </div>
-        </div>
-
-        {{-- 6. Achievement Unlocked (read) --}}
-        <div class="np__item" data-type="course">
-            <div class="np__item-icon np__item-icon--gold">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="6"/>
-                    <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
-                </svg>
-            </div>
-            <div class="np__item-body">
-                <div class="np__item-header-row">
-                    <span class="np__item-category">Achievement</span>
-                </div>
-                <p class="np__item-title">You earned the <strong>"First Score"</strong> badge 🎉</p>
-                <p class="np__item-desc">Congratulations! You completed your very first graded exam on IC.EDU. Keep going — more badges await!</p>
-                <div class="np__item-meta">
-                    <span class="np__item-time">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        4 days ago
-                    </span>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Footer --}}
-    <div class="np__footer">
-        <a href="#" class="np__footer-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            View all notifications
-        </a>
+        @endforelse
     </div>
 </div>
 
@@ -657,7 +546,6 @@
 function openNotifPanel() {
     document.getElementById('notif-panel').classList.add('is-open');
     document.getElementById('notif-overlay').classList.add('is-open');
-    document.querySelector('.notif-btn .notif-badge')?.style.setProperty('display', 'none');
 }
 
 function closeNotifPanel() {
@@ -672,6 +560,50 @@ function markAllRead() {
     document.querySelectorAll('.np__unread-dot').forEach(dot => dot.remove());
     document.querySelector('.np__subtitle').textContent = 'All caught up!';
     document.querySelectorAll('.np__tab-badge').forEach(b => b.style.display = 'none');
+    
+    // Hide red dot on main hero banner bell if exists
+    const heroBadge = document.querySelector('.group\\/notif div');
+    if (heroBadge) heroBadge.remove();
+
+    fetch('{{ route('test_taker.notifications.mark_all_read') }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    });
+}
+
+function markAsRead(id, element) {
+    const item = element.closest('.np__item');
+    if (!item || !item.classList.contains('np__item--unread')) return;
+
+    item.classList.remove('np__item--unread');
+    const dot = item.querySelector('.np__unread-dot');
+    if (dot) dot.remove();
+
+    // Recalculate unread subtitle count
+    const unreadCountEl = document.querySelector('#notif-badge-count');
+    if (unreadCountEl) {
+        let count = parseInt(unreadCountEl.textContent) - 1;
+        if (count <= 0) {
+            unreadCountEl.style.display = 'none';
+            document.querySelector('.np__subtitle').textContent = 'All caught up!';
+            const heroBadge = document.querySelector('.group\\/notif div');
+            if (heroBadge) heroBadge.remove();
+        } else {
+            unreadCountEl.textContent = count;
+            document.querySelector('.np__subtitle').textContent = count + ' unread message' + (count > 1 ? 's' : '');
+        }
+    }
+
+    fetch(`/user/notifications/${id}/mark-as-read`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    });
 }
 
 function filterNotif(btn, type) {

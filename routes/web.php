@@ -102,6 +102,20 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
         Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
+
+        // Notification Routes
+        Route::post('/notifications/mark-all-read', function() {
+            auth()->user()->unreadNotifications->markAsRead();
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_all_read');
+
+        Route::post('/notifications/{id}/mark-as-read', function($id) {
+            $notif = auth()->user()->notifications()->find($id);
+            if ($notif) {
+                $notif->markAsRead();
+            }
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_as_read');
     });
 
 Route::get('/download-template-soal', function () {

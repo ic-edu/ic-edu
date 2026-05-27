@@ -3,12 +3,17 @@
 
 @section('content')
 {{-- PAGE HEADER HERO --}}
-<div class="relative w-full rounded-[2rem] bg-brand-primary p-8 lg:p-10 text-white mb-8 overflow-hidden shadow-xl shadow-brand-primary/10 anim-in d1 flex items-center justify-between">
+<div class="relative w-full rounded-[2rem] bg-brand-primary p-8 lg:p-10 text-white mb-8 overflow-hidden shadow-xl shadow-brand-primary/10 anim-in d1 flex items-center justify-start gap-8 lg:gap-12">
     {{-- Glassmorphic Notification Bell --}}
     <div class="absolute top-6 right-6 z-20">
+        @php
+            $unreadCount = auth()->user()->unreadNotifications->count();
+        @endphp
         <button onclick="openNotifPanel()" class="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 backdrop-blur-md relative border border-white/10 active:scale-95 group/notif" aria-label="Open notifications">
             <x-lucide-bell class="w-5 h-5 transition-transform group-hover/notif:rotate-12" />
-            <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-brand-primary"></div>
+            @if($unreadCount > 0)
+                <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-brand-primary animate-pulse"></div>
+            @endif
         </button>
     </div>
 
@@ -16,6 +21,15 @@
     <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/2 pointer-events-none"></div>
     <div class="absolute bottom-0 left-10 w-32 h-32 bg-brand-secondary opacity-20 rounded-full blur-2xl pointer-events-none"></div>
     
+    {{-- Hero Mascot Container (now on the left) --}}
+    <div id="hero-mascot" class="relative z-10 items-center justify-center self-stretch min-w-[130px] lg:min-w-[160px]" style="display:flex; perspective: 600px;">
+        <img id="mascot-img" src="{{ asset('assets/maskot/hero.png') }}" 
+             alt="Mascot" 
+             class="object-contain w-24 lg:w-40 xl:w-48 select-none mascot-3d" 
+             draggable="false" />
+    </div>
+
+    {{-- Text Content --}}
     <div class="relative z-10 max-w-xl">
         <h1 class="text-3xl lg:text-4xl !text-white font-black font-heading tracking-tight mb-2 flex items-center gap-2">
             @php
@@ -56,13 +70,6 @@
                 Find a Course
             </a>
         @endif
-    </div>
-
-    <div id="hero-mascot" class="relative z-10 items-center justify-center self-stretch min-w-[130px] lg:min-w-[160px]" style="display:flex; perspective: 600px;">
-        <img id="mascot-img" src="{{ asset('assets/maskot/hero.png') }}" 
-             alt="Mascot" 
-             class="object-contain w-24 lg:w-40 xl:w-48 select-none mascot-3d" 
-             draggable="false" />
     </div>
 </div>
 
