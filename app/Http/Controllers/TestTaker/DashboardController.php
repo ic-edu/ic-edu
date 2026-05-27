@@ -27,6 +27,17 @@ class DashboardController extends Controller
         $avgScore = ExamAttempt::where('user_id', $user->id)
                             ->whereIn('status', [ExamAttemptStatus::FINISHED->value, ExamAttemptStatus::GRADED->value])->avg('converted_score') ?? 0;
         
+        $avgScoresGrouped = ExamAttempt::join('exams', 'exam_attempts.exam_id', '=', 'exams.id')
+                            ->join('exam_types', 'exams.exam_type_id', '=', 'exam_types.id')
+                            ->where('exam_attempts.user_id', $user->id)
+                            ->whereIn('exam_attempts.status', [ExamAttemptStatus::FINISHED->value, ExamAttemptStatus::GRADED->value])
+                            ->select('exam_types.name as type_name')
+                            ->selectRaw('AVG(exam_attempts.converted_score) as avg_score')
+                            ->groupBy('exam_types.name')
+                            ->pluck('avg_score', 'type_name')
+                            ->map(fn($val) => round((float)$val, 1))
+                            ->toArray();
+        
         // Active Courses count
         $activeCourses = CourseEnrollment::where('user_id', $user->id)->count();
 
@@ -140,7 +151,7 @@ class DashboardController extends Controller
         }
 
         return view('test_taker.dashboard', compact(
-            'finishedExams', 'inProgressExams', 'avgScore', 'activeCourses', 'recentResults', 'activeEnrollments', 'examCategories',
+            'finishedExams', 'inProgressExams', 'avgScore', 'avgScoresGrouped', 'activeCourses', 'recentResults', 'activeEnrollments', 'examCategories',
             'chartDataGrouped', 'streakDays', 'activeDaysCount', 'certificates'
         ));
     }

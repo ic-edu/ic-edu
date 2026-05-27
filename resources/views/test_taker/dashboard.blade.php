@@ -125,11 +125,24 @@
         <div class="anim-in d2">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {{-- Card 1: Average Score --}}
-                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group">
+                <div class="seamless-card rounded-2xl p-5 flex flex-col items-center justify-center text-center hover:-translate-y-1 transition-all group relative">
+                    @if(!empty($avgScoresGrouped) && count($avgScoresGrouped) > 0)
+                        <div class="absolute top-2.5 right-2.5 z-10">
+                            <select id="avgScoreTypeSelector" class="text-[0.55rem] border-0 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-brand-primary font-bold focus:ring-0 py-0.5 pl-1.5 pr-6 rounded-lg cursor-pointer transition-all shadow-sm" onchange="updateAvgScoreDisplay(this.value)">
+                                @foreach($avgScoresGrouped as $typeName => $score)
+                                    <option value="{{ $typeName }}">{{ $typeName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-3 group-hover:scale-110 transition-transform">
                         <x-lucide-target class="w-6 h-6" stroke-width="2.5" />
                     </div>
-                    <p class="text-xl font-black text-slate-800 leading-none">{{ number_format($avgScore, 1) }}</p>
+                    @php
+                        $firstTypeName = !empty($avgScoresGrouped) ? array_key_first($avgScoresGrouped) : null;
+                        $displayScore = $firstTypeName ? $avgScoresGrouped[$firstTypeName] : 0.0;
+                    @endphp
+                    <p id="avgScoreDisplay" class="text-xl font-black text-slate-800 leading-none">{{ number_format($displayScore, 1) }}</p>
                     <p class="text-[0.65rem] font-bold text-slate-400 mt-1 uppercase tracking-wider">Avg. Score</p>
                 </div>
                 
@@ -479,6 +492,13 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+    var avgScoresData = @json($avgScoresGrouped ?? []);
+
+    function updateAvgScoreDisplay(val) {
+        var score = avgScoresData[val] !== undefined ? avgScoresData[val] : 0.0;
+        document.getElementById('avgScoreDisplay').textContent = Number(score).toFixed(1);
+    }
+
     var groupedData = @json($chartDataGrouped ?? []);
     var scoreChart;
 
