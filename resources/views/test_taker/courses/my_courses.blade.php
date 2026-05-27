@@ -227,11 +227,13 @@
     border-radius: 14px;
     padding: 16px 24px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
-.mco__stat { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+.mco__stat { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; min-width: 80px; }
 .mco__stat-num   { font-size: 22px; font-weight: 900; color: var(--text); font-family: 'Poppins', sans-serif; line-height: 1; }
-.mco__stat-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-.mco__stat-div   { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; margin: 0 8px; }
+.mco__stat-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
+.mco__stat-div   { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; margin: 0 4px; }
 
 .mco__list { display: flex; flex-direction: column; gap: 10px; }
 
@@ -334,7 +336,13 @@
 @media (max-width: 700px) {
     .mco__status-col { display: none; }
     .mco__desc { display: none; }
-    .mco__title { max-width: 200px; }
+    .mco__title { max-width: 100%; white-space: normal; }
+    .mco__info-top { flex-wrap: wrap; }
+    .mco__row { flex-wrap: wrap; padding: 14px; gap: 12px; }
+    .mco__action-col { width: 100%; justify-content: flex-end; padding-top: 8px; border-top: 1px dashed var(--border); }
+    .mco__stats { padding: 16px; gap: 16px; }
+    .mco__stat { min-width: 40%; }
+    .mco__stat-div { display: none; }
 }
 </style>
 

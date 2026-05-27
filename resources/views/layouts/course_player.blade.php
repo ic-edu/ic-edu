@@ -114,9 +114,29 @@
 
         /* Layout modifications for smaller screens */
         @media (max-width: 1024px) {
-            .cp-body { flex-direction: column-reverse; }
-            .cp-sidebar { width: 100%; height: 350px; border-left: none; border-top: 1px solid var(--border); margin-right: 0; }
-            .cp-sidebar.collapsed { margin-right: 0; display: none; }
+            .cp-body { flex-direction: column; }
+            .cp-sidebar { 
+                position: fixed; top: 0; right: -100%; 
+                width: 320px; max-width: 85vw; height: 100vh; 
+                margin-right: 0; z-index: 9999; 
+                transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+            }
+            .cp-sidebar.open { right: 0; display: flex !important; }
+            .cp-sidebar.collapsed { margin-right: 0; }
+            .cp-overlay {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+                z-index: 9998; opacity: 0; pointer-events: none;
+                transition: opacity 0.3s ease; backdrop-filter: blur(2px);
+            }
+            .cp-overlay.open { opacity: 1; pointer-events: auto; }
+        }
+        @media (max-width: 700px) {
+            .cp-topbar { padding: 14px 20px !important; height: auto !important; min-height: 64px; flex-wrap: wrap; gap: 14px; justify-content: center !important; }
+            .cp-topbar-left { width: 100%; }
+            .cp-topbar-actions { width: 100%; justify-content: space-between; }
+            .cp-topbar-exit span { display: none; }
+            .course-title-text { white-space: normal !important; overflow: visible !important; max-width: 100% !important; }
         }
     </style>
     @stack('styles')
@@ -125,20 +145,20 @@
 <body>
     <div class="cp-container">
         <header class="cp-topbar" style="justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), #4f46e5); display: flex; align-items: center; justify-content: center;">
+            <div class="cp-topbar-left" style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), #4f46e5); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                     <svg style="width:14px;height:14px;color:white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.75 19 7.5 19s3.332.477 4.5 1.253"/></svg>
                 </div>
-                <div>
+                <div style="min-width: 0;">
                     <p style="font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">IC-EDU Course</p>
-                    <p style="font-size: 0.85rem; font-weight: 800; color: var(--text); line-height: 1.2;">{{ $course->title ?? 'Course Player' }}</p>
+                    <p class="course-title-text" style="font-size: 0.85rem; font-weight: 800; color: var(--text); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; padding-top: 2px;">{{ $course->title ?? 'Course Player' }}</p>
                 </div>
             </div>
             
             <div class="cp-topbar-actions">
                 <a href="{{ isset($course) ? route('test_taker.course.show', $course->id) : route('test_taker.dashboard') }}" class="cp-topbar-exit">
                     <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    Course Overview
+                    <span>Course Overview</span>
                 </a>
                 <button class="cp-sidebar-toggle" id="btn-toggle-sidebar" title="Toggle Sidebar">
                     <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -151,6 +171,7 @@
                 @yield('content')
             </main>
             
+            <div class="cp-overlay" id="cp-overlay"></div>
             <aside class="cp-sidebar" id="cp-sidebar">
                 <div class="cp-sidebar-header">
                     <h3 style="font-size: 1.15rem; font-weight: 900; color: var(--text);">Course Content</h3>
@@ -211,9 +232,29 @@
         document.addEventListener('DOMContentLoaded', function() {
             const toggleBtn = document.getElementById('btn-toggle-sidebar');
             const sidebar = document.getElementById('cp-sidebar');
+            const overlay = document.getElementById('cp-overlay');
+            
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', () => {
-                    sidebar.classList.toggle('collapsed');
+                    if (window.innerWidth <= 1024) {
+                        sidebar.classList.toggle('open');
+                        if(overlay) overlay.classList.toggle('open');
+                        if (sidebar.classList.contains('open')) {
+                            document.body.style.overflow = 'hidden'; // prevent background scrolling
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    } else {
+                        sidebar.classList.toggle('collapsed');
+                    }
+                });
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('open');
+                    document.body.style.overflow = '';
                 });
             }
         });

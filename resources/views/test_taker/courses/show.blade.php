@@ -376,7 +376,17 @@
 }
 @media (max-width: 900px) {
     .cd__layout { grid-template-columns: 1fr; }
-    .cd__sidebar { order: -1; }
+    .cd__sidebar { order: -1; margin-bottom: 8px; position: relative; top: auto; z-index: 1; }
+}
+@media (max-width: 700px) {
+    .cd__breadcrumb { flex-wrap: wrap; }
+    .cd__header { padding: 16px; }
+    .cd__section { padding: 16px; }
+    .cd__accordion-btn { padding: 14px 14px !important; }
+    .cd__panel-lessons { padding: 8px 14px 16px !important; }
+    .cd__gate-btn { width: 100%; justify-content: center; }
+    .cd__content-gate { padding: 24px 16px; }
+    .cd__title { font-size: 1.25rem; }
 }
 
 /* Main column */
