@@ -18,11 +18,37 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-Route::view('/courses', 'courses')->name('courses');
-Route::view('/pricing', 'pricing')->name('pricing');
-Route::view('/toefl', 'toefl')->name('toefl');
-Route::view('/toeic', 'toeic')->name('toeic');
-Route::view('/ielts', 'ielts')->name('ielts');
+Route::get('/courses', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    $courses = \App\Models\Course::where('is_published', true)
+        ->withCount(['modules', 'enrollments'])
+        ->latest()
+        ->take(6)
+        ->get();
+    return view('courses', compact('courses'));
+})->name('courses');
+Route::get('/pricing', function () {
+    $courses = \App\Models\Course::where('is_published', true)
+        ->withCount(['modules', 'enrollments'])
+        ->latest()
+        ->get();
+    return view('pricing', compact('courses'));
+})->name('pricing');
+Route::get('/toefl', function () {
+    $examType = \App\Models\ExamType::where('name', 'TOEFL')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('toefl');
+Route::get('/toeic', function () {
+    $examType = \App\Models\ExamType::where('name', 'TOEIC')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('toeic');
+Route::get('/ielts', function () {
+    $examType = \App\Models\ExamType::where('name', 'IELTS')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('ielts');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
