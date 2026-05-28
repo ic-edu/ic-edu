@@ -41,6 +41,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'english_level',
         'learning_purpose',
         'profile_bio',
+        'tokens',
     ];
 
     /**
@@ -65,6 +66,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             'password' => 'hashed',
             'onboarding_completed_at' => 'datetime',
             'target_score' => 'integer',
+            'tokens' => 'integer',
         ];
     }
 
@@ -95,6 +97,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return Storage::url($this->profile_photo);
     }
 
+    public function voucherRedemptions()
+    {
+        return $this->hasMany(VoucherRedemption::class);
+    }
+
     public function examAttempts()
     {
         return $this->hasMany(ExamAttempt::class);
@@ -108,6 +115,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function courseEnrollments()
     {
         return $this->hasMany(CourseEnrollment::class);
+    }
+
+    public function tokenTransactions()
+    {
+        return $this->hasMany(TokenTransaction::class);
     }
 
     public function canAccessPanel(Panel $panel): bool

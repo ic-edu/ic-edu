@@ -359,13 +359,12 @@
                     @php
                         // Determine price based on target level
                         $level = is_array($course->target_level) ? ($course->target_level[0] ?? 'Intermediate') : ($course->target_level ?? 'Intermediate');
-                        $priceText = 'Rp 149.000';
+                        $priceVal = $course->price ?? 149000;
+                        $priceText = 'Rp ' . number_format($priceVal, 0, ',', '.');
                         $levelColor = 'bg-amber-100 text-amber-800 border-amber-200';
                         if ($level === 'Beginner') {
-                            $priceText = 'Rp 99.000';
                             $levelColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
                         } elseif ($level === 'Advanced') {
-                            $priceText = 'Rp 199.000';
                             $levelColor = 'bg-rose-100 text-rose-800 border-rose-200';
                         }
                     @endphp

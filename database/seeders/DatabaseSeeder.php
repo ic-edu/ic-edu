@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
+            'tokens' => 5,
         ]);
         $this->call(ExamTypesTableSeeder::class);
         $this->call(ExamsTableSeeder::class);

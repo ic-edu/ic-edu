@@ -3,6 +3,7 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
+use App\Models\Setting;
 use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
@@ -106,6 +107,12 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
 
         // Dashboard
         Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
+
+        // Wallet Route
+        Route::get('/wallet', [\App\Http\Controllers\TestTaker\WalletController::class, 'index'])->name('wallet');
+        Route::post('/wallet/simulate-purchase', [\App\Http\Controllers\TestTaker\WalletController::class, 'simulatePurchase'])->name('wallet.simulate_purchase');
+
+        Route::post('/wallet/redeem-voucher', [\App\Http\Controllers\VoucherController::class, 'redeem'])->name('wallet.redeem_voucher');
 
         // Course / LMS Routes
         Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');

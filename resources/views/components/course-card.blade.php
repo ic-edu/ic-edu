@@ -61,6 +61,10 @@
                 </svg>
                 Enrolled
             </span>
+        @else
+            <span class="cc__price-badge">
+                {{ 'Rp ' . number_format($course->price ?? 149000, 0, ',', '.') }}
+            </span>
         @endif
     </div>
 
@@ -227,6 +231,20 @@
     color: #0f172a;
     border: 1.5px solid rgba(255,255,255,0.7);
     backdrop-filter: blur(6px);
+    z-index: 2;
+}
+.cc__price-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #059669;
+    color: white;
+    box-shadow: 0 4px 12px rgba(5,150,105,0.25);
     z-index: 2;
 }
 

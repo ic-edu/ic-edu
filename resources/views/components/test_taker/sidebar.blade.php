@@ -41,6 +41,10 @@
 
         {{-- ACCOUNT --}}
         <p class="nav-label font-heading">Account</p>
+        <a href="{{ route('test_taker.wallet') }}" data-tour="wallet" class="s-btn {{ request()->routeIs('test_taker.wallet') ? 'active' : '' }}">
+            <x-lucide-wallet class="w-5 h-5 min-w-[20px]" />
+            <span class="s-label font-heading">Wallet</span>
+        </a>
         <a href="{{ route('profile.show') }}" data-tour="settings" class="s-btn {{ request()->routeIs('profile.show') ? 'active' : '' }}">
             <x-lucide-settings class="w-5 h-5 min-w-[20px]" />
             <span class="s-label font-heading">Settings</span>

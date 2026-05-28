@@ -4,6 +4,7 @@ use App\Models\Exam;
 use App\Models\ExamAttempt;
 use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
@@ -39,21 +40,51 @@ class extends Component {
     {
         $userId = Auth::id();
 
-        // Cek lagi untuk mencegah double-enrollment
-        $existing = \App\Models\ExamEnrollment::where('user_id', $userId)
-            ->where('exam_id', $this->exam->id)
-            ->first();
+        DB::transaction(function () use ($userId) {
+            /** @var \App\Models\User $user */
+            $user = \App\Models\User::where('id', $userId)->lockForUpdate()->first();
 
-        if (!$existing) {
+            // Prevent double enrollment
+            $existing = \App\Models\ExamEnrollment::where('user_id', $userId)
+                ->where('exam_id', $this->exam->id)
+                ->first();
+
+            if ($existing) {
+                session()->flash('success', 'You are already enrolled in this exam.');
+                return;
+            }
+
+            $tokensRequired = $this->exam->tokens_required ?? 1;
+
+            if ($user->tokens < $tokensRequired) {
+                session()->flash('error', 'Insufficient tokens. You need ' . $tokensRequired . ' token(s) to unlock this exam (Your balance: ' . $user->tokens . ' tokens).');
+                return;
+            }
+
+            // Deduct tokens
+            $user->decrement('tokens', $tokensRequired);
+
+            // Create token transaction record
+            \App\Models\TokenTransaction::create([
+                'user_id' => $user->id,
+                'type' => 'deduction',
+                'amount' => -$tokensRequired,
+                'description' => $this->exam->title . ' Attempt',
+                'reference_id' => 'TXN-' . strtoupper(\Illuminate\Support\Str::random(8)),
+                'status' => 'completed',
+            ]);
+
+            // Create enrollment
             \App\Models\ExamEnrollment::create([
                 'user_id' => $userId,
                 'exam_id' => $this->exam->id,
                 'enrolled_at' => now(),
                 'status' => 'active'
             ]);
-        }
 
-        session()->flash('success', 'Berhasil mendaftar ujian! Silakan klik tombol Start Exam untuk memulai.');
+            session()->flash('success', 'Exam successfully unlocked! ' . $tokensRequired . ' token(s) deducted from your balance.');
+        });
+
         return redirect()->route('test_taker.exam.detail', $this->exam->id);
     }
 };
@@ -61,6 +92,23 @@ class extends Component {
 
 <div x-data="{ showConfirm: false }">
 <div class="ed__page-wrapper">
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl text-emerald-800 text-sm font-semibold flex items-center gap-2 shadow-sm">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl text-rose-800 text-sm font-semibold flex items-center gap-2 shadow-sm">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ session('error') }}
+        </div>
+    @endif
 
     {{-- BREADCRUMB --}}
     <div class="ed__breadcrumb">
@@ -287,6 +335,17 @@ class extends Component {
                             <span class="ed__ov-stat-value">{{ ucfirst($exam->mode ?? 'Online') }}</span>
                         </div>
                     </div>
+                    <div class="ed__ov-stat">
+                        <div class="ed__ov-stat-icon" style="color: #f43f5e;">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <div class="ed__ov-stat-info">
+                            <span class="ed__ov-stat-label">Tokens Cost</span>
+                            <span class="ed__ov-stat-value">{{ $exam->tokens_required ?? 1 }} Token(s)</span>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- ENROLLMENT STATUS --}}
@@ -366,18 +425,32 @@ class extends Component {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
             </div>
-            <h3 class="ed__modal-title">Confirm Enrollment</h3>
+            <h3 class="ed__modal-title">Unlock with Tokens</h3>
             <p class="ed__modal-body">
-                You're about to enroll in this exam. It will be added to your My Exams menu and you can start it anytime.
+                This exam requires <strong>{{ $exam->tokens_required ?? 1 }} Token(s)</strong> to unlock.
+                <br><br>
+                Your Balance: <strong>{{ auth()->user()->tokens ?? 0 }} Token(s)</strong>
+                <br>
+                @if((auth()->user()->tokens ?? 0) >= ($exam->tokens_required ?? 1))
+                    <span class="text-slate-500 text-xs block mt-2">Deducting <strong>{{ $exam->tokens_required ?? 1 }} Token(s)</strong> from your wallet to enroll.</span>
+                @else
+                    <span class="text-rose-600 font-bold block mt-2">You do not have enough tokens. Please purchase more tokens first.</span>
+                @endif
             </p>
             <div class="ed__modal-actions">
                 <button @click="showConfirm = false" class="ed__modal-cancel">
                     Cancel
                 </button>
-                <button wire:click="enroll" wire:loading.attr="disabled" class="ed__modal-confirm">
-                    <span wire:loading.remove wire:target="enroll">Confirm Enrollment</span>
-                    <span wire:loading wire:target="enroll">Processing...</span>
-                </button>
+                @if((auth()->user()->tokens ?? 0) >= ($exam->tokens_required ?? 1))
+                    <button wire:click="enroll" wire:loading.attr="disabled" class="ed__modal-confirm">
+                        <span wire:loading.remove wire:target="enroll">Confirm & Unlock</span>
+                        <span wire:loading wire:target="enroll">Processing...</span>
+                    </button>
+                @else
+                    <a href="{{ route('test_taker.wallet') }}" class="ed__modal-confirm" style="display: flex; align-items: center; justify-content: center; text-decoration: none; background: #f59e0b; border-color: #f59e0b; color: white; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px;">
+                        Buy Tokens
+                    </a>
+                @endif
             </div>
         </div>
     </div>

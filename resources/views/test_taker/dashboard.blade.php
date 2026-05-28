@@ -4,6 +4,16 @@
 @section('content')
 {{-- PAGE HEADER HERO --}}
 <div class="relative w-full rounded-[2rem] bg-brand-primary p-8 lg:p-10 text-white mb-8 overflow-hidden shadow-xl shadow-brand-primary/10 anim-in d1 flex items-center justify-start gap-8 lg:gap-12">
+    {{-- Glassmorphic Token Wallet --}}
+    <div class="absolute top-6 right-20 z-20 hidden md:block">
+        <a href="{{ route('test_taker.wallet') }}" class="h-10 px-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center gap-2 transition-all duration-200 backdrop-blur-md border border-white/10 active:scale-95 text-xs font-black no-underline">
+            <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <span>{{ auth()->user()->tokens ?? 0 }} Tokens</span>
+        </a>
+    </div>
+
     {{-- Glassmorphic Notification Bell --}}
     <div class="absolute top-6 right-6 z-20">
         @php
@@ -30,7 +40,7 @@
     </div>
 
     {{-- Text Content --}}
-    <div class="relative z-10 max-w-xl">
+    <div class="relative z-10 max-w-xl pr-16 md:pr-0">
         <h1 class="text-3xl lg:text-4xl !text-white font-black font-heading tracking-tight mb-2 flex items-center gap-2">
             @php
                 $hour = date('H');

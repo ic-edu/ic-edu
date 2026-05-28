@@ -21,12 +21,14 @@ class Exam extends Model
         'mode',
         'is_active',
         'is_public',
+        'tokens_required',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'is_public' => 'boolean',
         'total_duration' => 'integer',
+        'tokens_required' => 'integer',
     ];
 
     public function examType(): BelongsTo
