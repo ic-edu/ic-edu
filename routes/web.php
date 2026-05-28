@@ -161,3 +161,9 @@ Route::get('/admin/geo-map', [MapController::class, 'index'])
     ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';
+
+// Google OAuth Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('login.google');
+    Route::get('/login/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('login.google.callback');
+});

@@ -31,5 +31,6 @@ class DatabaseSeeder extends Seeder
         $this->call(QuestionsTableSeeder::class);
         $this->call(QuestionOptionsTableSeeder::class);
         $this->call(ExamTypesContentSeeder::class);
+        $this->call(SettingsTableSeeder::class);
     }
 }
