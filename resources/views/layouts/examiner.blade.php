@@ -31,8 +31,9 @@
 
         <div class="dash-main">
 
-            {{-- TOPBAR --}}
-            @include('components.test_taker.topbar')
+            @if (request()->routeIs('examiner.dashboard'))
+            @include('components.examiner.topbar')
+            @endif
 
             <div class="page-body">
 
