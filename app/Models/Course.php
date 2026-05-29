@@ -16,11 +16,13 @@ class Course extends Model
         'description',
         'target_level',
         'is_published',
+        'price',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
         'target_level' => 'array',
+        'price' => 'integer',
     ];
 
     public function modules(): HasMany

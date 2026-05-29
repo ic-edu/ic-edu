@@ -32,7 +32,7 @@ new class extends Component
 
         // Ambil data attempt beserta relasi user, exam, dan examType
         $this->attempt = $attempt->load(['user', 'exam.examType']);
-        $this->answers = AttemptAnswer::with('question')
+        $this->answers = AttemptAnswer::with(['question.questionGroup', 'question.options'])
             ->where('exam_attempt_id', $this->attempt->id)
             ->get();
 
@@ -153,12 +153,46 @@ new class extends Component
 
         {{-- Looping Jawaban Peserta --}}
         <div class="space-y-6">
+            @php
+                $lastGroupId = null;
+            @endphp
             @foreach($answers as $index => $ans)
                 @php
                     $q = $ans->question;
+                    $group = $q->questionGroup;
                     $type = strtolower(trim(str_replace(' ', '_', $q->type)));
                     $maxPoints = $q->points ?? 1;
                 @endphp
+
+                @if($group && $group->id !== $lastGroupId)
+                    @php $lastGroupId = $group->id; @endphp
+                    {{-- Group Context Card --}}
+                    <div class="bg-slate-200/50 p-5 rounded-xl border border-slate-300/40 mb-4 mt-8 first:mt-0">
+                        @if($group->title)
+                            <h4 class="font-extrabold text-xs text-slate-800 uppercase tracking-wider mb-2">{{ $group->title }}</h4>
+                        @endif
+                        @if($group->instruction)
+                            <p class="text-[11px] text-slate-500 font-semibold mb-3 italic">{{ $group->instruction }}</p>
+                        @endif
+                        @if($group->passage_text)
+                            <div class="prose max-w-none text-xs text-slate-700 bg-white p-4 rounded-lg border border-slate-200/50 mb-3 shadow-inner leading-relaxed">
+                                {!! $group->passage_text !!}
+                            </div>
+                        @endif
+                        @if($group->audio_path)
+                            <div class="mb-3">
+                                <audio controls class="h-10 w-full max-w-md">
+                                    <source src="{{ asset('storage/' . $group->audio_path) }}">
+                                </audio>
+                            </div>
+                        @endif
+                        @if($group->image_path)
+                            <div class="mb-3">
+                                <img src="{{ asset('storage/' . $group->image_path) }}" alt="Group Image" class="max-w-md rounded-lg shadow-sm border border-slate-200">
+                            </div>
+                        @endif
+                    </div>
+                @endif
 
             <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
 
@@ -167,11 +201,22 @@ new class extends Component
                     <div class="flex-shrink-0 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold">
                         {{ $index + 1 }}
                     </div>
-                    <div>
-                        <span class="text-xs font-bold uppercase px-2 py-1 bg-gray-100 rounded-md mb-2 inline-block">
-                            {{ str_replace('_', ' ', $type) }}
-                        </span>
-                        <div class="prose max-w-none text-gray-800">{!! $q->question_text !!}</div>
+                    <div class="flex-1">
+                        <div class="prose max-w-none text-gray-800 font-bold mb-3 text-sm leading-relaxed">
+                            {!! $q->question_text !!}
+                        </div>
+                        @if($q->image_path)
+                            <div class="mb-3">
+                                <img src="{{ asset('storage/' . $q->image_path) }}" alt="Question Image" class="max-w-md rounded-lg shadow-sm border border-gray-200">
+                            </div>
+                        @endif
+                        @if($q->audio_path)
+                            <div class="mb-3">
+                                <audio controls class="h-10">
+                                    <source src="{{ asset('storage/' . $q->audio_path) }}">
+                                </audio>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

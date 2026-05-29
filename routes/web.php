@@ -3,9 +3,12 @@
 use App\Exports\TemplateSoalExport;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\User\ExamController;
+use App\Models\Setting;
 use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\TestTaker\DashboardController as TestTakerDashboardController;
 use App\Http\Controllers\TestTaker\CourseController as TestTakerCourseController;
+use App\Livewire\Onboarding\OnboardingWizard;
+use App\Livewire\TestTaker\ProfilePage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -42,11 +45,37 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-Route::view('/courses', 'courses')->name('courses');
-Route::view('/pricing', 'pricing')->name('pricing');
-Route::view('/toefl', 'toefl')->name('toefl');
-Route::view('/toeic', 'toeic')->name('toeic');
-Route::view('/ielts', 'ielts')->name('ielts');
+Route::get('/courses', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    $courses = \App\Models\Course::where('is_published', true)
+        ->withCount(['modules', 'enrollments'])
+        ->latest()
+        ->take(6)
+        ->get();
+    return view('courses', compact('courses'));
+})->name('courses');
+Route::get('/pricing', function () {
+    $courses = \App\Models\Course::where('is_published', true)
+        ->withCount(['modules', 'enrollments'])
+        ->latest()
+        ->get();
+    return view('pricing', compact('courses'));
+})->name('pricing');
+Route::get('/toefl', function () {
+    $examType = \App\Models\ExamType::where('name', 'TOEFL')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('toefl');
+Route::get('/toeic', function () {
+    $examType = \App\Models\ExamType::where('name', 'TOEIC')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('toeic');
+Route::get('/ielts', function () {
+    $examType = \App\Models\ExamType::where('name', 'IELTS')->firstOrFail();
+    return view('our_test', compact('examType'));
+})->name('ielts');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard Route
@@ -60,10 +89,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
     })->name('dashboard');
 
-    // Profile Routes
+    // Profile Routes (Breeze — kept for examiner/admin)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // New Profile Page for test_taker
+    Route::get('/settings', ProfilePage::class)->name('profile.show');
+    Route::redirect('/settings-old', '/settings');
 });
 
 // Route Examiner
@@ -87,14 +120,25 @@ Route::middleware(['auth', 'verified', 'role:examiner'])
         })->name('examiner.settings');
     });
 
+// Onboarding Route
+Route::middleware(['auth'])
+     ->get('/onboarding', OnboardingWizard::class)
+     ->name('onboarding.index');
+
 // Route Test-Taker
-Route::middleware(['auth', 'verified', 'role:test_taker'])
+Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
     ->prefix('user')
     ->name('test_taker.')
     ->group(function () {
 
         // Dashboard
         Route::get('/dashboard', [TestTakerDashboardController::class, 'index'])->name('dashboard');
+
+        // Wallet Route
+        Route::get('/wallet', [\App\Http\Controllers\TestTaker\WalletController::class, 'index'])->name('wallet');
+        Route::post('/wallet/simulate-purchase', [\App\Http\Controllers\TestTaker\WalletController::class, 'simulatePurchase'])->name('wallet.simulate_purchase');
+
+        Route::post('/wallet/redeem-voucher', [\App\Http\Controllers\VoucherController::class, 'redeem'])->name('wallet.redeem_voucher');
 
         // Course / LMS Routes
         Route::get('/courses', [TestTakerCourseController::class, 'index'])->name('course.index');
@@ -117,14 +161,35 @@ Route::middleware(['auth', 'verified', 'role:test_taker'])
         Volt::route('/exams/{attempt}', 'user.exam')->name('exam.attempt');
         Route::get('/exams/{attempt}/result', [ExamController::class, 'showResult'])->name('exam.result');
         Route::get('/exams/{attempt}/score-report', [ExamController::class, 'scoreReport'])->name('exam.score_report');
+        Route::get('/exams/{attempt}/sections/{section}/review', [ExamController::class, 'sectionReview'])->name('exam.section.review');
+
+        // Notification Routes
+        Route::post('/notifications/mark-all-read', function() {
+            auth()->user()->unreadNotifications->markAsRead();
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_all_read');
+
+        Route::post('/notifications/{id}/mark-as-read', function($id) {
+            $notif = auth()->user()->notifications()->find($id);
+            if ($notif) {
+                $notif->markAsRead();
+            }
+            return response()->json(['success' => true]);
+        })->name('notifications.mark_as_read');
     });
 
 Route::get('/download-template-soal', function () {
     return Excel::download(new TemplateSoalExport, 'Template_Bank_Soal.xlsx');
-})->middleware(['auth', 'role:examiner']);
+})->middleware(['auth', 'role:admin']);
 
 Route::get('/admin/geo-map', [MapController::class, 'index'])
-    ->middleware(['web', 'auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin'])
     ->name('admin.geo.map');
 
 require __DIR__ . '/auth.php';
+
+// Google OAuth Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('login.google');
+    Route::get('/login/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('login.google.callback');
+});

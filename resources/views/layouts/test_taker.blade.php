@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
     <title>@yield('title', 'Student Portal') - {{ config('app.name', 'IC-EDU') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,12 +21,16 @@
         @include('components.test_taker.sidebar')
         <div class="dash-main">
             @yield('topbar')
+            @include('components.test_taker.notification')
             <div class="page-body">
                 @yield('content')
                 {{ $slot ?? '' }}
             </div>
         </div>
     </div>
+    @auth
+        @include('components.test_taker.walkthrough')
+    @endauth
     @stack('scripts')
 </body>
 

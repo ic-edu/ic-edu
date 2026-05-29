@@ -57,6 +57,11 @@ class CoursesTable
                     ->badge()
                     ->color('success'),
 
+                TextColumn::make('price')
+                    ->label('Price')
+                    ->money('idr')
+                    ->sortable(),
+
                 IconColumn::make('is_published')
                     ->label('Published')
                     ->boolean()

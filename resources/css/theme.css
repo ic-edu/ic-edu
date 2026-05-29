@@ -507,10 +507,53 @@ h6 {
     display: block;
 }
 
-[data-theme="dark"] .icon-sun {
-    display: block;
-}
-
 [data-theme="dark"] .icon-moon {
     display: none;
+}
+
+/* ────────────────────────────────────────────────────
+   CUSTOM OVERRIDES FOR HARDCODED BRAND COLORS IN DARK MODE
+   ──────────────────────────────────────────────────── */
+[data-theme="dark"] .text-\[\#1a3a5a\] {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] .text-\[\#1a365d\] {
+    color: var(--text-heading) !important;
+}
+
+[data-theme="dark"] .bg-\[\#1a3a5a\] {
+    background-color: var(--bg-muted) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .bg-\[\#1a3a5a\]:hover {
+    background-color: var(--brand-blue) !important;
+}
+
+[data-theme="dark"] .bg-\[\#1d3557\] {
+    background-color: var(--brand-blue) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .hover\:bg-\[\#14243b\]:hover {
+    background-color: var(--brand-indigo) !important;
+}
+
+[data-theme="dark"] .border-\[\#1d3557\] {
+    border-color: var(--brand-blue) !important;
+}
+
+[data-theme="dark"] .text-\[\#1d3557\] {
+    color: var(--brand-blue) !important;
+}
+[data-theme="dark"] .hover\:text-white:hover {
+    color: #ffffff !important;
+}
+[data-theme="dark"] .hover\:bg-\[\#1d3557\]:hover {
+    background-color: var(--brand-blue) !important;
+}
+
+[data-theme="dark"] .testi-title {
+    color: var(--text-heading) !important;
 }

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
+            'tokens' => 5,
         ]);
         $this->call(ExamTypesTableSeeder::class);
         $this->call(ExamsTableSeeder::class);
@@ -29,5 +30,7 @@ class DatabaseSeeder extends Seeder
         $this->call(QuestionGroupsTableSeeder::class);
         $this->call(QuestionsTableSeeder::class);
         $this->call(QuestionOptionsTableSeeder::class);
+        $this->call(ExamTypesContentSeeder::class);
+        $this->call(SettingsTableSeeder::class);
     }
 }

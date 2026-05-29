@@ -199,12 +199,16 @@
         
         /* Sengaja tidak diberi transition agar gerakannya 100% lengket dengan scroll wheel */
     }
+
+    #mobile-drawer {
+        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    }
 </style>
 
 <nav id="navbar" class="fixed z-50">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
         <a href="{{ url('/') }}" class="flex-shrink-0">
-            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-15">
+            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 sm:h-12 lg:h-14 w-auto object-contain">
         </a>
         <div class="hidden md:flex items-center gap-7">
             <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
@@ -279,7 +283,7 @@
         </button>
         @auth
             <a href="{{ url('/dashboard') }}"
-                class="inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
+                class="hidden md:inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
                           border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all bg-white/80 backdrop-blur-sm">
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-inner">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -288,17 +292,116 @@
             </a>
         @else
             <a href="{{ route('login') }}" id="btn-signin"
-                class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
+                class="hidden md:inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
                           border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
                 Sign In
             </a>
             <a href="{{ route('register') }}"
-                class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
+                class="hidden md:inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
                           btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
                 Get Started
             </a>
         @endauth
+
+        <!-- Hamburger Menu Button (Mobile Only) -->
+        <button id="mobile-menu-toggle" class="flex md:hidden w-10 h-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 active:scale-95 transition-all" aria-label="Toggle mobile menu">
+            <svg id="hamburger-icon" class="w-6 h-6 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="w-6 h-6 hidden transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
+    </div>
+
+    <!-- Mobile Full-Screen Menu Overlay -->
+    <div id="mobile-drawer" class="fixed inset-0 w-full h-full min-h-screen z-50 bg-[#091124] backdrop-blur-2xl flex flex-col justify-between p-6 opacity-0 invisible translate-x-full md:hidden overflow-y-auto" style="transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s; padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));">
+        <!-- Header (Logo & Close Button) -->
+        <div class="flex items-center justify-between pb-6 border-b border-white/10">
+            <a href="{{ url('/') }}" class="flex-shrink-0">
+                <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 w-auto object-contain">
+            </a>
+            <button id="mobile-menu-close" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all" aria-label="Close menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body Links -->
+        <div class="flex-1 flex flex-col gap-6 py-8">
+            <a href="{{ url('/') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Home</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+            <a href="{{ route('courses') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Courses</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+            
+            <!-- Accordion Tests Menu -->
+            <div class="border-t border-b border-white/10 py-4">
+                <button id="mobile-tests-accordion" class="w-full flex items-center justify-between text-xl font-extrabold text-white hover:text-blue-400 transition-colors">
+                    <span>Our Tests</span>
+                    <svg id="mobile-accordion-chevron" class="w-5 h-5 text-white/60 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="mobile-tests-content" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                    <div class="grid grid-cols-1 gap-3 pt-4">
+                        <a href="{{ route('ielts') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 font-black text-sm flex-shrink-0">IE</div>
+                            <div>
+                                <span class="block text-base font-extrabold text-white">IELTS Academic</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">International study & visa</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('toefl') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 font-black text-sm flex-shrink-0">TF</div>
+                            <div>
+                                <span class="block text-base font-extrabold text-white">TOEFL iBT</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">US university admissions</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('toeic') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm flex-shrink-0">TC</div>
+                            <div>
+                                <span class="block text-base font-extrabold text-white">TOEIC L&R</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">Workplace English standard</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ route('pricing') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Pricing</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+
+        <!-- Footer (Auth Buttons) -->
+        <div class="flex flex-col gap-3 pt-6 border-t border-white/10">
+            @auth
+                <a href="{{ url('/dashboard') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg">
+                    Go to Dashboard
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white border-2 border-white/20 hover:bg-white/10 transition-all">
+                    Sign In
+                </a>
+                <a href="{{ route('register') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white btn-shimmer shadow-lg transition-all">
+                    Get Started
+                </a>
+            @endauth
+        </div>
     </div>
 </nav>
 
@@ -357,7 +460,6 @@
             if (!ticking) {
                 window.requestAnimationFrame(function() {
                     let scrollY = window.scrollY;
-                    // Proses transformasi diubah menjadi jarak scroll sejauh 200px agar lebih cepat selesai
                     let progress = Math.min(Math.max(scrollY / 200, 0), 1);
                     navbar.style.setProperty('--scroll-p', progress);
                     ticking = false;
@@ -389,6 +491,44 @@
         document.addEventListener('click', function(e) {
             if (!testsMenu.contains(e.target)) closeDrop();
         });
+
+        // Mobile Menu Drawer Logic
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+
+        if (mobileMenuToggle && mobileMenuClose && mobileDrawer) {
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileDrawer.classList.remove('opacity-0', 'invisible', 'translate-x-full');
+                mobileDrawer.classList.add('opacity-100', 'visible', 'translate-x-0');
+                document.body.style.overflow = 'hidden';
+            });
+
+            mobileMenuClose.addEventListener('click', function() {
+                mobileDrawer.classList.add('opacity-0', 'invisible', 'translate-x-full');
+                mobileDrawer.classList.remove('opacity-100', 'visible', 'translate-x-0');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Mobile Accordion Logic
+        const accordionBtn = document.getElementById('mobile-tests-accordion');
+        const accordionContent = document.getElementById('mobile-tests-content');
+        const accordionChevron = document.getElementById('mobile-accordion-chevron');
+
+        if (accordionBtn && accordionContent) {
+            accordionBtn.addEventListener('click', function() {
+                const isOpen = accordionContent.style.maxHeight && accordionContent.style.maxHeight !== '0px';
+                if (isOpen) {
+                    accordionContent.style.maxHeight = '0px';
+                    accordionChevron.style.transform = 'rotate(0deg)';
+                } else {
+                    accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
+                    accordionChevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+
         document.querySelectorAll('.test-card').forEach(function(card) {
             var accent = card.dataset.accent;
 

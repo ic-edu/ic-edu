@@ -26,6 +26,11 @@ class UsersTable
                     ->searchable(),
                 TextColumn::make('role')
                     ->badge(),
+                TextColumn::make('tokens')
+                    ->label('Tokens')
+                    ->badge()
+                    ->color('success')
+                    ->sortable(),
                 TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),

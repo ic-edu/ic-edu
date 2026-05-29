@@ -34,6 +34,7 @@ return new class extends Component {
             'exam.courseLessons.module.course',
         ])
             ->where('status', ExamAttemptStatus::FINISHED->value)
+            ->where('examiner_id', auth()->id())
             ->whereHas('exam.courseLessons');
 
         if (!empty($this->search)) {
@@ -57,129 +58,234 @@ return new class extends Component {
 };
 ?>
 
-<div class="min-h-screen bg-transparent p-2 font-poppins">
-    <div class="max-w-7xl mx-auto">
+<div class="ec__page-wrapper">
 
-        {{-- Header --}}
-        <div class="mb-6 anim-in d1">
-            <h1 class="text-3xl font-bold font-dmSans tracking-tight text-slate-900">Antrean Penilaian Course</h1>
-            <p class="text-slate-500 mt-2 text-sm font-poppins">Pilih peserta yang telah menyelesaikan latihan atau tes course untuk diberikan penilaian manual.</p>
+    {{-- PAGE HEADER --}}
+    <div class="ec__page-header">
+        <div>
+            <div class="ec__breadcrumb">
+                <span class="ec__breadcrumb-root">Examiner</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M4.5 3L7.5 6L4.5 9" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="ec__breadcrumb-current">Course Reviews</span>
+            </div>
+
+            <h1 class="ec__page-title">
+                Course Review Queue
+            </h1>
+
+            <p class="ec__page-subtitle">
+                Review completed course assignments and provide manual scores.
+            </p>
         </div>
 
-        {{-- Filter & Search Bar --}}
-        <div
-            class="seamless-card rounded-[2rem] p-5 border border-slate-100 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center anim-in d2">
+        {{-- Search --}}
+        <div class="ec__search-wrap">
+            <svg class="ec__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
 
-            <div class="w-full md:w-1/3 relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd" />
+            <input type="text"
+                wire:model.live.debounce.500ms="search"
+                class="page-search-input"
+                placeholder="Search participant...">
+        </div>
+    </div>
+
+    {{-- FILTER + COUNT ROW --}}
+    <div class="ec__filter-row">
+        <div class="ec__filter-tabs">
+            <button type="button" class="filter-tab active-tab">
+                All Course Reviews
+            </button>
+        </div>
+
+        <div class="ec__filter-right">
+            <span class="ec__count-text">
+                <span class="ec__count-number">{{ $attempts->total() }}</span>
+                submission{{ $attempts->total() !== 1 ? 's' : '' }} waiting
+            </span>
+
+            <select wire:model.live="selectedCourse"
+                class="page-search-input"
+                style="width: 220px; cursor: pointer;">
+                <option value="">All Courses</option>
+                @foreach ($courses as $course)
+                    <option value="{{ $course->id }}">
+                        {{ $course->title }}
+                    </option>
+                @endforeach
+            </select>
+
+            <div class="ec__view-toggle">
+                <button type="button" class="view-toggle-btn active" id="btn-grid-view" title="Grid View" aria-label="Grid View">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+                        <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/>
+                    </svg>
+                </button>
+
+                <button type="button" class="view-toggle-btn" id="btn-list-view" title="List View" aria-label="List View">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="1" y="2" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                        <rect x="1" y="6.75" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                        <rect x="1" y="11.5" width="14" height="2.5" rx="1.25" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- LOADING --}}
+    <div wire:loading class="text-sm font-bold text-blue-700 mb-4">
+        Loading review queue...
+    </div>
+
+    {{-- REVIEW LIST --}}
+    <div class="ec__grid view-grid" id="course-grid-container">
+
+        @forelse($attempts as $att)
+            @php
+                $courseTitle = $att->exam->courseLessons->first()?->module?->course?->title ?? 'Unknown Course';
+                $lessonTitle = $att->exam->courseLessons->first()?->title ?? 'Unknown Lesson';
+
+                $gradient = 'linear-gradient(135deg, #0d3b4f 0%, #1A456C 60%, #16637a 100%)';
+            @endphp
+
+            <div class="ec__card anim-in d{{ $loop->index % 5 + 1 }}"
+                data-type="course"
+                data-title="{{ strtolower(($courseTitle) . ' ' . ($att->user->name ?? '') . ' ' . ($att->user->email ?? '')) }}">
+
+                {{-- Thumbnail --}}
+                <div class="ec__thumb" style="background: {{ $gradient }};">
+                    <div class="ec__thumb-circle-lg"></div>
+                    <div class="ec__thumb-circle-sm"></div>
+                    <div class="ec__thumb-dots"></div>
+                    <div class="ec__thumb-line"></div>
+
+                    <span class="ec__thumb-watermark" style="font-size: 3rem;">
+                        COURSE
+                    </span>
+
+                    <span class="ec__thumb-badge-type">
+                        Assignment
+                    </span>
+
+                    <span class="ec__thumb-badge-dur ec__thumb-badge-dur--active">
+                        Pending
+                    </span>
+                </div>
+
+                {{-- Body --}}
+                <div class="ec__body">
+                    <h3 class="ec__title">
+                        {{ $courseTitle }}
+                    </h3>
+
+                    <p class="ec__desc" style="margin-bottom: 8px;">
+                        <strong>Lesson:</strong> {{ $lessonTitle }}
+                    </p>
+
+                    <p class="ec__desc">
+                        Submission from
+                        <strong>{{ $att->user->name ?? 'User' }}</strong>
+                        {{ $att->user->email ? '(' . $att->user->email . ')' : '' }}
+                    </p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;">
+                        <span style="font-size: .7rem; font-weight: 800; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 7px 10px; border-radius: 999px;">
+                            Submitted: {{ $att->submitted_at ? \Carbon\Carbon::parse($att->submitted_at)->format('d M Y, H:i') : '-' }}
+                        </span>
+
+                        <span style="font-size: .7rem; font-weight: 900; color: #1d4ed8; background: #dbeafe; padding: 7px 10px; border-radius: 999px;">
+                            Auto Score: {{ number_format($att->converted_score ?? 0, 1) }}
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <a href="{{ route('examiner.grading', ['attempt' => $att->id]) }}" class="ec__footer">
+                    <span class="ec__footer-text">
+                        Review Now
+                    </span>
+
+                    <span class="ec__footer-arrow">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </span>
+                </a>
+
+            </div>
+        @empty
+
+            {{-- Empty State --}}
+            <div class="ec__empty-state">
+                <div class="ec__empty-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+                        stroke="#1A456C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
                     </svg>
                 </div>
-                <input type="text" wire:model.live.debounce.500ms="search"
-                    placeholder="Cari nama atau email peserta..."
-                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+
+                <h3 class="ec__empty-title">
+                    No Reviews Available
+                </h3>
+
+                <p class="ec__empty-text">
+                    There are no completed course assignments waiting for manual grading.
+                </p>
             </div>
 
-            <div class="w-full md:w-1/3">
-                <select wire:model.live="selectedCourse"
-                    class="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-
-                    <option value="">-- Semua Course --</option>
-
-                    @foreach ($courses as $course)
-                    <option value="{{ $course->id }}">{{ $course->title }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div wire:loading class="class=" text-brand-primary text-sm font-bold animate-pulse w-full md:w-auto text-right">
-                Memuat data...
-            </div>
-        </div>
-
-        {{-- Tabel Data --}}
-        <div class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm anim-in d3">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100 text-[0.7rem] uppercase tracking-[0.2em] text-slate-400">
-                            <th class="px-6 py-5 font-bold">Nama Peserta</th>
-                            <th class="px-6 py-5 font-bold">Ujian</th>
-                            <th class="px-6 py-5 font-bold text-center">Waktu Submit</th>
-                            <th class="px-6 py-5 font-bold text-center">Skor (Auto)</th>
-                            <th class="px-6 py-5 font-bold text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($attempts as $att)
-                        <tr class="hover:bg-slate-50 transition-colors duration-200">
-                            <td class="px-6 py-5">
-                                <div class="font-bold text-slate-800">
-                                    {{ $att->user->name ?? 'User Tidak Diketahui' }}
-                                </div>
-                                <div class="text-sm text-slate-500 mt-0.5">{{ $att->user->email ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-5">
-                                <div class="font-semibold text-gray-700">
-                                    {{ $att->exam->courseLessons->first()?->module?->course?->title ?? 'Course Tidak Diketahui' }}
-                                </div>
-                                <div class="text-xs text-gray-400">
-                                    Lesson: {{ $att->exam->courseLessons->first()?->title ?? '-' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-5 text-center">
-                                <div class="text-sm text-gray-700">
-                                    {{ \Carbon\Carbon::parse($att->submitted_at)->format('d M Y') }}
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ \Carbon\Carbon::parse($att->submitted_at)->format('H:i') }} WIB
-                                </div>
-                            </td>
-                            <td class="px-6 py-5 text-center">
-                                <span
-                                    class="px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full font-bold text-xs">
-                                    {{ number_format($att->converted_score ?? 0, 1) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-5 text-center">
-                                <a href="{{ route('examiner.grading', ['attempt' => $att->id]) }}"
-                                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white hover:opacity-90 rounded-xl font-bold text-xs transition-all shadow-sm hover:-translate-y-0.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                        fill="currentColor">
-                                        <path
-                                            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                    </svg>
-                                    Nilai Sekarang
-                                </a>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="py-20 text-center text-slate-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Tidak ada data antrean penilaian ujian yang ditemukan.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Pagination Links --}}
-            @if ($attempts->hasPages())
-            <div class="p-5 border-t border-slate-100 bg-slate-50">
-                {{ $attempts->links() }}
-            </div>
-            @endif
-        </div>
+        @endforelse
 
     </div>
+
+    {{-- PAGINATION --}}
+    @if ($attempts->hasPages())
+        <div class="mt-6">
+            {{ $attempts->links() }}
+        </div>
+    @endif
+
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const gridBtn   = document.getElementById('btn-grid-view');
+    const listBtn   = document.getElementById('btn-list-view');
+    const container = document.getElementById('course-grid-container');
+
+    function getCards() {
+        return Array.from(document.querySelectorAll('#course-grid-container .ec__card'));
+    }
+
+    if (gridBtn && listBtn && container) {
+        gridBtn.addEventListener('click', function () {
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+            container.classList.replace('view-list', 'view-grid');
+            getCards().forEach(c => c.classList.remove('ec__card--list'));
+        });
+
+        listBtn.addEventListener('click', function () {
+            listBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+            container.classList.replace('view-grid', 'view-list');
+            getCards().forEach(c => c.classList.add('ec__card--list'));
+        });
+    }
+});
+</script>
+@endpush

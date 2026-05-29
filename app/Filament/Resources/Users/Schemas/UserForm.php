@@ -24,6 +24,11 @@ class UserForm
                     ->options(['examiner' => 'Examiner', 'test_taker' => 'Test taker', 'admin' => 'Admin'])
                     ->default('test_taker')
                     ->required(),
+                TextInput::make('tokens')
+                    ->label('Universal Tokens')
+                    ->numeric()
+                    ->default(0)
+                    ->required(),
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()

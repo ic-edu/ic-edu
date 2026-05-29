@@ -9,6 +9,7 @@ use App\Models\Exam;
 use App\Models\ExamAttempt;
 use App\Models\Question;
 use App\Models\User;
+use App\Models\TokenTransaction;
 use App\Enums\ExamAttemptStatus;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -31,7 +32,57 @@ class DashboardStatsWidget extends BaseWidget
         $gradedAttempts  = ExamAttempt::where('status', ExamAttemptStatus::GRADED->value)->count();
         $totalAttempts   = ExamAttempt::count();
 
-        $certificatesIssued = Certificate::count();
+        // Calculate Grand Total Revenue
+        $courseRevenue = CourseEnrollment::join('courses', 'course_enrollments.course_id', '=', 'courses.id')
+            ->sum('courses.price');
+
+        $tokenTx = TokenTransaction::where('type', 'purchase')->where('status', 'completed')->get();
+        $tokenRevenue = 0;
+        
+        $price1 = (int) \App\Models\Setting::get('token_price_per_unit', 99000);
+        $price3 = (int) \App\Models\Setting::get('token_package_3_price', 249000);
+        $price5 = (int) \App\Models\Setting::get('token_package_5_price', 399000);
+
+        foreach ($tokenTx as $t) {
+            $amount = abs($t->amount);
+            if ($amount === 1) {
+                $tokenRevenue += $price1;
+            } elseif ($amount === 3) {
+                $tokenRevenue += $price3;
+            } elseif ($amount === 5) {
+                $tokenRevenue += $price5;
+            } else {
+                $tokenRevenue += $amount * $price1;
+            }
+        }
+        $grandTotalRevenue = $courseRevenue + $tokenRevenue;
+
+        // Calculate last 4 days revenue trend for sparkline
+        $revenueTrend = [];
+        for ($i = 3; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $dayCourse = CourseEnrollment::join('courses', 'course_enrollments.course_id', '=', 'courses.id')
+                ->whereDate('course_enrollments.created_at', $date)
+                ->sum('courses.price');
+            $dayTx = TokenTransaction::where('type', 'purchase')
+                ->where('status', 'completed')
+                ->whereDate('created_at', $date)
+                ->get();
+            $dayToken = 0;
+            foreach ($dayTx as $t) {
+                $amount = abs($t->amount);
+                if ($amount === 1) {
+                    $dayToken += $price1;
+                } elseif ($amount === 3) {
+                    $dayToken += $price3;
+                } elseif ($amount === 5) {
+                    $dayToken += $price5;
+                } else {
+                    $dayToken += $amount * $price1;
+                }
+            }
+            $revenueTrend[] = $dayCourse + $dayToken;
+        }
 
         return [
             Stat::make('Total Students', number_format($totalStudents))
@@ -52,11 +103,11 @@ class DashboardStatsWidget extends BaseWidget
                 ->color('warning')
                 ->chart([max(0,$gradedAttempts-8), max(0,$gradedAttempts-5), max(0,$gradedAttempts-2), $gradedAttempts]),
 
-            Stat::make('Certificates Issued', $certificatesIssued)
-                ->description('Course completion certificates')
-                ->descriptionIcon('heroicon-m-trophy')
+            Stat::make('Grand Total Revenue', 'Rp ' . number_format($grandTotalRevenue, 0, ',', '.'))
+                ->description('Combined course & token sales')
+                ->descriptionIcon('heroicon-m-banknotes')
                 ->color('info')
-                ->chart([max(0,$certificatesIssued-3), max(0,$certificatesIssued-2), max(0,$certificatesIssued-1), $certificatesIssued]),
+                ->chart($revenueTrend),
         ];
     }
 }

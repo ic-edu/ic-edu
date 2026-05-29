@@ -37,6 +37,14 @@ class CourseForm
                 ->default(false)
                 ->helperText('Only published courses are visible to students.'),
 
+            TextInput::make('price')
+                ->label('Price (Rp)')
+                ->numeric()
+                ->required()
+                ->prefix('Rp')
+                ->default(149000)
+                ->placeholder('e.g., 149000'),
+
             FileUpload::make('thumbnail_path')
                 ->label('Thumbnail Image')
                 ->image()

@@ -68,8 +68,8 @@
 
             $gradients = [
                 'TOEIC' => 'linear-gradient(135deg, #0f3460 0%, #1A456C 60%, #16637a 100%)',
-                'IELTS' => 'linear-gradient(135deg, #1a3a5c 0%, #1e4d6b 60%, #1a5276 100%)',
-                'TOEFL' => 'linear-gradient(135deg, #0d3b4f 0%, #1A456C 60%, #117a65 100%)',
+                'IELTS' => 'linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%)',
+                'TOEFL' => 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 60%, #991b1b 100%)',
             ];
             $gradient = $gradients[$typeName] ?? 'linear-gradient(135deg, #1A456C 0%, #2c6b8a 100%)';
 
