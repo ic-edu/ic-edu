@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Table;
 use App\Models\User;
 use App\Enums\ExamAttemptStatus;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ExamNeedsGradingMail;
 
 class ExamAttemptsTable
 {
@@ -50,7 +52,7 @@ class ExamAttemptsTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         ExamAttemptStatus::FINISHED->value => 'warning',
                         ExamAttemptStatus::GRADED->value => 'success',
                         default => 'gray',
@@ -62,8 +64,22 @@ class ExamAttemptsTable
                     ->sortable(),
                 SelectColumn::make('examiner_id')
                     ->label('Assign Examiner')
-                    ->options(fn () => User::where('role', 'examiner')->pluck('name', 'id'))
-                    ->disabled(fn ($record) => $record->status === ExamAttemptStatus::GRADED->value)
+                    ->options(fn() => User::where('role', 'examiner')->pluck('name', 'id'))
+                    ->disabled(fn($record) => $record->status === ExamAttemptStatus::GRADED->value)
+                    ->afterStateUpdated(function ($record, $state) {
+                        $examiner = User::find($state);
+                        if (
+                            $examiner &&
+                            $record->status === ExamAttemptStatus::FINISHED->value
+                        ) {
+                            Mail::to($examiner->email)->send(
+                                new ExamNeedsGradingMail(
+                                    $record->fresh(['user', 'exam.examType']),
+                                    $examiner
+                                )
+                            );
+                        }
+                    })
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -119,14 +135,26 @@ class ExamAttemptsTable
                         ->form([
                             Select::make('examiner_id')
                                 ->label('Select Examiner')
-                                ->options(fn () => User::where('role', 'examiner')->pluck('name', 'id'))
+                                ->options(fn() => User::where('role', 'examiner')->pluck('name', 'id'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
+                            $examiner = User::find($data['examiner_id']);
+
                             foreach ($records as $record) {
-                                // Only assign if it's FINISHED (Waiting for Grading)
                                 if ($record->status === ExamAttemptStatus::FINISHED->value) {
-                                    $record->update(['examiner_id' => $data['examiner_id']]);
+                                    $record->update([
+                                        'examiner_id' => $data['examiner_id'],
+                                    ]);
+
+                                    if ($examiner) {
+                                        Mail::to($examiner->email)->send(
+                                            new ExamNeedsGradingMail(
+                                                $record->fresh(['user', 'exam.examType']),
+                                                $examiner
+                                            )
+                                        );
+                                    }
                                 }
                             }
                         })

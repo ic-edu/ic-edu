@@ -11,6 +11,32 @@ use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Volt\Volt;
 
+//test email
+use App\Models\User;
+use App\Models\ExamAttempt;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ExamNeedsGradingMail;
+
+Route::get('/dev/test-grading-email', function () {
+
+    $examiner = User::where('role', 'examiner')->first();
+
+    $attempt = ExamAttempt::with(['user', 'exam.examType'])
+        ->whereNotNull('examiner_id')
+        ->latest()
+        ->first();
+
+    if (! $examiner || ! $attempt) {
+        dd('Examiner atau attempt belum ada.');
+    }
+
+    Mail::to('baskara2201@gmail.com')->send(
+        new ExamNeedsGradingMail($attempt, $examiner)
+    );
+
+    return 'Email grading notification sent!';
+});
+
 // Landing Page Route
 Route::get('/', function () {
     return view('landing');
