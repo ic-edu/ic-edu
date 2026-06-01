@@ -62,4 +62,9 @@ class CourseLesson extends Model
             'quiz'      => 'Quiz / Practice',
         ];
     }
+
+    public function progresses()
+    {
+        return $this->hasMany(LessonProgress::class, 'course_lesson_id');
+    }
 }
