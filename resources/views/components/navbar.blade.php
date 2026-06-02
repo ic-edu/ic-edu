@@ -223,12 +223,16 @@ $tests = [
         border-color: var(--brand-blue) !important;
         color: var(--brand-blue) !important;
     }
+
+    #mobile-drawer {
+        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    }
 </style>
 
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-b border-transparent">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
         <a href="{{ url('/') }}" class="flex-shrink-0">
-            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-15">
+            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 sm:h-12 lg:h-14 w-auto object-contain">
         </a>
         <div class="hidden md:flex items-center gap-7">
 
@@ -349,102 +353,126 @@ $tests = [
                     d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </button>
-        
-        <div class="hidden md:flex items-center gap-3">
-            @auth
-                <a href="{{ url('/dashboard') }}"
-                    class="inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
-                              border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all bg-white/80 backdrop-blur-sm">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-inner">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-                    <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
-                </a>
-            @else
-                <a href="{{ route('login') }}" id="btn-signin"
-                    class="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
-                              border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
-                    Sign In
-                </a>
-                <a href="{{ route('register') }}"
-                    class="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
-                              btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
-                    Get Started
-                </a>
-            @endauth
-        </div>
+        @auth
+            <a href="{{ url('/dashboard') }}"
+                class="hidden md:inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
+                          border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all bg-white/80 backdrop-blur-sm">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs shadow-inner">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
+                <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
+            </a>
+        @else
+            <a href="{{ route('login') }}" id="btn-signin"
+                class="hidden md:inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-slate-700
+                          border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
+                Sign In
+            </a>
+            <a href="{{ route('register') }}"
+                class="hidden md:inline-flex items-center px-5 py-2.5 rounded-full text-sm font-bold text-white
+                          btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
+                Get Started
+            </a>
+        @endauth
 
-        <button id="mobile-menu-toggle" type="button" class="flex md:hidden items-center justify-center w-10 h-10 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors" aria-label="Toggle Menu">
-            <svg id="hamburger-icon" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <!-- Hamburger Menu Button (Mobile Only) -->
+        <button id="mobile-menu-toggle" class="flex md:hidden w-10 h-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-blue-600 active:scale-95 transition-all" aria-label="Toggle mobile menu">
+            <svg id="hamburger-icon" class="w-6 h-6 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg id="close-icon" class="w-6 h-6 hidden transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
     </div>
     </div>
 
-    <!-- Mobile Menu Dropdown -->
-    <div id="mobile-menu"
-        class="absolute top-[calc(100%+12px)] left-0 right-0 max-h-[calc(100vh-100px)] overflow-y-auto bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-100 shadow-[0_32px_80px_rgba(0,0,0,0.15)] p-6 opacity-0 invisible pointer-events-none md:hidden"
-        style="transform: translateY(10px); transition: opacity .25s ease, transform .3s cubic-bezier(.34,1.2,.64,1), visibility .25s;">
-        <div class="flex flex-col gap-2">
-            <a href="{{ url('/') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Home</a>
-            <a href="{{ route('courses') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Courses</a>
+    <!-- Mobile Full-Screen Menu Overlay -->
+    <div id="mobile-drawer" class="fixed inset-0 w-full h-full min-h-screen z-50 bg-[#091124] backdrop-blur-2xl flex flex-col justify-between p-6 opacity-0 invisible translate-x-full md:hidden overflow-y-auto" style="transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s; padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));">
+        <!-- Header (Logo & Close Button) -->
+        <div class="flex items-center justify-between pb-6 border-b border-white/10">
+            <a href="{{ url('/') }}" class="flex-shrink-0">
+                <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 w-auto object-contain">
+            </a>
+            <button id="mobile-menu-close" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all" aria-label="Close menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body Links -->
+        <div class="flex-1 flex flex-col gap-6 py-8">
+            <a href="{{ url('/') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Home</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+            <a href="{{ route('courses') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Courses</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
             
-            <!-- Our Tests Accordion for Mobile -->
-            <div class="flex flex-col">
-                <button id="mobile-tests-btn" type="button" class="flex items-center justify-between w-full text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 text-left">
+            <!-- Accordion Tests Menu -->
+            <div class="border-t border-b border-white/10 py-4">
+                <button id="mobile-tests-accordion" class="w-full flex items-center justify-between text-xl font-extrabold text-white hover:text-blue-400 transition-colors">
                     <span>Our Tests</span>
-                    <svg id="mobile-tests-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform .25s ease;">
+                    <svg id="mobile-accordion-chevron" class="w-5 h-5 text-white/60 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <div id="mobile-tests-dropdown" class="hidden flex-col gap-2 pl-4 mt-2">
-                    @foreach($tests as $t)
-                        <a href="{{ $t['link'] }}" class="flex items-center gap-3.5 p-3 rounded-2xl hover:bg-slate-100 transition-colors">
-                            <div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center text-xs font-extrabold" style="background: {{ $t['orb'] }}; color: {{ $t['accent'] }};">
-                                {{ $t['name'] }}
-                            </div>
+                <div id="mobile-tests-content" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                    <div class="grid grid-cols-1 gap-3 pt-4">
+                        <a href="{{ route('ielts') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 font-black text-sm flex-shrink-0">IE</div>
                             <div>
-                                <div class="text-sm font-bold text-slate-800 leading-tight">
-                                    {{ $t['name'] }} <span class="font-normal text-slate-400">{{ $t['sub'] }}</span>
-                                </div>
-                                <div class="text-[0.7rem] text-slate-400 mt-0.5 leading-tight">{{ $t['desc'] }}</div>
+                                <span class="block text-base font-extrabold text-white">IELTS Academic</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">International study & visa</span>
                             </div>
                         </a>
-                    @endforeach
+                        <a href="{{ route('toefl') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 font-black text-sm flex-shrink-0">TF</div>
+                            <div>
+                                <span class="block text-base font-extrabold text-white">TOEFL iBT</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">US university admissions</span>
+                            </div>
+                        </a>
+                        <a href="{{ route('toeic') }}" class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm flex-shrink-0">TC</div>
+                            <div>
+                                <span class="block text-base font-extrabold text-white">TOEIC L&R</span>
+                                <span class="block text-xs text-slate-300 mt-0.5">Workplace English standard</span>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <a href="{{ route('pricing') }}" class="text-base font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 px-4 rounded-xl hover:bg-slate-100 flex items-center">Pricing</a>
-            
-            <hr class="border-slate-100 my-2">
+            <a href="{{ route('pricing') }}" class="text-xl font-extrabold text-white hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Pricing</span>
+                <svg class="w-5 h-5 text-white/40" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
 
-            <!-- Mobile Auth/Action Buttons -->
-            <div class="flex flex-col gap-3 mt-2">
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 p-3 rounded-2xl bg-slate-100 border border-slate-200">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center text-white text-sm font-bold shadow-inner">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-sm font-bold text-slate-800 truncate">{{ Auth::user()->name }}</div>
-                            <div class="text-xs text-slate-400">Go to Dashboard</div>
-                        </div>
-                    </a>
-                @else
-                    <a href="{{ route('login') }}" id="mobile-btn-signin"
-                        class="flex items-center justify-center w-full py-3 rounded-full text-sm font-bold text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all">
-                        Sign In
-                    </a>
-                    <a href="{{ route('register') }}"
-                        class="flex items-center justify-center w-full py-3 rounded-full text-sm font-bold text-white btn-shimmer shadow-lg shadow-blue-300/40 hover:shadow-blue-400/50 hover:-translate-y-0.5 transition-all">
-                        Get Started
-                    </a>
-                @endauth
-            </div>
+        <!-- Footer (Auth Buttons) -->
+        <div class="flex flex-col gap-3 pt-6 border-t border-white/10">
+            @auth
+                <a href="{{ url('/dashboard') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg">
+                    Go to Dashboard
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white border-2 border-white/20 hover:bg-white/10 transition-all">
+                    Sign In
+                </a>
+                <a href="{{ route('register') }}" class="w-full text-center py-3.5 rounded-full text-sm font-bold text-white btn-shimmer shadow-lg transition-all">
+                    Get Started
+                </a>
+            @endauth
         </div>
     </div>
 </nav>
@@ -500,14 +528,15 @@ $tests = [
         let dropTimer;
 
         function applyScroll() {
-            const scrolled = window.scrollY > 60;
-            navbar.classList.toggle('bg-white/95', scrolled);
-            navbar.classList.toggle('backdrop-blur-xl', scrolled);
-            navbar.classList.toggle('border-slate-200', scrolled);
-            navbar.classList.toggle('shadow-sm', scrolled);
-            navbar.classList.toggle('scrolled-nav', scrolled);
-            navbar.classList.toggle('bg-transparent', !scrolled);
-            navbar.classList.toggle('border-transparent', !scrolled);
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    let scrollY = window.scrollY;
+                    let progress = Math.min(Math.max(scrollY / 200, 0), 1);
+                    navbar.style.setProperty('--scroll-p', progress);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         }
         window.addEventListener('scroll', applyScroll, {
             passive: true
@@ -588,6 +617,44 @@ $tests = [
                 if (closeIcon) closeIcon.classList.add('hidden');
             }
         });
+
+        // Mobile Menu Drawer Logic
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileDrawer = document.getElementById('mobile-drawer');
+
+        if (mobileMenuToggle && mobileMenuClose && mobileDrawer) {
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileDrawer.classList.remove('opacity-0', 'invisible', 'translate-x-full');
+                mobileDrawer.classList.add('opacity-100', 'visible', 'translate-x-0');
+                document.body.style.overflow = 'hidden';
+            });
+
+            mobileMenuClose.addEventListener('click', function() {
+                mobileDrawer.classList.add('opacity-0', 'invisible', 'translate-x-full');
+                mobileDrawer.classList.remove('opacity-100', 'visible', 'translate-x-0');
+                document.body.style.overflow = '';
+            });
+        }
+
+        // Mobile Accordion Logic
+        const accordionBtn = document.getElementById('mobile-tests-accordion');
+        const accordionContent = document.getElementById('mobile-tests-content');
+        const accordionChevron = document.getElementById('mobile-accordion-chevron');
+
+        if (accordionBtn && accordionContent) {
+            accordionBtn.addEventListener('click', function() {
+                const isOpen = accordionContent.style.maxHeight && accordionContent.style.maxHeight !== '0px';
+                if (isOpen) {
+                    accordionContent.style.maxHeight = '0px';
+                    accordionChevron.style.transform = 'rotate(0deg)';
+                } else {
+                    accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
+                    accordionChevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+
         document.querySelectorAll('.test-card').forEach(function(card) {
             var accent = card.dataset.accent;
 

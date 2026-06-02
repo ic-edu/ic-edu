@@ -35,6 +35,13 @@ class ExamsTable
                     ->suffix(' mins')
                     ->sortable(),
 
+                TextColumn::make('tokens_required')
+                    ->label('Tokens Required')
+                    ->numeric()
+                    ->badge()
+                    ->color('warning')
+                    ->sortable(),
+
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean(),

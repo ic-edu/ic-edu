@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ExamTypes\Schemas;
 
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -76,6 +77,84 @@ class ExamTypeForm
                         ->label('Show Per-Section Scores')
                         ->helperText('Enable for TOEIC/TOEFL to display Listening, Reading, etc. scores separately on results.')
                         ->default(false),
+                ])->columns(2),
+
+            // ─── Landing Page Configuration ────────────────────────────────
+            Section::make('Landing Page Configuration')
+                ->description('Customize the public description page for this exam type.')
+                ->schema([
+                    TextInput::make('page_content.hero_title')
+                        ->label('Hero Title')
+                        ->placeholder('e.g. Reach Your IELTS Goals\nwith IC Edu')
+                        ->columnSpanFull(),
+
+                    Textarea::make('page_content.hero_subtitle')
+                        ->label('Hero Subtitle')
+                        ->rows(3)
+                        ->columnSpanFull(),
+
+                    TextInput::make('page_content.what_is_title')
+                        ->label('What is [Exam] Title')
+                        ->placeholder('e.g. What is IELTS?'),
+
+                    TextInput::make('page_content.practice_route')
+                        ->label('Practice Route / Redirect Target')
+                        ->default('test_taker.exam.index')
+                        ->helperText('Default is test_taker.exam.index'),
+
+                    Repeater::make('page_content.bubbles')
+                        ->label('Floating Bubbles')
+                        ->schema([
+                            TextInput::make('bubble')
+                                ->label('Bubble Text')
+                                ->required(),
+                        ])
+                        ->grid(2)
+                        ->columnSpanFull(),
+
+                    Repeater::make('page_content.features')
+                        ->label('Key Features')
+                        ->schema([
+                            TextInput::make('feature')
+                                ->label('Feature Description')
+                                ->required(),
+                        ])
+                        ->columnSpanFull(),
+
+                    Repeater::make('page_content.what_is_description')
+                        ->label('What is Description Paragraphs')
+                        ->schema([
+                            Textarea::make('paragraph')
+                                ->label('Paragraph')
+                                ->rows(2)
+                                ->required(),
+                        ])
+                        ->columnSpanFull(),
+
+                    Repeater::make('page_content.accordion_items')
+                        ->label('Test Section Accordions')
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Section Title')
+                                ->placeholder('e.g. 1: Listening Section (30 minutes)')
+                                ->required(),
+
+                            TextInput::make('subtitle')
+                                ->label('Section Subtitle')
+                                ->placeholder('e.g. This section takes around 30 minutes with 40 questions')
+                                ->required(),
+
+                            Repeater::make('bullets')
+                                ->label('Details / Bullets')
+                                ->schema([
+                                    TextInput::make('bullet')
+                                        ->label('Bullet Point')
+                                        ->placeholder('e.g. Part 1: Social contexts (monologues and dialogues)')
+                                        ->required(),
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columnSpanFull(),
                 ])->columns(2),
 
         ])->columns(1);

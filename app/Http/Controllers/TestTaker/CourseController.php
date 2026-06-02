@@ -12,6 +12,8 @@ use App\Models\ExamAttempt;
 use App\Enums\ExamAttemptStatus;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
@@ -76,6 +78,14 @@ class CourseController extends Controller
                 $certificate = Certificate::where('user_id', $userId)
                     ->where('course_id', $course->id)
                     ->first();
+
+                // Failsafe: automatically update status if they somehow completed it but it's still active
+                $currentEnrollment = CourseEnrollment::where('user_id', $userId)
+                    ->where('course_id', $course->id)
+                    ->first();
+                if ($currentEnrollment && $currentEnrollment->status === 'active') {
+                    $currentEnrollment->update(['status' => 'graduated']);
+                }
             }
         }
 
@@ -84,26 +94,71 @@ class CourseController extends Controller
 
     /**
      * Enroll in a course.
+     *
+     * NOTE: Courses use direct payment (not token-based).
+     * Enrollment is currently free while the payment gateway integration
+     * is pending confirmation from the business partner.
+     *
+     * TODO: When payment gateway is ready, insert the payment verification
+     *       step BEFORE the CourseEnrollment::create() call below.
+     *       The payment flow should:
+     *         1. Check $course->price > 0
+     *         2. Initiate payment via gateway (Midtrans/Xendit/etc.)
+     *         3. Only create enrollment after payment callback confirms success
      */
     public function enroll(Course $course)
     {
         $userId = Auth::id();
 
-        $existing = CourseEnrollment::where('user_id', $userId)
-            ->where('course_id', $course->id)
-            ->first();
-
-        if (!$existing) {
-            CourseEnrollment::create([
-                'user_id'     => $userId,
-                'course_id'   => $course->id,
-                'status'      => 'active',
-                'enrolled_at' => now(),
-            ]);
+        // Guard: course must be published
+        if (!$course->is_published) {
+            return redirect()->route('test_taker.course.index')
+                ->with('error', 'This course is not available for enrollment.');
         }
 
-        return redirect()->route('test_taker.course.my_courses')
-            ->with('success', 'Berhasil mendaftar kursus! Selamat belajar.');
+        try {
+            DB::transaction(function () use ($userId, $course) {
+                // Lock the user to prevent concurrent enrollment requests
+                $user = \App\Models\User::where('id', $userId)->lockForUpdate()->first();
+
+                // Guard: prevent double enrollment (atomic check inside transaction)
+                $alreadyEnrolled = CourseEnrollment::where('user_id', $userId)
+                    ->where('course_id', $course->id)
+                    ->exists();
+
+                if ($alreadyEnrolled) {
+                    // Nothing to do — user is already enrolled
+                    return;
+                }
+
+                // ─────────────────────────────────────────────────────────────
+                // TODO: PAYMENT GATEWAY HOOK — insert payment verification here
+                // if ($course->price > 0) {
+                //     PaymentService::charge($userId, $course->price, $course->title);
+                // }
+                // ─────────────────────────────────────────────────────────────
+
+                CourseEnrollment::create([
+                    'user_id'     => $userId,
+                    'course_id'   => $course->id,
+                    'status'      => 'active',
+                    'enrolled_at' => now(),
+                ]);
+            });
+
+            return redirect()->route('test_taker.course.my_courses')
+                ->with('success', 'Berhasil mendaftar kursus! Selamat belajar.');
+
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Course enrollment failed', [
+                'user_id'   => $userId,
+                'course_id' => $course->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('test_taker.course.show', $course->id)
+                ->with('error', 'Terjadi kesalahan saat mendaftar kursus. Silakan coba lagi.');
+        }
     }
 
     /**
@@ -112,6 +167,12 @@ class CourseController extends Controller
     public function lesson(Course $course, CourseLesson $lesson)
     {
         $userId = Auth::id();
+
+        // Validate lesson belongs to this course
+        $lesson->load('module');
+        if ($lesson->module->course_id !== $course->id) {
+            abort(404, 'Lesson not found in this course.');
+        }
 
         $isEnrolled = CourseEnrollment::where('user_id', $userId)
             ->where('course_id', $course->id)
@@ -165,21 +226,8 @@ class CourseController extends Controller
                     );
                     $isCompleted = true;
                     
-                    // Generate certificate if all lessons are complete
-                    $completedLessonsCount = LessonProgress::where('user_id', $userId)
-                        ->whereIn('course_lesson_id', $allLessons->pluck('id'))
-                        ->where('is_completed', true)
-                        ->count();
-                        
-                    if ($completedLessonsCount >= $allLessons->count()) {
-                        Certificate::firstOrCreate(
-                            ['user_id' => $userId, 'course_id' => $course->id],
-                            [
-                                'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
-                                'issued_at' => now(),
-                            ]
-                        );
-                    }
+                    // Check and generate certificate if all lessons are complete
+                    $this->checkAndGenerateCertificate($userId, $course, $allLessons);
                 }
             }
         }
@@ -217,6 +265,12 @@ class CourseController extends Controller
     {
         $userId = Auth::id();
 
+        // Validate lesson belongs to this course
+        $lesson->load('module');
+        if ($lesson->module->course_id !== $course->id) {
+            abort(404, 'Lesson not found in this course.');
+        }
+
         if ($lesson->type === 'quiz') {
             return redirect()->back()->with('error', 'Quizzes are graded automatically.');
         }
@@ -236,21 +290,7 @@ class CourseController extends Controller
                 ->with('success', 'Lesson completed! Proceeding to the next lesson.');
         }
 
-        // Generate certificate if all lessons are complete
-        $completedLessonsCount = LessonProgress::where('user_id', $userId)
-            ->whereIn('course_lesson_id', $allLessons->pluck('id'))
-            ->where('is_completed', true)
-            ->count();
-            
-        if ($completedLessonsCount >= $allLessons->count()) {
-            Certificate::firstOrCreate(
-                ['user_id' => $userId, 'course_id' => $course->id],
-                [
-                    'certificate_code' => 'CERT-' . strtoupper(uniqid()) . '-' . $userId,
-                    'issued_at' => now(),
-                ]
-            );
-        }
+        $this->checkAndGenerateCertificate($userId, $course, $allLessons);
 
         // If it was the last lesson, redirect to course overview and show certificate (to be implemented)
         return redirect()->route('test_taker.course.show', $course->id)
@@ -263,6 +303,12 @@ class CourseController extends Controller
     public function startQuiz(Course $course, CourseLesson $lesson)
     {
         $userId = Auth::id();
+
+        // Validate lesson belongs to this course
+        $lesson->load('module');
+        if ($lesson->module->course_id !== $course->id) {
+            abort(404, 'Lesson not found in this course.');
+        }
 
         $isEnrolled = CourseEnrollment::where('user_id', $userId)
             ->where('course_id', $course->id)
@@ -316,5 +362,30 @@ class CourseController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download('Certificate_' . str_replace(' ', '_', $course->title) . '.pdf');
+    }
+
+    /**
+     * Helper to check completion status and generate certificate.
+     */
+    private function checkAndGenerateCertificate($userId, Course $course, $allLessons)
+    {
+        $completedLessonsCount = LessonProgress::where('user_id', $userId)
+            ->whereIn('course_lesson_id', $allLessons->pluck('id'))
+            ->where('is_completed', true)
+            ->count();
+
+        if ($completedLessonsCount >= $allLessons->count()) {
+            Certificate::firstOrCreate(
+                ['user_id' => $userId, 'course_id' => $course->id],
+                [
+                    'certificate_code' => 'CERT-' . strtoupper(Str::uuid()),
+                    'issued_at' => now(),
+                ]
+            );
+
+            CourseEnrollment::where('user_id', $userId)
+                ->where('course_id', $course->id)
+                ->update(['status' => 'graduated']);
+        }
     }
 }

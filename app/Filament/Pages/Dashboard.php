@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\DashboardStatsWidget;
+use App\Filament\Widgets\FinancialOverviewWidget;
 use App\Filament\Widgets\ExamResultsDonut;
 use App\Filament\Widgets\RecentActivityWidget;
 use App\Filament\Widgets\UserDemographicsMap;
@@ -15,6 +16,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             DashboardStatsWidget::class,
+            FinancialOverviewWidget::class,
             UserGrowthChart::class,
             ExamResultsDonut::class,
             UserDemographicsMap::class,

@@ -19,6 +19,7 @@ class ExamType extends Model
         'rounding_step',
         'min_score',
         'section_min_score',
+        'page_content',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class ExamType extends Model
         'rounding_step'       => 'decimal:2',
         'min_score'           => 'decimal:1',
         'section_min_score'   => 'decimal:1',
+        'page_content'        => 'array',
     ];
 
     public function exams()

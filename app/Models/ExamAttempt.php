@@ -56,6 +56,44 @@ class ExamAttempt extends Model
         return $this->hasMany(AttemptAnswer::class);
     }
 
+    protected static function booted()
+    {
+        static::updated(function ($attempt) {
+            if ($attempt->isDirty('status')) {
+                $newStatus = $attempt->status;
+                $oldStatus = $attempt->getOriginal('status');
+                
+                $user = $attempt->user;
+                if ($user) {
+                    $exam = $attempt->exam;
+                    if ($newStatus === 'finished' && $oldStatus !== 'finished') {
+                        $user->notify(new \App\Notifications\GeneralNotification([
+                            'title' => 'Exam submitted: <strong>' . $exam->title . '</strong>',
+                            'desc' => 'Your answers have been successfully submitted and are pending review by our instruction team.',
+                            'type' => 'exam',
+                            'category' => 'Exam Submitted',
+                            'action_url' => route('test_taker.exam.my_exams'),
+                            'action_text' => 'View My Exams →'
+                        ]));
+                    } elseif ($newStatus === 'graded' && $oldStatus !== 'graded') {
+                        $passingScore = $exam->examType->passing_score ?? null;
+                        $isPassed = $passingScore ? $attempt->converted_score >= $passingScore : null;
+                        $passedText = $isPassed === true ? ' — excellent performance!' : '';
+                        
+                        $user->notify(new \App\Notifications\GeneralNotification([
+                            'title' => 'Score report is ready for <strong>' . $exam->title . '</strong>',
+                            'desc' => 'Your full score breakdown is now available. You scored <span class="np__score-chip np__score-chip--high">' . number_format($attempt->converted_score, 1) . '</span>' . $passedText,
+                            'type' => 'exam',
+                            'category' => 'Score Report',
+                            'action_url' => route('test_taker.exam.score_report', $attempt->id),
+                            'action_text' => 'View Report →'
+                        ]));
+                    }
+                }
+            }
+        });
+    }
+
     public function currentQuestion()
     {
         return $this->belongsTo(Question::class, 'current_question_id');

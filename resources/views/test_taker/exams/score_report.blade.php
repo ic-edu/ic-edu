@@ -52,7 +52,7 @@
             {{-- QR Code --}}
             <td style="vertical-align:middle; text-align:right; width:80px;">
                 <img class="header-qr-img"
-                     src="data:image/svg+xml;base64,{!! base64_encode(QrCode::format('svg')->size(90)->margin(0)->generate(route('test_taker.exam.result', $attempt->id))) !!}"
+                     src="data:image/svg+xml;base64,{!! base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(90)->margin(0)->generate(route('test_taker.exam.result', $attempt->id))) !!}"
                      alt="QR">
                 <div class="header-qr-label">Scan to Verify</div>
             </td>

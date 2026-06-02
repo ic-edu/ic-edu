@@ -45,7 +45,8 @@ new class extends Component {
             'user',
             'exam.examType',
         ])
-            ->where('status', ExamAttemptStatus::FINISHED->value);
+            ->where('status', ExamAttemptStatus::FINISHED->value)
+            ->whereDoesntHave('exam.courseLessons');
 
         if (!empty($this->search)) {
             $query->where(function ($query) {

@@ -28,6 +28,13 @@ class ExamForm
                 ->numeric()
                 ->required(),
 
+            TextInput::make('tokens_required')
+                ->label('Tokens Required to Unlock')
+                ->numeric()
+                ->default(1)
+                ->minValue(0)
+                ->required(),
+
             Select::make('mode')
                 ->label('Exam Mode')
                 ->options([

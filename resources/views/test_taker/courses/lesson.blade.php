@@ -231,10 +231,10 @@
             @endif
 
             {{-- NAVIGATION --}}
-            <div class="anim-in d3" style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 40px;">
+            <div class="anim-in d3" style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 40px; flex-wrap: wrap;">
                 @if($prevLesson)
                 <a href="{{ route('test_taker.course.lesson', [$course->id, $prevLesson->id]) }}"
-                   style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: var(--surface); border: 1.5px solid var(--border); text-decoration: none; transition: all .2s; flex: 1; max-width: 50%;"
+                   style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: var(--surface); border: 1.5px solid var(--border); text-decoration: none; transition: all .2s; flex: 1; min-width: 140px;"
                    onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
                     <svg style="width:18px;height:18px;color:var(--muted);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     <div style="min-width: 0;">
@@ -248,7 +248,7 @@
 
                 @if($nextLesson)
                     @if($isEnrolled && !$isCompleted)
-                    <div style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: #f8fafc; border: 1.5px solid var(--border); opacity: 0.6; cursor: not-allowed; flex: 1; max-width: 50%; text-align: right; justify-content: flex-end;" title="Complete this lesson to continue">
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: #f8fafc; border: 1.5px solid var(--border); opacity: 0.6; cursor: not-allowed; flex: 1; min-width: 140px; text-align: right; justify-content: flex-end;" title="Complete this lesson to continue">
                         <div style="min-width: 0;">
                             <p style="font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Locked</p>
                             <p style="font-size: 0.82rem; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Complete this lesson</p>
@@ -257,7 +257,7 @@
                     </div>
                     @else
                     <a href="{{ route('test_taker.course.lesson', [$course->id, $nextLesson->id]) }}"
-                       style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: var(--surface); border: 1.5px solid var(--border); text-decoration: none; transition: all .2s; flex: 1; max-width: 50%; text-align: right; justify-content: flex-end;"
+                       style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: var(--surface); border: 1.5px solid var(--border); text-decoration: none; transition: all .2s; flex: 1; min-width: 140px; text-align: right; justify-content: flex-end;"
                        onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
                         <div style="min-width: 0;">
                             <p style="font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase;">Next</p>
@@ -267,7 +267,15 @@
                     </a>
                     @endif
                 @else
-                <div></div>
+                <a href="{{ route('test_taker.course.show', $course->id) }}"
+                   style="display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; text-decoration: none; transition: all .2s; flex: 1; min-width: 140px; text-align: right; justify-content: flex-end; box-shadow: 0 4px 12px rgba(16,185,129,0.3);"
+                   onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='brightness(1)'">
+                    <div style="min-width: 0;">
+                        <p style="font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.8); text-transform: uppercase;">Course Finished</p>
+                        <p style="font-size: 0.88rem; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Complete Course</p>
+                    </div>
+                    <svg style="width:20px;height:20px;color:white;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </a>
                 @endif
             </div>
         </div>

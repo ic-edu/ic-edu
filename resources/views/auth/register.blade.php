@@ -40,10 +40,10 @@
 
                 <div class="divider"><span>or</span></div>
 
-                <button type="button" class="google-login-btn">
+                <a href="{{ route('login.google') }}" class="google-login-btn" style="text-decoration: none; display: flex; justify-content: center; align-items: center; gap: 8px;">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="16">
                     Continue With Google
-                </button>
+                </a>
 
                 <p class="footer-auth-text">
                     Already have an account? <a href="{{ route('login') }}" class="auth-link">Sign In</a>

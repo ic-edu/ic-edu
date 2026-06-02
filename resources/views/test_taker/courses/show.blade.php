@@ -9,6 +9,11 @@
     $displayLevel = is_array($course->target_level)
         ? implode(' · ', $course->target_level)
         : ($tl);
+        
+    // Price mapping
+    $priceVal = $course->price ?? 149000;
+    $priceText = 'Rp ' . number_format($priceVal, 0, ',', '.');
+
     $levelMap = [
         'Beginner'     => ['color' => '#059669', 'soft' => 'rgba(5,150,105,0.07)'],
         'Intermediate' => ['color' => '#d97706', 'soft' => 'rgba(217,119,6,0.07)'],
@@ -116,67 +121,58 @@
                 </div>
 
                 @if($isEnrolled)
-                {{-- Tab bar --}}
-                <div class="cd__tabs" id="module-tabs" data-color="#1A456C">
+                <div class="cd__accordion" style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
                     @foreach($course->modules as $idx => $module)
-                    <button class="cd__tab {{ $idx === 0 ? 'cd__tab--active' : '' }}"
-                            onclick="switchTab({{ $idx }})"
-                            style="{{ $idx === 0 ? 'border-bottom-color:#1A456C; color:#1A456C;' : '' }}">
-                        <span class="cd__tab-num">{{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                        <span class="cd__tab-label">{{ Str::limit($module->title, 35) }}</span>
-                    </button>
-                    @endforeach
-                </div>
-
-                {{-- Tab panels --}}
-                @foreach($course->modules as $idx => $module)
-                <div class="cd__tab-panel {{ $idx === 0 ? 'cd__tab-panel--active' : '' }}" id="panel-{{ $idx }}">
-
-                    {{-- Panel header --}}
-                    <div class="cd__panel-head">
-                        <div>
-                            <span class="cd__panel-step">
-                                Module {{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}
-                            </span>
-                            <p class="cd__panel-title">{{ $module->title }}</p>
-                        </div>
-                        <span class="cd__panel-meta">
-                            {{ $module->lessons->count() }} lessons
-                            @if($module->lessons->sum('duration_minutes'))
-                                · {{ $module->lessons->sum('duration_minutes') }} min
-                            @endif
-                        </span>
-                    </div>
-
-                    {{-- Lessons --}}
-                    <div class="cd__panel-lessons">
-                        @foreach($module->lessons as $lesson)
-                        @php $typeIcon = $typeIconMap[$lesson->type] ?? 'file'; @endphp
-                        <a href="{{ route('test_taker.course.lesson', [$course->id, $lesson->id]) }}"
-                           class="cd__lesson">
-
-                            <div class="cd__lesson-icon">
-                                <x-dynamic-component :component="'lucide-' . $typeIcon" style="width:12px;height:12px;" />
-                            </div>
-
-                            <div class="cd__lesson-info">
-                                <span class="cd__lesson-title">{{ $lesson->title }}</span>
-                                <div class="cd__lesson-meta">
-                                    <span>{{ ucfirst($lesson->type) }}</span>
-                                    @if($lesson->duration_minutes)
-                                        <span class="cd__dot"></span>
-                                        <span>{{ $lesson->duration_minutes }} min</span>
-                                    @endif
+                    <div class="cd__accordion-item" style="border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: white;">
+                        
+                        {{-- Accordion Header --}}
+                        <button type="button" class="cd__accordion-btn" data-target="acc-{{ $idx }}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: var(--base); border: none; cursor: pointer; text-align: left; transition: background 0.2s;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(26,69,108,0.1); color: #1A456C; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;">
+                                    {{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}
+                                </div>
+                                <div>
+                                    <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 0 0 3px;">{{ $module->title }}</h3>
+                                    <p style="font-size: 0.75rem; color: var(--muted); margin: 0;">
+                                        {{ $module->lessons->count() }} lessons
+                                        @if($module->lessons->sum('duration_minutes'))
+                                            · {{ $module->lessons->sum('duration_minutes') }} min
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
+                            <svg class="cd__accordion-icon" id="icon-{{ $idx }}" style="width: 18px; height: 18px; color: var(--muted); transition: transform 0.3s; transform: {{ $idx === 0 ? 'rotate(180deg)' : 'rotate(0deg)' }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
 
-                            <x-lucide-chevron-right class="cd__lesson-arrow" />
-                        </a>
-                        @endforeach
+                        {{-- Accordion Body --}}
+                        <div class="cd__accordion-body" id="acc-{{ $idx }}" style="display: {{ $idx === 0 ? 'block' : 'none' }}; border-top: 1px solid var(--border);">
+                            <div class="cd__panel-lessons" style="padding: 8px 20px 20px;">
+                                @foreach($module->lessons as $lesson)
+                                @php $typeIcon = $typeIconMap[$lesson->type] ?? 'file'; @endphp
+                                <a href="{{ route('test_taker.course.lesson', [$course->id, $lesson->id]) }}"
+                                   class="cd__lesson" style="margin: 0; padding: 12px 8px; border-bottom: 1px solid var(--border); border-radius: 0;">
+                                    <div class="cd__lesson-icon">
+                                        <x-dynamic-component :component="'lucide-' . $typeIcon" style="width:12px;height:12px;" />
+                                    </div>
+                                    <div class="cd__lesson-info">
+                                        <span class="cd__lesson-title">{{ $lesson->title }}</span>
+                                        <div class="cd__lesson-meta">
+                                            <span>{{ ucfirst($lesson->type) }}</span>
+                                            @if($lesson->duration_minutes)
+                                                <span class="cd__dot"></span>
+                                                <span>{{ $lesson->duration_minutes }} min</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <x-lucide-chevron-right class="cd__lesson-arrow" />
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+
                     </div>
-
+                    @endforeach
                 </div>
-                @endforeach
 
                 @else
                 {{-- Enrollment gate --}}
@@ -184,15 +180,12 @@
                     <div class="cd__gate-icon">
                         <x-lucide-lock style="width:22px;height:22px;color:#1A456C;" />
                     </div>
-                    <p class="cd__gate-title">Enroll to Access Course Content</p>
-                    <p class="cd__gate-desc">This course has {{ $course->modules_count }} modules and {{ $totalLessons }} lessons waiting for you. Enroll for free to unlock all materials.</p>
-                    <form action="{{ route('test_taker.course.enroll', $course->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="cd__gate-btn">
-                            <x-lucide-plus-circle style="width:15px;height:15px;" />
-                            Enroll Now — Free
-                        </button>
-                    </form>
+                    <p class="cd__gate-title">Buy Course to Access Content</p>
+                    <p class="cd__gate-desc">This course has {{ $course->modules_count }} modules and {{ $totalLessons }} lessons waiting for you. Purchase lifetime access to unlock all lessons.</p>
+                    <button type="button" onclick="openCourseCheckout()" class="cd__gate-btn">
+                        <x-lucide-shopping-cart style="width:15px;height:15px;" />
+                        Buy Course — {{ $priceText }}
+                    </button>
                 </div>
                 @endif
             </section>
@@ -245,7 +238,7 @@
                     @else
                         <div class="cd__not-enrolled-note">
                             <x-lucide-info style="width:13px;height:13px;flex-shrink:0;" />
-                            Free to enroll — start anytime
+                            One-time purchase — lifetime access
                         </div>
                     @endif
                 </div>
@@ -269,13 +262,10 @@
                             </a>
                         @endif
                     @else
-                        <form action="{{ route('test_taker.course.enroll', $course->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="cd__btn cd__btn--primary" style="background: #1A456C; width:100%; border:none; cursor:pointer; font-family:inherit;">
-                                <x-lucide-plus-circle style="width:16px;height:16px;" />
-                                Enroll Now — Free
-                            </button>
-                        </form>
+                        <button type="button" onclick="openCourseCheckout()" class="cd__btn cd__btn--primary" style="background: #1A456C; width:100%; border:none; cursor:pointer; font-family:inherit;">
+                            <x-lucide-shopping-cart style="width:16px;height:16px;" />
+                            Buy Course — {{ $priceText }}
+                        </button>
                     @endif
                 </div>
 
@@ -385,7 +375,17 @@
 }
 @media (max-width: 900px) {
     .cd__layout { grid-template-columns: 1fr; }
-    .cd__sidebar { order: -1; }
+    .cd__sidebar { order: -1; margin-bottom: 8px; position: relative; top: auto; z-index: 1; }
+}
+@media (max-width: 700px) {
+    .cd__breadcrumb { flex-wrap: wrap; }
+    .cd__header { padding: 16px; }
+    .cd__section { padding: 16px; }
+    .cd__accordion-btn { padding: 14px 14px !important; }
+    .cd__panel-lessons { padding: 8px 14px 16px !important; }
+    .cd__gate-btn { width: 100%; justify-content: center; }
+    .cd__content-gate { padding: 24px 16px; }
+    .cd__title { font-size: 1.25rem; }
 }
 
 /* Main column */
@@ -742,23 +742,113 @@
 .cd__btn--cert:hover { border-color: var(--primary); background: white; }
 </style>
 
+{{-- Course Checkout Modal --}}
+<div id="courseCheckoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden items-center justify-center transition-all duration-300">
+    <div class="bg-white rounded-3xl max-w-md w-full mx-4 p-8 shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="courseCheckoutModalContent">
+        <div class="flex justify-between items-start mb-6">
+            <h3 class="text-xl font-bold font-heading text-slate-800">Checkout Simulation</h3>
+            <button onclick="closeCourseCheckout()" class="text-slate-400 hover:text-slate-600 transition">
+                <x-lucide-x class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Item Details</div>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-slate-800 text-sm">{{ $course->title }} Course</span>
+                <span class="font-black text-brand-primary text-base">{{ $priceText }}</span>
+            </div>
+        </div>
+
+        {{-- Payment Methods Mock --}}
+        <div class="mb-8">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Select Payment Method</div>
+            <div class="space-y-2">
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-brand-primary/20 bg-brand-primary/5 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="radio" name="payment_method" value="qris" checked class="text-brand-primary focus:ring-brand-primary">
+                    <div class="flex-grow">
+                        <div class="text-xs font-bold text-slate-800">QRIS (Instant Checkout)</div>
+                        <div class="text-[0.65rem] text-slate-400">Pay using Gopay, OVO, Dana, LinkAja, ShopeePay, or Banking apps</div>
+                    </div>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition opacity-60">
+                    <input type="radio" name="payment_method" value="va" disabled class="text-brand-primary focus:ring-brand-primary">
+                    <div class="flex-grow">
+                        <div class="text-xs font-bold text-slate-800">Virtual Account (Bank Transfer)</div>
+                        <div class="text-[0.65rem] text-slate-400">Under maintenance</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="closeCourseCheckout()" class="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition text-sm">
+                Cancel
+            </button>
+            <form action="{{ route('test_taker.course.enroll', $course->id) }}" method="POST" class="flex-1" id="course-enroll-form">
+                @csrf
+                <button type="button" onclick="confirmCoursePurchase()" id="btnConfirmCoursePurchase" class="w-full py-3 bg-brand-primary hover:bg-brand-primary/95 text-white rounded-xl font-bold transition shadow-lg shadow-brand-primary/10 text-sm flex items-center justify-center gap-2">
+                    <x-lucide-check-circle class="w-4 h-4" />
+                    <span>Simulate Pay</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
-function switchTab(idx) {
-    const tabs   = document.querySelectorAll('.cd__tab');
-    const panels = document.querySelectorAll('.cd__tab-panel');
-    const color  = document.getElementById('module-tabs').dataset.color;
+    function openCourseCheckout() {
+        const modal = document.getElementById('courseCheckoutModal');
+        const content = document.getElementById('courseCheckoutModalContent');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
 
-    tabs.forEach((t, i) => {
-        t.classList.toggle('cd__tab--active', i === idx);
-        t.style.borderBottomColor = i === idx ? color : 'transparent';
-        t.style.color = i === idx ? color : '';
-    });
+    function closeCourseCheckout() {
+        const modal = document.getElementById('courseCheckoutModal');
+        const content = document.getElementById('courseCheckoutModalContent');
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }, 300);
+    }
 
-    panels.forEach((p, i) => {
-        p.classList.toggle('cd__tab-panel--active', i === idx);
+    function confirmCoursePurchase() {
+        const btn = document.getElementById('btnConfirmCoursePurchase');
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4.5 w-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+        
+        setTimeout(() => {
+            alert('Payment successful! Enrolled in course.');
+            document.getElementById('course-enroll-form').submit();
+        }, 800);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.cd__accordion-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const targetBody = document.getElementById(targetId);
+                const icon = this.querySelector('.cd__accordion-icon');
+                
+                if (targetBody.style.display === 'none' || targetBody.style.display === '') {
+                    targetBody.style.display = 'block';
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    targetBody.style.display = 'none';
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
     });
-}
 </script>
 @endpush
 
