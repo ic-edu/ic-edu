@@ -43,7 +43,7 @@
             </p>
             <div>
                 <a href="#" class="inline-block bg-[#1a3a5a] text-white font-bold px-8 py-3.5 rounded-full hover:bg-[#152e4a] transition-all shadow-lg text-sm md:text-base">
-                    Get Started - Its Free Trial
+                    Get Started - It's Free Trial
                 </a>
             </div>
         </div>
@@ -62,8 +62,6 @@
         </svg>
     </div>
 </section>
-<x-landing.pricingcard/>
-<x-landing.unlock/>
 
 {{-- 2. Switcher & Main Layout --}}
 <div class="bg-white pb-32 pt-12">
