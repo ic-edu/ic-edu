@@ -211,7 +211,53 @@ new class extends Component {
         $gradient = $gradients[$typeName] ?? 'linear-gradient(135deg, #1A456C 0%, #2c6b8a 100%)';
         @endphp
 
-        <div class="ec__card anim-in d{{ $loop->index % 5 + 1 }} cursor-pointer"
+        {{-- MOBILE LIST ITEM --}}
+        <a href="{{ route('examiner.grading', $att->id) }}"
+            class="sm:hidden block rounded-2xl border border-slate-200 bg-white p-4 mb-3 shadow-sm active:scale-[0.99] transition">
+
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+
+                    <span class="inline-flex mb-2 rounded-full bg-blue-50 px-3 py-1 text-[0.65rem] font-black uppercase tracking-wide text-[#1A456C]">
+                        {{ $typeName }}
+                    </span>
+
+                    <h3 class="text-sm font-black leading-5 text-slate-900">
+                        {{ $exam->title ?? 'Ujian Dihapus' }}
+                    </h3>
+
+                    <p class="mt-1 text-xs leading-5 text-slate-500">
+                        Submission from
+                        <strong class="text-slate-700">
+                            {{ $att->user->name ?? 'User Tidak Diketahui' }}
+                        </strong>
+                    </p>
+
+                    @if($att->user?->email)
+                    <p class="text-[0.7rem] leading-4 text-slate-400 break-all">
+                        {{ $att->user->email }}
+                    </p>
+                    @endif
+
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-1 text-[0.65rem] font-bold text-slate-500">
+                            {{ $att->submitted_at ? \Carbon\Carbon::parse($att->submitted_at)->format('d M Y, H:i') : '-' }}
+                        </span>
+
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[0.65rem] font-black text-blue-700">
+                            Score: {{ number_format($att->converted_score ?? 0, 1) }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#1A456C] font-black">
+                    →
+                </div>
+            </div>
+        </a>
+
+        {{-- DESKTOP CARD --}}
+        <div class="ec__card hidden sm:flex anim-in d{{ $loop->index % 5 + 1 }} cursor-pointer"
             onclick="window.location.href='{{ route('examiner.grading', $att->id) }}'"
             role="link"
             tabindex="0"
@@ -267,7 +313,10 @@ new class extends Component {
             </div>
 
             {{-- Footer --}}
-            <a href="{{ route('examiner.grading', ['attempt' => $att->id]) }}" class="ec__footer">
+            <a href="{{ route('examiner.grading', ['attempt' => $att->id]) }}"
+                class="ec__footer"
+                onclick="event.stopPropagation();">
+
                 <span class="ec__footer-text">
                     Review Now
                 </span>
@@ -282,6 +331,7 @@ new class extends Component {
             </a>
 
         </div>
+
         @empty
 
         {{-- Empty State --}}
@@ -347,3 +397,354 @@ new class extends Component {
     });
 </script>
 @endpush
+
+<style>
+    @media (max-width: 640px) {
+        .ec__page-wrapper {
+            padding: 1rem !important;
+            border-radius: 1.5rem !important;
+            margin: 1rem !important;
+            margin-bottom: 6rem !important;
+            width: auto !important;
+            max-width: calc(100vw - 2rem) !important;
+            overflow: hidden !important;
+        }
+
+        .ec__page-header {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        .ec__breadcrumb {
+            font-size: 0.65rem !important;
+            letter-spacing: 0.12em !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .ec__page-title {
+            font-size: 1.55rem !important;
+            line-height: 1.9rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .ec__page-subtitle {
+            font-size: 0.82rem !important;
+            line-height: 1.4rem !important;
+        }
+
+        .ec__search-wrap {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .ec__search-wrap .page-search-input {
+            width: 100% !important;
+            height: 44px !important;
+            font-size: 0.82rem !important;
+            border-radius: 1rem !important;
+        }
+
+        .ec__filter-row {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 1px solid #e5edf5 !important;
+        }
+
+        .ec__filter-tabs {
+            display: flex !important;
+            gap: 0.5rem !important;
+            overflow-x: auto !important;
+            padding-bottom: 0.25rem !important;
+            scrollbar-width: none !important;
+        }
+
+        .ec__filter-tabs::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .filter-tab {
+            flex: 0 0 auto !important;
+            height: 38px !important;
+            padding: 0 1rem !important;
+            border-radius: 999px !important;
+            font-size: 0.76rem !important;
+            white-space: nowrap !important;
+        }
+
+        .ec__filter-right {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+        }
+
+        .ec__count-text {
+            font-size: 0.78rem !important;
+            line-height: 1.2rem !important;
+        }
+
+        .ec__filter-right select.page-search-input {
+            width: 100% !important;
+            height: 44px !important;
+            border-radius: 1rem !important;
+            font-size: 0.82rem !important;
+        }
+
+        .ec__view-toggle {
+            display: none !important;
+        }
+
+        .ec__grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+        }
+
+        /* MOBILE LIST MODE */
+        .ec__page-wrapper {
+            padding: 1rem !important;
+            border-radius: 1.5rem !important;
+            margin: 1rem !important;
+            margin-bottom: 6rem !important;
+            width: auto !important;
+            max-width: calc(100vw - 2rem) !important;
+            overflow: hidden !important;
+        }
+
+        .ec__page-header {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        .ec__breadcrumb {
+            font-size: 0.65rem !important;
+            letter-spacing: 0.12em !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        .ec__page-title {
+            font-size: 1.5rem !important;
+            line-height: 1.85rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        .ec__page-subtitle {
+            font-size: 0.82rem !important;
+            line-height: 1.45rem !important;
+        }
+
+        .ec__search-wrap {
+            width: 100% !important;
+        }
+
+        .ec__search-wrap .page-search-input {
+            width: 100% !important;
+            height: 44px !important;
+            border-radius: 1rem !important;
+            font-size: 0.82rem !important;
+        }
+
+        .ec__filter-row {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 1rem !important;
+            border-bottom: 1px solid #e5edf5 !important;
+        }
+
+        .ec__filter-tabs {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+
+        .filter-tab {
+            height: 36px !important;
+            padding: 0 0.95rem !important;
+            border-radius: 999px !important;
+            font-size: 0.74rem !important;
+            white-space: nowrap !important;
+        }
+
+        .ec__filter-right {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.75rem !important;
+        }
+
+        .ec__count-text {
+            font-size: 0.78rem !important;
+            line-height: 1.25rem !important;
+        }
+
+        .ec__filter-right select.page-search-input {
+            width: 100% !important;
+            height: 44px !important;
+            border-radius: 1rem !important;
+            font-size: 0.82rem !important;
+        }
+
+        .ec__view-toggle {
+            display: none !important;
+        }
+
+        .ec__grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.8rem !important;
+        }
+
+        /* compact list card */
+        .ec__card {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            display: block !important;
+            position: relative !important;
+            padding: 1rem !important;
+            border-radius: 1.25rem !important;
+            background: #ffffff !important;
+            border: 1px solid #e5edf5 !important;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+        }
+
+        /* hide big thumbnail on mobile */
+        .ec__thumb {
+            display: none !important;
+        }
+
+        .ec__thumb-watermark,
+        .ec__thumb-badge-dur {
+            display: none !important;
+        }
+
+        /* if type badge is inside thumbnail, keep it hidden too */
+        .ec__thumb-badge-type {
+            display: none !important;
+        }
+
+        .ec__card-body,
+        .ec__card-content,
+        .ec__content {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* add exam type badge via existing data-type */
+        .ec__card::before {
+            content: attr(data-type);
+            display: inline-flex;
+            width: fit-content;
+            margin-bottom: 0.65rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: #eef6ff;
+            color: #1A456C;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ec__card-title,
+        .ec__title {
+            font-size: 0.98rem !important;
+            line-height: 1.3rem !important;
+            margin-bottom: 0.35rem !important;
+            color: #0f172a !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+        }
+
+        .ec__card-subtitle,
+        .ec__subtitle,
+        .ec__meta-text {
+            font-size: 0.78rem !important;
+            line-height: 1.3rem !important;
+            color: #64748b !important;
+            margin-bottom: 0.75rem !important;
+            word-break: break-word !important;
+        }
+
+        .ec__meta,
+        .ec__badges,
+        .ec__info-row {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 0.45rem !important;
+            margin-top: 0.65rem !important;
+            max-width: 100% !important;
+        }
+
+        .ec__meta span,
+        .ec__badges span,
+        .ec__info-row span {
+            font-size: 0.66rem !important;
+            line-height: 1rem !important;
+            padding: 0.35rem 0.6rem !important;
+            border-radius: 999px !important;
+            max-width: 100% !important;
+            white-space: normal !important;
+        }
+
+        .ec__action-row,
+        .ec__card-footer {
+            margin-top: 0.85rem !important;
+            padding-top: 0.8rem !important;
+            border-top: 1px solid #eef2f7 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.75rem !important;
+        }
+
+        .ec__card-action,
+        .ec__review-link {
+            font-size: 0.78rem !important;
+            font-weight: 900 !important;
+            color: #1A456C !important;
+        }
+
+        .ec__arrow,
+        .ec__card-arrow {
+            width: 2rem !important;
+            height: 2rem !important;
+            min-width: 2rem !important;
+            border-radius: 999px !important;
+        }
+
+        nav[role="navigation"] {
+            margin-bottom: 5rem !important;
+        }
+
+        pagination,
+        nav[role="navigation"] {
+            margin-bottom: 5rem !important;
+        }
+
+        @media (max-width: 640px) {
+        .ec__card.hidden,
+        .ec__card.hidden.sm\:flex {
+            display: none !important;
+        }
+    }
+    }
+</style>

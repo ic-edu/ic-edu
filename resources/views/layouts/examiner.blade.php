@@ -29,7 +29,6 @@
 
     <div class="dash-shell">
 
-        {{-- SIDEBAR --}}
         @include('components.examiner.sidebar')
 
         <div class="dash-main">
