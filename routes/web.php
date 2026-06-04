@@ -15,10 +15,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Volt\Volt;
 use App\Models\ExamAttempt;
 use App\Enums\ExamAttemptStatus;
-
-//test email
 use App\Models\User;
-use App\Models\ExamAttempt;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ExamNeedsGradingMail;
 
