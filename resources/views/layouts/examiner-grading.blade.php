@@ -19,29 +19,25 @@
 
     <main class="min-h-screen px-6 py-6 lg:px-10">
 
-        {{-- Workspace Header --}}
         <div
             class="sticky top-0 z-30 mb-8 rounded-3xl border border-slate-200/70 bg-white/80 backdrop-blur-xl shadow-sm">
 
             <div class="flex items-center justify-between px-6 py-5">
 
-                {{-- LEFT --}}
                 <div class="flex items-center gap-5">
 
-                    {{-- BACK BUTTON --}}
-                    <a href="{{ route('examiner.exam-manage') }}"
+                    <a href="{{ route('examiner.exam-reviews') }}"
                         class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800">
 
                         <x-lucide-arrow-left class="w-4 h-4" />
 
                         <span>
-                            Back to Queue
+                            Back
                         </span>
                     </a>
 
                     <div class="h-8 w-px bg-slate-200"></div>
 
-                    {{-- TITLE --}}
                     <div>
 
                         <h1 class="text-2xl font-black tracking-tight text-slate-900">
@@ -56,9 +52,7 @@
 
                 </div>
 
-                {{-- RIGHT --}}
                 <div class="flex items-center gap-3">
-                    {{-- EXAMINER --}}
                     <div
                         class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-2 shadow-sm">
 
@@ -78,28 +72,18 @@
                             <p class="text-xs text-slate-400">
                                 Examiner
                             </p>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
-        {{-- PAGE CONTENT --}}
         <div class="mx-auto max-w-6xl">
 
             {{ $slot ?? '' }}
 
             @yield('content')
-
         </div>
-
     </main>
-
 </body>
-
 </html>

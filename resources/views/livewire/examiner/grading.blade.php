@@ -11,7 +11,6 @@ new class extends Component
     public ExamAttempt $attempt;
     public $answers = [];
 
-    // Untuk menampung skor dan masukan manual
     public array $scores = [];
     public array $feedbacks = [];
 
@@ -30,7 +29,6 @@ new class extends Component
             abort(403, 'Ujian ini masih dikerjakan oleh peserta atau belum selesai.');
         }
 
-        // Ambil data attempt beserta relasi user, exam, dan examType
         $this->attempt = $attempt->load(['user', 'exam.examType']);
         $this->answers = AttemptAnswer::with(['question.questionGroup', 'question.options'])
             ->where('exam_attempt_id', $this->attempt->id)
@@ -43,7 +41,6 @@ new class extends Component
         }
     }
 
-    // Auto-save nilai saat Dosen mengetik skor/feedback
     public function updated($property, $value)
     {
         $parts = explode('.', $property);
@@ -57,31 +54,21 @@ new class extends Component
                 $columnToUpdate => $value
             ]);
 
-            // Hitung ulang skor menggunakan scoring engine ExamType
             $this->recalculateScore();
         }
     }
-
-    /**
-     * Hitung ulang skor total berdasarkan scoring_method ExamType.
-     * Dipanggil setiap kali Examiner menyimpan nilai soal.
-     */
     protected function recalculateScore(): void
     {
         $examType = $this->attempt->exam->examType;
 
-        // 1. Kumpulkan semua jawaban terkini dari DB
         $allAnswers = AttemptAnswer::with([
             'question.questionGroup.subsection.section',
         ])->where('exam_attempt_id', $this->attempt->id)->get();
 
-        // 2. Hitung raw score (total poin yang diperoleh)
         $rawScore = (int) $allAnswers->sum('score');
 
-        // 3. Hitung total soal (untuk formula raw)
         $totalQuestions = $allAnswers->count();
 
-        // 4. Bangun sectionRaws & sectionTotals (per nama section)
         $sectionRaws   = [];
         $sectionTotals = [];
         foreach ($allAnswers as $ans) {
@@ -130,7 +117,6 @@ new class extends Component
 <div class="min-h-screen bg-gray-100 p-8 font-sans">
     <div class="max-w-5xl mx-auto">
 
-        {{-- Header Data Peserta --}}
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Lembar Penilaian (Examiner)</h1>
@@ -151,7 +137,6 @@ new class extends Component
             </div>
         </div>
 
-        {{-- Looping Jawaban Peserta --}}
         <div class="space-y-6">
             @php
                 $lastGroupId = null;
@@ -195,8 +180,6 @@ new class extends Component
                 @endif
 
             <div class="bg-white p-6 rounded-xl shadow-sm border {{ $type === 'multiple_choice' ? 'border-gray-200 opacity-80' : 'border-indigo-200' }}">
-
-                {{-- Soal --}}
                 <div class="flex gap-4 mb-4">
                     <div class="flex-shrink-0 w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold">
                         {{ $index + 1 }}
@@ -220,7 +203,6 @@ new class extends Component
                     </div>
                 </div>
 
-                {{-- Jawaban Peserta --}}
                 <div class="ml-12 p-4 bg-yellow-50 rounded-lg border border-yellow-100 mb-6">
                     <p class="text-sm font-semibold text-yellow-800 mb-2">Jawaban Peserta:</p>
 
@@ -254,7 +236,6 @@ new class extends Component
                     @endif
                 </div>
 
-                {{-- Area Penilaian (Hanya bisa diedit untuk selain Multiple Choice) --}}
                 <div class="ml-12 flex flex-col md:flex-row gap-4 items-start bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <div class="w-full md:w-32">
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Skor (Maks: {{ $maxPoints }})</label>
@@ -279,7 +260,6 @@ new class extends Component
             @endforeach
         </div>
 
-        {{-- Tombol Simpan Final --}}
         <div class="mt-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center sticky bottom-6">
             <div>
                 <p class="text-gray-600">Skor Final: <strong class="text-2xl text-indigo-600 ml-2">{{ number_format($attempt->converted_score ?? 0, 1) }}</strong>
