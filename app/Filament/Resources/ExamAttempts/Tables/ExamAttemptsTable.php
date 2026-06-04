@@ -25,6 +25,7 @@ use App\Models\User;
 use App\Enums\ExamAttemptStatus;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ExamNeedsGradingMail;
+use App\Notifications\GeneralNotification;
 
 class ExamAttemptsTable
 {
@@ -66,20 +67,34 @@ class ExamAttemptsTable
                     ->label('Assign Examiner')
                     ->options(fn() => User::where('role', 'examiner')->pluck('name', 'id'))
                     ->disabled(fn($record) => $record->status === ExamAttemptStatus::GRADED->value)
+
                     ->afterStateUpdated(function ($record, $state) {
                         $examiner = User::find($state);
+
                         if (
                             $examiner &&
                             $record->status === ExamAttemptStatus::FINISHED->value
                         ) {
+                            $freshRecord = $record->fresh(['user', 'exam.examType']);
+
                             Mail::to($examiner->email)->send(
                                 new ExamNeedsGradingMail(
-                                    $record->fresh(['user', 'exam.examType']),
+                                    $freshRecord,
                                     $examiner
                                 )
                             );
+
+                            $examiner->notify(new GeneralNotification([
+                                'title' => 'New grading assignment',
+                                'desc' => 'You have been assigned to review <strong>' . ($freshRecord->exam->title ?? 'an exam submission') . '</strong> from ' . ($freshRecord->user->name ?? 'a student') . '.',
+                                'type' => 'grading',
+                                'category' => 'Grading Assignment',
+                                'action_url' => route('examiner.grading', $freshRecord->id),
+                                'action_text' => 'Start Grading →',
+                            ]));
                         }
                     })
+
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -124,7 +139,7 @@ class ExamAttemptsTable
                     }),
             ])
             ->recordActions([
-                // Removed EditAction
+
             ])
             ->bulkActions([
                 BulkActionGroup::make([

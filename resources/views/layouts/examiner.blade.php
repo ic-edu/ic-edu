@@ -34,13 +34,11 @@
 
         <div class="dash-main">
 
-            @if (request()->routeIs('examiner.dashboard'))
-            @include('components.examiner.topbar')
-            @endif
+            @yield('topbar')
+
+            @include('components.examiner.notification')
 
             <div class="page-body">
-
-
                 @yield('content')
 
                 {{ $slot ?? '' }}
