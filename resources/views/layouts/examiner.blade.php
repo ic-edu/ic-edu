@@ -34,11 +34,12 @@
 
         <div class="dash-main">
 
-            @yield('topbar')
-
-            @include('components.examiner.notification')
+            {{-- TOPBAR --}}
+            @include('components.test_taker.topbar')
 
             <div class="page-body">
+
+
                 @yield('content')
 
                 {{ $slot ?? '' }}

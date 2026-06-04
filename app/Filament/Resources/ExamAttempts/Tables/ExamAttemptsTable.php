@@ -23,9 +23,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Table;
 use App\Models\User;
 use App\Enums\ExamAttemptStatus;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ExamNeedsGradingMail;
-use App\Notifications\GeneralNotification;
 
 class ExamAttemptsTable
 {
@@ -53,7 +50,7 @@ class ExamAttemptsTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         ExamAttemptStatus::FINISHED->value => 'warning',
                         ExamAttemptStatus::GRADED->value => 'success',
                         default => 'gray',
@@ -65,36 +62,8 @@ class ExamAttemptsTable
                     ->sortable(),
                 SelectColumn::make('examiner_id')
                     ->label('Assign Examiner')
-                    ->options(fn() => User::where('role', 'examiner')->pluck('name', 'id'))
-                    ->disabled(fn($record) => $record->status === ExamAttemptStatus::GRADED->value)
-
-                    ->afterStateUpdated(function ($record, $state) {
-                        $examiner = User::find($state);
-
-                        if (
-                            $examiner &&
-                            $record->status === ExamAttemptStatus::FINISHED->value
-                        ) {
-                            $freshRecord = $record->fresh(['user', 'exam.examType']);
-
-                            Mail::to($examiner->email)->send(
-                                new ExamNeedsGradingMail(
-                                    $freshRecord,
-                                    $examiner
-                                )
-                            );
-
-                            $examiner->notify(new GeneralNotification([
-                                'title' => 'New grading assignment',
-                                'desc' => 'You have been assigned to review <strong>' . ($freshRecord->exam->title ?? 'an exam submission') . '</strong> from ' . ($freshRecord->user->name ?? 'a student') . '.',
-                                'type' => 'grading',
-                                'category' => 'Grading Assignment',
-                                'action_url' => route('examiner.grading', $freshRecord->id),
-                                'action_text' => 'Start Grading →',
-                            ]));
-                        }
-                    })
-
+                    ->options(fn () => User::where('role', 'examiner')->pluck('name', 'id'))
+                    ->disabled(fn ($record) => $record->status === ExamAttemptStatus::GRADED->value)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -139,7 +108,7 @@ class ExamAttemptsTable
                     }),
             ])
             ->recordActions([
-
+                // Removed EditAction
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -150,7 +119,7 @@ class ExamAttemptsTable
                         ->form([
                             Select::make('examiner_id')
                                 ->label('Select Examiner')
-                                ->options(fn() => User::where('role', 'examiner')->pluck('name', 'id'))
+                                ->options(fn () => User::where('role', 'examiner')->pluck('name', 'id'))
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
