@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use Livewire\Volt\Volt;
+use App\Models\ExamAttempt;
+use App\Enums\ExamAttemptStatus;
 
 // Landing Page Route
 Route::get('/', function () {
@@ -78,9 +80,51 @@ Route::middleware(['auth', 'verified', 'role:examiner'])
     ->prefix('examiner')
     ->group(function () {
 
-        // Dashboard Examiner
         Route::get('/dashboard', function () {
-            return view('examiner.dashboard');
+            $examiner = auth()->user();
+
+            $assignedReviews = ExamAttempt::where('examiner_id', $examiner->id)->count();
+
+            $pendingReviews = ExamAttempt::where('examiner_id', $examiner->id)
+                ->where('status', ExamAttemptStatus::FINISHED->value)
+                ->count();
+
+            $completedReviews = ExamAttempt::where('examiner_id', $examiner->id)
+                ->where('status', ExamAttemptStatus::GRADED->value)
+                ->count();
+
+            $completionRate = $assignedReviews > 0
+                ? round(($completedReviews / $assignedReviews) * 100)
+                : 0;
+
+            $recentSubmissions = ExamAttempt::with(['user', 'exam.examType'])
+                ->where('examiner_id', $examiner->id)
+                ->where('status', ExamAttemptStatus::FINISHED->value)
+                ->latest('submitted_at')
+                ->limit(5)
+                ->get();
+
+            $recentActivities = ExamAttempt::with(['user', 'exam.examType'])
+                ->where('examiner_id', $examiner->id)
+                ->where('status', ExamAttemptStatus::GRADED->value)
+                ->latest('updated_at')
+                ->limit(5)
+                ->get();
+
+            $gradedToday = ExamAttempt::where('examiner_id', $examiner->id)
+                ->where('status', ExamAttemptStatus::GRADED->value)
+                ->whereDate('updated_at', today())
+                ->count();
+
+            return view('examiner.dashboard', compact(
+                'assignedReviews',
+                'pendingReviews',
+                'completedReviews',
+                'gradedToday',
+                'completionRate',
+                'recentSubmissions',
+                'recentActivities'
+            ));
         })->name('examiner.dashboard');
 
         Volt::route('/exam-manage', 'examiner.exam-manage')->name('examiner.exam-manage');
@@ -96,8 +140,8 @@ Route::middleware(['auth', 'verified', 'role:examiner'])
 
 // Onboarding Route
 Route::middleware(['auth'])
-     ->get('/onboarding', OnboardingWizard::class)
-     ->name('onboarding.index');
+    ->get('/onboarding', OnboardingWizard::class)
+    ->name('onboarding.index');
 
 // Route Test-Taker
 Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
@@ -138,12 +182,12 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
         Route::get('/exams/{attempt}/sections/{section}/review', [ExamController::class, 'sectionReview'])->name('exam.section.review');
 
         // Notification Routes
-        Route::post('/notifications/mark-all-read', function() {
+        Route::post('/notifications/mark-all-read', function () {
             auth()->user()->unreadNotifications->markAsRead();
             return response()->json(['success' => true]);
         })->name('notifications.mark_all_read');
 
-        Route::post('/notifications/{id}/mark-as-read', function($id) {
+        Route::post('/notifications/{id}/mark-as-read', function ($id) {
             $notif = auth()->user()->notifications()->find($id);
             if ($notif) {
                 $notif->markAsRead();
