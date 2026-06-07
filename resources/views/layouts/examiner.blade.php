@@ -29,17 +29,15 @@
 
     <div class="dash-shell">
 
-        {{-- SIDEBAR --}}
         @include('components.examiner.sidebar')
 
         <div class="dash-main">
 
-            {{-- TOPBAR --}}
-            @include('components.test_taker.topbar')
+            @yield('topbar')
+
+            @include('components.examiner.notification')
 
             <div class="page-body">
-
-
                 @yield('content')
 
                 {{ $slot ?? '' }}
