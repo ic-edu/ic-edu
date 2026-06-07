@@ -50,9 +50,7 @@ class TokenTransactionResource extends Resource
     {
         return [
             'index' => ListTokenTransactions::route('/'),
-            'create' => CreateTokenTransaction::route('/create'),
             'view' => ViewTokenTransaction::route('/{record}'),
-            'edit' => EditTokenTransaction::route('/{record}/edit'),
         ];
     }
 }

@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->globalSearch(false)
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Operations')
