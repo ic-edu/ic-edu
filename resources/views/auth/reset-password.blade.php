@@ -1,39 +1,46 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+    @vite(['resources/css/login.css'])
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+    <div class="auth-container">
+        <div class="auth-form-section">
+            <div class="auth-content-wrapper">
+                <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU Logo" class="main-logo">
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                <div class="welcome-text">
+                    <h1>Reset Password</h1>
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 25px;">
+                        Enter your new password below to reset it.
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ route('password.store') }}" class="main-auth-form">
+                    @csrf
+                    <!-- Password Reset Token -->
+                    <input type="hidden" name="token" value="{{ $request->route('token') }}">
+
+                    <div class="form-group">
+                        <input id="email" type="email" name="email" placeholder="Email Address" class="form-input @error('email') input-error @enderror" value="{{ old('email', $request->email) }}" required autofocus>
+                        @error('email') <span class="error-msg">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <input id="password" type="password" name="password" placeholder="New Password" class="form-input @error('password') input-error @enderror" required>
+                        @error('password') <span class="error-msg">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Confirm New Password" class="form-input @error('password_confirmation') input-error @enderror" required>
+                        @error('password_confirmation') <span class="error-msg">{{ $message }}</span> @enderror
+                    </div>
+
+                    <button type="submit" class="submit-btn">Reset Password</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="auth-visual-section">
+            <div class="speech-bubble">Almost there!</div>
+            <img src="{{ asset('assets/maskot/login maskot.png') }}" alt="Mascot" class="mascot-img">
         </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </div>
 </x-guest-layout>

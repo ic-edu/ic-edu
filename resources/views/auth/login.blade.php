@@ -17,9 +17,12 @@
                         @error('email') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" style="position: relative;">
                         <input id="password" type="password" name="password" placeholder="Password" class="form-input @error('password') input-error @enderror" required>
                         @error('password') <span class="error-msg">{{ $message }}</span> @enderror
+                        <div style="text-align: right; margin-top: 5px;">
+                            <a href="{{ route('password.request') }}" style="font-size: 11px; color: #007bff; text-decoration: none; font-weight: 500;">Forgot password?</a>
+                        </div>
                     </div>
 
                     <button type="submit" class="submit-btn">Submit</button>

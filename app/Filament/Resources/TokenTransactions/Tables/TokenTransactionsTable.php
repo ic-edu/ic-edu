@@ -41,7 +41,7 @@ class TokenTransactionsTable
                 //
             ])
             ->recordActions([
-                \Filament\Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

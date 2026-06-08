@@ -23,7 +23,7 @@ class ListTokenTransactions extends ListRecords
                     'token_package_5_price' => \App\Models\Setting::get('token_package_5_price', '399000'),
                 ])
                 ->form([
-                    \Filament\Forms\Components\Grid::make(3)
+                    \Filament\Schemas\Components\Grid::make(3)
                         ->components([
                             \Filament\Forms\Components\TextInput::make('token_price_per_unit')
                                 ->label('Price per 1 Token (IDR)')

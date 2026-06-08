@@ -57,13 +57,36 @@
 .form-input {
     width: 100%;
     padding: 10px 16px;
-    /* Ukuran input lebih kecil/padat */
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     background-color: #f8fafc;
     font-size: 13px;
     font-family: 'Poppins', sans-serif;
     transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.input-error {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.input-error:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-msg {
+    display: block;
+    color: #ef4444;
+    font-size: 11px;
+    margin-top: 4px;
+    font-weight: 500;
 }
 
 .submit-btn {

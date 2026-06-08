@@ -742,7 +742,7 @@ new #[Layout('layouts.bare')] class extends Component {
                                 @endif
                             </div>
                             @endif
-                            @if($this->currentGroup->passage_text)
+                            @if($this->currentGroup->passage_text && trim(strip_tags($this->currentGroup->passage_text, '<img><audio><video><iframe>')) !== '')
                             <div class="passage-content prose prose-sm max-w-none prose-slate">
                                 {!! $this->currentGroup->passage_text !!}
                             </div>
@@ -827,7 +827,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 @endif
 
                 {{-- Passage Text --}}
-                @if($this->currentGroup->passage_text)
+                @if($this->currentGroup->passage_text && trim(strip_tags($this->currentGroup->passage_text, '<img><audio><video><iframe>')) !== '')
                 <div style="background:#fefce8;padding:20px;border-radius:14px;border:1px solid #fde68a;margin-bottom:24px;">
                     <div class="passage-content prose prose-sm max-w-none prose-slate">{!! $this->currentGroup->passage_text !!}</div>
                 </div>

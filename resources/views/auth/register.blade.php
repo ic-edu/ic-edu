@@ -14,18 +14,22 @@
                     @csrf
                     <div class="form-group">
                         <input id="name" type="text" name="name" placeholder="Fullname" class="form-input @error('name') input-error @enderror" value="{{ old('name') }}" required autofocus>
+                        @error('name') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
                         <input id="email" type="email" name="email" placeholder="Email" class="form-input @error('email') input-error @enderror" value="{{ old('email') }}" required>
+                        @error('email') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
                         <input id="password" type="password" name="password" placeholder="Password" class="form-input @error('password') input-error @enderror" required>
+                        @error('password') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="form-group">
-                        <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Confirm Password" class="form-input" required>
+                        <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Confirm Password" class="form-input @error('password_confirmation') input-error @enderror" required>
+                        @error('password_confirmation') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="terms-container" style="margin-bottom: 10px;">
