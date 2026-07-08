@@ -462,7 +462,7 @@
 <div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] hidden items-center justify-center transition-all duration-300">
     <div class="bg-white rounded-3xl max-w-md w-full mx-4 p-8 shadow-2xl border border-slate-100 transform scale-95 opacity-0 transition-all duration-300" id="checkoutModalContent">
         <div class="flex justify-between items-start mb-6">
-            <h3 class="text-xl font-bold font-heading text-slate-800">Checkout Simulation</h3>
+            <h3 class="text-xl font-bold font-heading text-slate-800">Top Up Token</h3>
             <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600 transition">
                 <x-lucide-x class="w-5 h-5" />
             </button>
@@ -471,41 +471,66 @@
         <div class="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Item Details</div>
             <div class="flex justify-between items-center">
-                <span class="font-bold text-slate-800 text-sm"><span id="modalItemQty">1</span> Exam Token(s)</span>
+                <span class="font-bold text-slate-800 text-sm"><span id="modalItemQty">1</span> Universal Token(s)</span>
                 <span class="font-black text-brand-primary text-base" id="modalItemPrice">Rp {{ number_format($tokenPrice, 0, ',', '.') }}</span>
             </div>
         </div>
 
-        {{-- Payment Methods Mock --}}
-        <div class="mb-8">
-            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Select Payment Method</div>
-            <div class="space-y-2">
-                <label class="flex items-center gap-3 p-3 rounded-xl border border-brand-primary/20 bg-brand-primary/5 cursor-pointer hover:bg-slate-50 transition">
-                    <input type="radio" name="payment_method" value="qris" checked class="text-brand-primary focus:ring-brand-primary">
-                    <div class="flex-grow">
-                        <div class="text-xs font-bold text-slate-800">QRIS (Instant Checkout)</div>
-                        <div class="text-[0.65rem] text-slate-400">Pay using Gopay, OVO, Dana, LinkAja, ShopeePay, or Banking apps</div>
-                    </div>
-                </label>
-                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition opacity-60">
-                    <input type="radio" name="payment_method" value="va" disabled class="text-brand-primary focus:ring-brand-primary">
-                    <div class="flex-grow">
-                        <div class="text-xs font-bold text-slate-800">Virtual Account (Bank Transfer)</div>
-                        <div class="text-[0.65rem] text-slate-400">Under maintenance</div>
-                    </div>
-                </label>
-            </div>
-        </div>
+        <form id="topupForm" onsubmit="submitTopUp(event)" enctype="multipart/form-data">
+            <input type="hidden" name="qty" id="formQty" value="1">
+            <input type="hidden" name="price" id="formPrice" value="{{ $tokenPrice }}">
 
-        <div class="flex gap-3">
-            <button onclick="closeCheckoutModal()" class="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition text-sm">
-                Cancel
-            </button>
-            <button onclick="confirmPurchase()" id="btnConfirmPurchase" class="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/95 text-white rounded-xl font-bold transition shadow-lg shadow-brand-primary/10 text-sm flex items-center justify-center gap-2">
-                <x-lucide-check-circle class="w-4 h-4" />
-                <span>Simulate Pay</span>
-            </button>
-        </div>
+            {{-- Payment Methods --}}
+            <div class="mb-6">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pilih Metode Pembayaran</div>
+                <div class="space-y-3">
+                    <!-- Method: Transfer -->
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition" onclick="togglePaymentMethod('transfer')">
+                        <input type="radio" name="method" value="transfer" checked class="mt-1 text-brand-primary focus:ring-brand-primary">
+                        <div class="flex-grow">
+                            <div class="text-sm font-bold text-slate-800">Transfer Bank / E-Wallet</div>
+                            <div class="text-xs text-slate-500 mt-1">Upload bukti transfer ke rekening admin.</div>
+                            
+                            <!-- Transfer Details (Shown if Transfer selected) -->
+                            <div id="transferDetails" class="mt-3 p-3 bg-white border border-slate-200 rounded-lg">
+                                <div class="text-xs text-slate-600 mb-2">Transfer ke salah satu rekening berikut:</div>
+                                <div class="font-mono text-sm font-bold text-slate-800">BCA - 1234567890 (a.n. iC.Edu)</div>
+                                <div class="font-mono text-sm font-bold text-slate-800 mb-3">OVO/GOPAY - 081234567890</div>
+                                
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Upload Bukti Transfer *</label>
+                                <input type="file" name="proof" id="proofFile" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-brand-primary/10 file:text-brand-primary hover:file:bg-brand-primary/20">
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Method: Cash -->
+                    <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition" onclick="togglePaymentMethod('cash')">
+                        <input type="radio" name="method" value="cash" class="mt-1 text-brand-primary focus:ring-brand-primary">
+                        <div class="flex-grow">
+                            <div class="text-sm font-bold text-slate-800">Tunai (Cash)</div>
+                            <div class="text-xs text-slate-500 mt-1">Bayar langsung kepada Admin di tempat.</div>
+                            
+                            <!-- Cash Details (Shown if Cash selected) -->
+                            <div id="cashDetails" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg hidden">
+                                <div class="text-xs text-amber-800">
+                                    <strong>Instruksi:</strong> Silakan serahkan uang tunai sebesar total tagihan langsung kepada Admin. Token akan ditambahkan setelah admin mengonfirmasi pembayaran Anda.
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" onclick="closeCheckoutModal()" class="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition text-sm">
+                    Batal
+                </button>
+                <button type="submit" id="btnConfirmPurchase" class="flex-1 py-3 bg-brand-primary hover:bg-brand-primary/95 text-white rounded-xl font-bold transition shadow-lg shadow-brand-primary/10 text-sm flex items-center justify-center gap-2">
+                    <x-lucide-check-circle class="w-4 h-4" />
+                    <span>Konfirmasi</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
@@ -619,6 +644,8 @@
         
         document.getElementById('modalItemQty').innerText = qty;
         document.getElementById('modalItemPrice').innerText = 'Rp ' + price.toLocaleString('id-ID');
+        document.getElementById('formQty').value = qty;
+        document.getElementById('formPrice').value = price;
 
         const modal = document.getElementById('checkoutModal');
         const content = document.getElementById('checkoutModalContent');
@@ -645,37 +672,72 @@
         }, 300);
     }
 
-    function confirmPurchase() {
+    function togglePaymentMethod(method) {
+        const transferDetails = document.getElementById('transferDetails');
+        const cashDetails = document.getElementById('cashDetails');
+        const proofFile = document.getElementById('proofFile');
+        
+        if (method === 'transfer') {
+            transferDetails.classList.remove('hidden');
+            cashDetails.classList.add('hidden');
+            proofFile.required = true;
+        } else {
+            transferDetails.classList.add('hidden');
+            cashDetails.classList.remove('hidden');
+            proofFile.required = false;
+        }
+    }
+
+    function submitTopUp(event) {
+        event.preventDefault();
+        
         const btn = document.getElementById('btnConfirmPurchase');
         btn.disabled = true;
         btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4.5 w-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
 
-        fetch("{{ route('test_taker.wallet.simulate_purchase') }}", {
+        const form = document.getElementById('topupForm');
+        const formData = new FormData(form);
+
+        fetch("{{ route('test_taker.wallet.submit_top_up') }}", {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({
-                qty: selectedPackageQty
-            })
+            body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 btn.innerHTML = `<span class="flex items-center gap-1">Success!</span>`;
-                setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    confirmButtonColor: '#2563eb'
+                }).then(() => {
                     window.location.reload();
-                }, 800);
+                });
             } else {
-                alert('Something went wrong. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.message || 'Something went wrong. Please try again.',
+                    confirmButtonColor: '#2563eb'
+                });
                 btn.disabled = false;
-                btn.innerHTML = 'Simulate Pay';
+                btn.innerHTML = 'Konfirmasi';
             }
         })
         .catch(err => {
             console.error(err);
-            window.location.reload();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while uploading. Please try again.',
+                confirmButtonColor: '#2563eb'
+            });
+            btn.disabled = false;
+            btn.innerHTML = 'Konfirmasi';
         });
     }
 
@@ -684,7 +746,12 @@
         const code = input.value.trim();
         
         if (!code) {
-            alert('Please enter a voucher code.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Wait!',
+                text: 'Please enter a voucher code.',
+                confirmButtonColor: '#2563eb'
+            });
             return;
         }
 
@@ -706,17 +773,33 @@
         .then(data => {
             if (data.success) {
                 input.value = '';
-                alert(data.message + '\\nTokens added: ' + data.tokens_added);
-                window.location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Voucher Applied!',
+                    text: data.message + '\nTokens added: ' + data.tokens_added,
+                    confirmButtonColor: '#2563eb'
+                }).then(() => {
+                    window.location.reload();
+                });
             } else {
-                alert(data.message || 'Failed to redeem voucher.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Voucher',
+                    text: data.message || 'Failed to redeem voucher.',
+                    confirmButtonColor: '#2563eb'
+                });
                 btn.disabled = false;
                 btn.innerHTML = originalBtnHtml;
             }
         })
         .catch(err => {
             console.error(err);
-            alert('An error occurred. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred. Please try again.',
+                confirmButtonColor: '#2563eb'
+            });
             btn.disabled = false;
             btn.innerHTML = originalBtnHtml;
         });

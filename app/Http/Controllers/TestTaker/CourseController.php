@@ -59,9 +59,11 @@ class CourseController extends Controller
         $course->loadCount(['modules', 'enrollments']);
 
         $userId = Auth::id();
-        $isEnrolled = CourseEnrollment::where('user_id', $userId)
+        $currentEnrollment = CourseEnrollment::where('user_id', $userId)
             ->where('course_id', $course->id)
-            ->exists();
+            ->first();
+            
+        $isEnrolled = $currentEnrollment !== null;
 
         $totalLessons = $course->modules->sum(fn ($m) => $m->lessons->count());
         $totalDuration = $course->modules->sum(fn ($m) => $m->lessons->sum('duration_minutes'));
@@ -80,10 +82,7 @@ class CourseController extends Controller
                     ->first();
 
                 // Failsafe: automatically update status if they somehow completed it but it's still active
-                $currentEnrollment = CourseEnrollment::where('user_id', $userId)
-                    ->where('course_id', $course->id)
-                    ->first();
-                if ($currentEnrollment && $currentEnrollment->status === 'active') {
+                if ($currentEnrollment->status === 'active') {
                     $currentEnrollment->update(['status' => 'graduated']);
                 }
             }
@@ -98,14 +97,13 @@ class CourseController extends Controller
      * NOTE: Courses use direct payment (not token-based).
      * Enrollment is currently free while the payment gateway integration
      * is pending confirmation from the business partner.
-     *
-     * TODO: When payment gateway is ready, insert the payment verification
-     *       step BEFORE the CourseEnrollment::create() call below.
-     *       The payment flow should:
-     *         1. Check $course->price > 0
-     *         2. Initiate payment via gateway (Midtrans/Xendit/etc.)
-     *         3. Only create enrollment after payment callback confirms success
-     */
+     * Handles course enrollment via token payment.
+     * The flow:
+     *   1. Lock user row to prevent race conditions.
+     *   2. Check if already enrolled.
+     *   3. Check if user has enough tokens.
+     *   4. Deduct tokens and log TokenTransaction.
+     *   5. Create CourseEnrollment./
     public function enroll(Course $course)
     {
         $userId = Auth::id();
@@ -131,12 +129,25 @@ class CourseController extends Controller
                     return;
                 }
 
-                // ─────────────────────────────────────────────────────────────
-                // TODO: PAYMENT GATEWAY HOOK — insert payment verification here
-                // if ($course->price > 0) {
-                //     PaymentService::charge($userId, $course->price, $course->title);
-                // }
-                // ─────────────────────────────────────────────────────────────
+                // Check and deduct tokens
+                $tokensRequired = $course->tokens_required ?? 10;
+                
+                if ($tokensRequired > 0) {
+                    if ($user->tokens < $tokensRequired) {
+                        throw new \Exception('Insufficient tokens');
+                    }
+                    
+                    $user->decrement('tokens', $tokensRequired);
+                    
+                    \App\Models\TokenTransaction::create([
+                        'user_id' => $user->id,
+                        'type' => 'deduction',
+                        'amount' => -$tokensRequired,
+                        'description' => 'Course Enrollment: ' . $course->title,
+                        'reference_id' => 'CRS-' . $course->id . '-' . strtoupper(\Illuminate\Support\Str::random(6)),
+                        'status' => 'completed',
+                    ]);
+                }
 
                 CourseEnrollment::create([
                     'user_id'     => $userId,
@@ -150,6 +161,11 @@ class CourseController extends Controller
                 ->with('success', 'Berhasil mendaftar kursus! Selamat belajar.');
 
         } catch (\Throwable $e) {
+            if ($e->getMessage() === 'Insufficient tokens') {
+                return redirect()->route('test_taker.wallet.index')
+                    ->with('error', 'Token Anda tidak cukup untuk mendaftar kursus ini. Silakan isi ulang (Top Up) Token Anda.');
+            }
+
             \Illuminate\Support\Facades\Log::error('Course enrollment failed', [
                 'user_id'   => $userId,
                 'course_id' => $course->id,

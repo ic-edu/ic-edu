@@ -11,8 +11,8 @@
         : ($tl);
         
     // Price mapping
-    $priceVal = $course->price ?? 149000;
-    $priceText = 'Rp ' . number_format($priceVal, 0, ',', '.');
+    $priceVal = $course->tokens_required ?? 10;
+    $priceText = $priceVal . ' Tokens';
 
     $levelMap = [
         'Beginner'     => ['color' => '#059669', 'soft' => 'rgba(5,150,105,0.07)'],
@@ -180,11 +180,11 @@
                     <div class="cd__gate-icon">
                         <x-lucide-lock style="width:22px;height:22px;color:#1A456C;" />
                     </div>
-                    <p class="cd__gate-title">Buy Course to Access Content</p>
+                    <p class="cd__gate-title">Enroll Course to Access Content</p>
                     <p class="cd__gate-desc">This course has {{ $course->modules_count }} modules and {{ $totalLessons }} lessons waiting for you. Purchase lifetime access to unlock all lessons.</p>
                     <button type="button" onclick="openCourseCheckout()" class="cd__gate-btn">
-                        <x-lucide-shopping-cart style="width:15px;height:15px;" />
-                        Buy Course — {{ $priceText }}
+                        <svg style="width:15px;height:15px;color:currentColor;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Enroll — {{ $priceText }}
                     </button>
                 </div>
                 @endif
@@ -263,8 +263,8 @@
                         @endif
                     @else
                         <button type="button" onclick="openCourseCheckout()" class="cd__btn cd__btn--primary" style="background: #1A456C; width:100%; border:none; cursor:pointer; font-family:inherit;">
-                            <x-lucide-shopping-cart style="width:16px;height:16px;" />
-                            Buy Course — {{ $priceText }}
+                            <svg style="width:16px;height:16px;color:currentColor;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Enroll — {{ $priceText }}
                         </button>
                     @endif
                 </div>
@@ -826,8 +826,15 @@
         btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-4.5 w-4.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
         
         setTimeout(() => {
-            alert('Payment successful! Enrolled in course.');
-            document.getElementById('course-enroll-form').submit();
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Payment successful! Enrolled in course.',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                document.getElementById('course-enroll-form').submit();
+            });
         }, 800);
     }
 

@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
 
-    <title>{{ config('app.name', 'IC-EDU') }}</title>
+    <title>{{ config('app.name', 'iC.Edu') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

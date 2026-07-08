@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
 
-    <title>@yield('title', config('app.name', 'IC.EDU')) — Master English, Master the World</title>
+    <title>@yield('title', config('app.name', 'iC.Edu')) — Master English, Master the World</title>
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,25 +16,7 @@
     {{-- Vite Assets (app.css sudah @import theme.css di dalamnya) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{--
-        Anti Flash-of-Wrong-Theme (FOWT):
-        Script kecil ini membaca localStorage dan menerapkan
-        data-theme ke <html> SEBELUM CSS selesai render,
-        sehingga tidak ada kedipan putih/gelap saat load.
-    --}}
-    <script>
-        (function() {
-            var saved = localStorage.getItem('icedu_theme');
-            if (saved === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            } else if (!saved) {
-                // Fallback: ikuti system preference
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            }
-        })();
-    </script>
+
 
     {{-- Per-page styles --}}
     @stack('styles')

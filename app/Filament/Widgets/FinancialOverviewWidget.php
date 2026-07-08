@@ -14,12 +14,16 @@ class FinancialOverviewWidget extends Widget
 
     protected int | array | string $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return auth()->user()->isSuperAdmin();
+    }
+
     protected function getViewData(): array
     {
         // 1. Course calculations
         $totalCoursePurchases = CourseEnrollment::count();
-        $courseRevenue = CourseEnrollment::join('courses', 'course_enrollments.course_id', '=', 'courses.id')
-            ->sum('courses.price');
+        // Course enrollments no longer generate IDR revenue, they burn tokens
 
         // 2. Token calculations
         $tokenTx = TokenTransaction::where('type', 'purchase')->where('status', 'completed')->get();
@@ -55,7 +59,7 @@ class FinancialOverviewWidget extends Widget
         $equivalentPromoValue = $tokensRedeemed * $price1;
 
         // 4. Combined calculations
-        $grandTotalRevenue = $courseRevenue + $tokenRevenue;
+        $grandTotalRevenue = $tokenRevenue;
 
         // 5. Recent enrollments and token transactions for display
         $recentEnrollments = CourseEnrollment::with(['user', 'course'])
@@ -71,7 +75,7 @@ class FinancialOverviewWidget extends Widget
 
         return [
             'courseCount' => $totalCoursePurchases,
-            'courseRevenue' => $courseRevenue,
+            'courseRevenue' => 0, // Deprecated
             'tokenCount' => $totalTokenPurchasesCount,
             'tokensPurchased' => $totalTokensPurchased,
             'tokenRevenue' => $tokenRevenue,

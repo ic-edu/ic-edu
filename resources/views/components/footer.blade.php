@@ -14,7 +14,7 @@
                      alt="IC.edu" 
                      class="h-[40px] w-auto object-contain self-start">
                 <p class="text-sm leading-relaxed max-w-[280px] !text-slate-300 font-medium">
-                    IC.EDU is a global online learning platform that helps you gain in-demand language skills to advance in your career.
+                    iC.Edu is a global online learning platform that helps you gain in-demand language skills to advance in your career.
                 </p>
             </div>
 
@@ -92,7 +92,7 @@
         {{-- Bottom Bar --}}
         <div class="text-center pt-4">
             <p class="text-xs !text-slate-400 tracking-wider">
-                2026 IC.EDU Copyright
+                2026 iC.Edu Copyright
             </p>    
         </div>
 

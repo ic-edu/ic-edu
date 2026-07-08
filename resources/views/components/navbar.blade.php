@@ -271,16 +271,7 @@
         <a href="{{ route('pricing') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Pricing</a>
     </div>
     <div class="flex items-center gap-3">
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Switch theme">
-            <svg class="icon-moon w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-            <svg class="icon-sun w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-        </button>
+
         @auth
             <a href="{{ url('/dashboard') }}"
                 class="hidden md:inline-flex items-center gap-2.5 pl-1.5 pr-5 py-1.5 rounded-full text-sm font-bold text-slate-700
@@ -407,48 +398,8 @@
 
 <script>
     (function() {
-        'use strict';
-        const STORAGE_KEY = 'icedu_theme';
-        const html = document.documentElement;
-        const toggleBtn = document.getElementById('theme-toggle');
 
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                html.setAttribute('data-theme', 'dark');
-            } else {
-                html.removeAttribute('data-theme');
-            }
-            localStorage.setItem(STORAGE_KEY, theme);
-        }
 
-        function toggleTheme() {
-            const isDark = html.getAttribute('data-theme') === 'dark';
-            applyTheme(isDark ? 'light' : 'dark');
-        }
-
-        function initTheme() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved === 'dark' || saved === 'light') {
-                applyTheme(saved);
-            } else {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                applyTheme(prefersDark ? 'dark' : 'light');
-            }
-        }
-        initTheme()
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', toggleTheme);
-        }
-        window.addEventListener('storage', function(e) {
-            if (e.key === STORAGE_KEY && (e.newValue === 'dark' || e.newValue === 'light')) {
-                applyTheme(e.newValue);
-            }
-        });
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-            if (!localStorage.getItem(STORAGE_KEY)) {
-                applyTheme(e.matches ? 'dark' : 'light');
-            }
-        });
         const navbar = document.getElementById('navbar');
         const dropdown = document.getElementById('tests-dropdown');
         const testsMenu = document.getElementById('tests-menu');

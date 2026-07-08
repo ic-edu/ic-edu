@@ -19,25 +19,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ExamNeedsGradingMail;
 
-Route::get('/dev/test-grading-email', function () {
-
-    $examiner = User::where('role', 'examiner')->first();
-
-    $attempt = ExamAttempt::with(['user', 'exam.examType'])
-        ->whereNotNull('examiner_id')
-        ->latest()
-        ->first();
-
-    if (! $examiner || ! $attempt) {
-        dd('Examiner atau attempt belum ada.');
-    }
-
-    Mail::to('baskara2201@gmail.com')->send(
-        new ExamNeedsGradingMail($attempt, $examiner)
-    );
-
-    return 'Email grading notification sent!';
-});
 
 // Landing Page Route
 Route::get('/', function () {
@@ -177,7 +158,7 @@ Route::middleware(['auth', 'verified', 'role:test_taker', 'onboarding'])
 
         // Wallet Route
         Route::get('/wallet', [\App\Http\Controllers\TestTaker\WalletController::class, 'index'])->name('wallet');
-        Route::post('/wallet/simulate-purchase', [\App\Http\Controllers\TestTaker\WalletController::class, 'simulatePurchase'])->name('wallet.simulate_purchase');
+        Route::post('/wallet/submit-top-up', [\App\Http\Controllers\TestTaker\WalletController::class, 'submitTopUp'])->name('wallet.submit_top_up');
 
         Route::post('/wallet/redeem-voucher', [\App\Http\Controllers\VoucherController::class, 'redeem'])->name('wallet.redeem_voucher');
 

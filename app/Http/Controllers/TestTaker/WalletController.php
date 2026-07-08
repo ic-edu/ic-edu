@@ -16,14 +16,18 @@ class WalletController extends Controller
         
         // Auto-populate transaction history for initial seeded balance if missing
         if (($user->tokens ?? 0) > 0 && $user->tokenTransactions()->count() === 0) {
-            \App\Models\TokenTransaction::create([
-                'user_id' => $user->id,
-                'type' => 'purchase',
-                'amount' => $user->tokens,
-                'description' => 'Initial Account Token Credit',
-                'reference_id' => 'TXN-INIT-' . strtoupper(Str::random(6)),
-                'status' => 'completed',
-            ]);
+            \App\Models\TokenTransaction::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'description' => 'Initial Account Token Credit',
+                ],
+                [
+                    'type' => 'purchase',
+                    'amount' => $user->tokens,
+                    'reference_id' => 'TXN-INIT-' . strtoupper(\Illuminate\Support\Str::random(6)),
+                    'status' => 'completed',
+                ]
+            );
         }
         
         $transactions = $user->tokenTransactions()->latest()->get();
@@ -45,39 +49,39 @@ class WalletController extends Controller
         return view('test_taker.wallet', compact('mappedTransactions', 'tokenPrice', 'package3Price', 'package5Price'));
     }
 
-    public function simulatePurchase(Request $request)
+    public function submitTopUp(Request $request)
     {
-        // TODO: REMOVE THIS ROUTE ONCE PAYMENT GATEWAY IS IMPLEMENTED
-        if (app()->environment('production')) {
-            abort(404, 'Simulation is not available in production.');
-        }
-
-        $qty = (int) $request->input('qty', 1);
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
-        $user->tokens = ($user->tokens ?? 0) + $qty;
-        $user->save();
-
-        // Create token transaction record
-        \App\Models\TokenTransaction::create([
-            'user_id' => $user->id,
-            'type' => 'purchase',
-            'amount' => $qty,
-            'description' => 'Token Purchase (Top Up)',
-            'reference_id' => 'TXN-' . strtoupper(Str::random(8)),
-            'status' => 'completed',
+        $request->validate([
+            'qty' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'method' => 'required|in:transfer,cash',
+            'proof' => 'required_if:method,transfer|image|max:2048', // max 2MB
         ]);
 
-        // Create notification for the user
-        $user->notify(new \App\Notifications\GeneralNotification([
-            'title' => 'Successfully purchased <strong>' . $qty . ' Token' . ($qty != 1 ? 's' : '') . '</strong>',
-            'desc' => 'Your payment was verified. ' . $qty . ' universal token' . ($qty != 1 ? 's' : '') . ' added to your balance.',
-            'type' => 'system',
-            'category' => 'Token Top Up',
-            'action_url' => route('test_taker.wallet'),
-            'action_text' => 'View Wallet →'
-        ]));
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
-        return response()->json(['success' => true, 'new_balance' => $user->tokens]);
+        $proofPath = null;
+        if ($request->hasFile('proof')) {
+            $proofPath = $request->file('proof')->store('topup_proofs', 'public');
+        }
+
+        \App\Models\TopUpRequest::create([
+            'user_id' => $user->id,
+            'amount' => $request->input('qty'),
+            'price' => $request->input('price'),
+            'method' => $request->input('method'),
+            'proof_path' => $proofPath,
+            'status' => 'pending',
+        ]);
+
+        $message = $request->input('method') === 'cash' 
+            ? 'Top Up diajukan. Silakan serahkan uang tunai kepada admin di lokasi agar token segera diproses.'
+            : 'Bukti transfer berhasil diunggah. Top Up Anda sedang menunggu persetujuan admin.';
+
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
     }
 }

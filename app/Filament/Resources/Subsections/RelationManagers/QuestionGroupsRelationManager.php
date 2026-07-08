@@ -64,13 +64,13 @@ class QuestionGroupsRelationManager extends RelationManager
                             ])
                             ->columnSpanFull(),
                         Grid::make(2)->schema([
-                            FileUpload::make('audio_path')
-                                ->label('Audio File')
-                                ->directory('questions/audios')
-                                ->visibility('public')
-                                ->disk('public')
-                                ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
-                                ->maxSize(14048),
+                                FileUpload::make('audio_path')
+                                    ->label('Audio File')
+                                    ->directory('questions/audios')
+                                    ->visibility('public')
+                                    ->disk('public')
+                                    ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/m4a'])
+                                    ->maxSize(14048),
                             FileUpload::make('image_path')
                                 ->label('Image File')
                                 ->directory('questions/images')
@@ -106,7 +106,7 @@ class QuestionGroupsRelationManager extends RelationManager
                                             ->directory('questions/audios')
                                             ->visibility('public')
                                             ->disk('public')
-                                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav'])
+                                            ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/m4a'])
                                             ->maxSize(14048),
 
                                         FileUpload::make('image_path')

@@ -24,6 +24,11 @@ class TokenTransactionResource extends Resource
 
     protected static \UnitEnum|string|null $navigationGroup = 'Financial & Revenue';
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isSuperAdmin();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return TokenTransactionForm::configure($schema);

@@ -359,8 +359,8 @@
                     @php
                         // Determine price based on target level
                         $level = is_array($course->target_level) ? ($course->target_level[0] ?? 'Intermediate') : ($course->target_level ?? 'Intermediate');
-                        $priceVal = $course->price ?? 149000;
-                        $priceText = 'Rp ' . number_format($priceVal, 0, ',', '.');
+                        $priceVal = $course->tokens_required ?? 10;
+                        $priceText = $priceVal . ' Tokens';
                         $levelColor = 'bg-amber-100 text-amber-800 border-amber-200';
                         if ($level === 'Beginner') {
                             $levelColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';

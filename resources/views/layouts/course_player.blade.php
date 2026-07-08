@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
-    <title>@yield('title', 'Course Player') - {{ config('app.name', 'IC-EDU') }}</title>
+    <title>@yield('title', 'Course Player') - {{ config('app.name', 'iC.Edu') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/css/test_taker.css', 'resources/js/app.js'])
@@ -151,7 +151,7 @@
                     <svg style="width:14px;height:14px;color:white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.75 19 7.5 19s3.332.477 4.5 1.253"/></svg>
                 </div>
                 <div style="min-width: 0;">
-                    <p style="font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">IC-EDU Course</p>
+                    <p style="font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">iC.Edu Course</p>
                     <p class="course-title-text" style="font-size: 0.85rem; font-weight: 800; color: var(--text); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; padding-top: 2px;">{{ $course->title ?? 'Course Player' }}</p>
                 </div>
             </div>

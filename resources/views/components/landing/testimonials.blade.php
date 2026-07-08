@@ -83,7 +83,7 @@
                     </svg>
                 </div>
                 <h2 class="testi-title text-4xl lg:text-5xl mb-6">
-                    Stories from<br>IC.EDU<br>Learners
+                    Stories from<br>iC.Edu<br>Learners
                 </h2>
                 <p class="text-slate-500 text-lg max-w-[320px] mx-auto lg:mx-0">Read what our students have to say about their journey.</p>
             </div>

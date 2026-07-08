@@ -222,7 +222,7 @@ class ProfilePage extends Component
         $user = Auth::user();
 
         return view('test_taker.profile.index', [
-            'user' => $user->fresh(),
+            'user' => $user,
         ]);
     }
 }

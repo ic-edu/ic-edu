@@ -62,18 +62,23 @@ class DashboardController extends Controller
                                 ->take(3)
                                 ->get();
 
+        $allActiveLessonIds = $activeEnrollments->flatMap(fn($e) => $e->course->modules->flatMap->lessons)->pluck('id');
+        $userLessonProgress = LessonProgress::where('user_id', $user->id)
+                                ->whereIn('course_lesson_id', $allActiveLessonIds)
+                                ->get();
+
         foreach($activeEnrollments as $enrollment) {
             $allLessonIds = $enrollment->course->modules->flatMap->lessons->pluck('id');
             $totalLessons = $allLessonIds->count();
-            $completedLessons = LessonProgress::where('user_id', $user->id)
-                                ->whereIn('course_lesson_id', $allLessonIds)
+            
+            $completedLessons = $userLessonProgress->whereIn('course_lesson_id', $allLessonIds)
                                 ->where('is_completed', true)->count();
+            
             $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
             
             // Find the last accessed lesson for "Resume" button
-            $lastProgress = LessonProgress::where('user_id', $user->id)
-                                ->whereIn('course_lesson_id', $allLessonIds)
-                                ->orderBy('last_accessed_at', 'desc')
+            $lastProgress = $userLessonProgress->whereIn('course_lesson_id', $allLessonIds)
+                                ->sortByDesc('last_accessed_at')
                                 ->first();
             
             $enrollment->progress_pct = $progress;

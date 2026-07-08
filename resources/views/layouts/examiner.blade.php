@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
 
-    <title>Examiner Portal - {{ config('app.name', 'IC-EDU') }}</title>
+    <title>Examiner Portal - {{ config('app.name', 'iC.Edu') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

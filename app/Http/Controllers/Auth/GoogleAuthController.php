@@ -58,6 +58,8 @@ class GoogleAuthController extends Controller
             // Redirect to intended page or dashboard
             return redirect()->intended(route('dashboard'));
 
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            return redirect()->route('login')->with('error', 'Sesi login telah kedaluwarsa. Silakan coba lagi.');
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Failed to authenticate with Google. Please try again.');
         }

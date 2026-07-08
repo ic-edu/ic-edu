@@ -510,7 +510,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 <svg style="width:14px;height:14px;color:white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.75 19 7.5 19s3.332.477 4.5 1.253"/></svg>
             </div>
             <div>
-                <p style="font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">IC-EDU Exam</p>
+                <p style="font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">iC.Edu Exam</p>
                 <p style="font-size: 0.85rem; font-weight: 800; color: var(--text); line-height: 1.2;">{{ $attempt->exam->title }}</p>
             </div>
         </div>
@@ -664,7 +664,7 @@ new #[Layout('layouts.bare')] class extends Component {
             </p>
             @endif
 
-            <button wire:click="dismissInstruction"
+            <button wire:click="dismissInstruction" onclick="enterFullscreen()"
                     style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; border-radius: 14px; font-size: 0.88rem; font-weight: 800; background: var(--blue); color: white; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,0.3); transition: all .2s;">
                 Start
                 <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -900,7 +900,7 @@ new #[Layout('layouts.bare')] class extends Component {
                             @elseif($question->type === 'record' || $question->type === 'audio_record')
                             <div style="border:2px dashed var(--border);border-radius:14px;padding:20px;background:#fafbfc;">
                                 @php $existingAudio = isset($answers[$question->id]) && is_string($answers[$question->id]) ? asset('storage/'.str_replace('public/','',$answers[$question->id])) : ''; @endphp
-                                <div x-data="{recording:false,mediaRecorder:null,audioChunks:[],audioUrl:'{{ $existingAudio }}',uploading:false,startRecording(){navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{this.mediaRecorder=new MediaRecorder(stream);this.audioChunks=[];this.mediaRecorder.ondataavailable=e=>this.audioChunks.push(e.data);this.mediaRecorder.onstop=()=>{let blob=new Blob(this.audioChunks,{type:'audio/webm'});this.audioUrl=URL.createObjectURL(blob);this.uploadAudio(blob);stream.getTracks().forEach(t=>t.stop());};this.mediaRecorder.start();this.recording=true;}).catch(e=>alert('Microphone access is required.'));},stopRecording(){if(this.mediaRecorder){this.mediaRecorder.stop();this.recording=false;}},uploadAudio(blob){this.uploading=true;let file=new File([blob],'recording_{{ $question->id }}.webm',{type:'audio/webm'});$wire.upload('answers.{{ $question->id }}',file,()=>{this.uploading=false;},()=>{this.uploading=false;alert('Upload failed.');});}}">
+                                <div x-data="{recording:false,mediaRecorder:null,audioChunks:[],audioUrl:'{{ $existingAudio }}',uploading:false,startRecording(){navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{this.mediaRecorder=new MediaRecorder(stream);this.audioChunks=[];this.mediaRecorder.ondataavailable=e=>this.audioChunks.push(e.data);this.mediaRecorder.onstop=()=>{let blob=new Blob(this.audioChunks,{type:'audio/webm'});this.audioUrl=URL.createObjectURL(blob);this.uploadAudio(blob);stream.getTracks().forEach(t=>t.stop());};this.mediaRecorder.start();this.recording=true;}).catch(e=>Swal.fire('Error', 'Microphone access is required.', 'error'));},stopRecording(){if(this.mediaRecorder){this.mediaRecorder.stop();this.recording=false;}},uploadAudio(blob){this.uploading=true;let file=new File([blob],'recording_{{ $question->id }}.webm',{type:'audio/webm'});$wire.upload('answers.{{ $question->id }}',file,()=>{this.uploading=false;},()=>{this.uploading=false;Swal.fire('Error', 'Upload failed.', 'error');});}}">
                                     <div x-show="audioUrl" style="margin-bottom:14px;background:white;padding:12px;border-radius:10px;border:1px solid var(--border);{{ $existingAudio ? '' : 'display:none;' }}">
                                         <audio :src="audioUrl" controls style="width:100%;height:40px;" controlsList="nodownload"></audio>
                                     </div>
@@ -937,7 +937,7 @@ new #[Layout('layouts.bare')] class extends Component {
                     <div wire:loading wire:target="answers" style="font-size:0.72rem;font-weight:700;color:var(--blue);">Saving...</div>
                     
                     @if ($currentIndex === count($groupIds) - 1)
-                    <button wire:click="finishExam" wire:loading.attr="disabled"
+                    <button type="button" onclick="confirmFinishExam()" wire:loading.attr="disabled"
                             style="padding:10px 20px;border-radius:12px;font-size:0.82rem;font-weight:800;background:#16a34a;color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,0.3);">
                         ✓ Submit Exam
                     </button>
@@ -970,7 +970,7 @@ new #[Layout('layouts.bare')] class extends Component {
                 <div style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--muted);margin-bottom:20px;"><div style="width:10px;height:10px;border-radius:4px;background:#f1f5f9;border:1px solid var(--border);"></div> Not Answered</div>
             </div>
 
-            <button wire:click="finishExam" wire:loading.attr="disabled" type="button"
+            <button type="button" onclick="confirmFinishExam()" wire:loading.attr="disabled"
                     style="width:100%;padding:12px;border-radius:14px;font-size:0.85rem;font-weight:800;background:#16a34a;color:white;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(22,163,74,0.3);transition:all .2s;"
                     onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
                 ✓ Finish Exam
@@ -982,6 +982,35 @@ new #[Layout('layouts.bare')] class extends Component {
     </div>
 
     <script>
+        function enterFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            }
+        }
+
+        document.addEventListener('click', function initFs() {
+            enterFullscreen();
+            document.removeEventListener('click', initFs);
+        }, { once: true });
+
+        function confirmFinishExam() {
+            Swal.fire({
+                title: 'Submit Exam?',
+                text: "Are you sure you want to finish and submit your exam?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id')).call('finishExam');
+                }
+            })
+        }
+
         window.addEventListener('beforeunload', function(e) { e.preventDefault(); e.returnValue = ''; });
 
         document.addEventListener('alpine:init', () => {

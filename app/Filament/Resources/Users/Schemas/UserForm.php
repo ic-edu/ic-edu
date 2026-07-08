@@ -21,13 +21,15 @@ class UserForm
                     ->unique(ignoreRecord: true)
                     ->required(),
                 Select::make('role')
-                    ->options(['examiner' => 'Examiner', 'test_taker' => 'Test taker', 'admin' => 'Admin'])
+                    ->options(['examiner' => 'Examiner', 'test_taker' => 'Test taker', 'admin' => 'Admin', 'superadmin' => 'Super Admin'])
                     ->default('test_taker')
+                    ->disabled(fn () => !auth()->user()->isSuperAdmin())
                     ->required(),
                 TextInput::make('tokens')
                     ->label('Universal Tokens')
                     ->numeric()
                     ->default(0)
+                    ->disabled(fn () => !auth()->user()->isSuperAdmin())
                     ->required(),
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')

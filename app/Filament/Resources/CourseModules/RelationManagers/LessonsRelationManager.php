@@ -48,6 +48,7 @@ class LessonsRelationManager extends RelationManager
                 ->disk('public')
                 ->directory('courses/lessons')
                 ->visible(fn (Get $get) => in_array($get('type'), ['pdf', 'audio', 'video']))
+                ->acceptedFileTypes(['application/pdf', 'audio/*', 'video/*'])
                 ->helperText('Upload local files here.'),
 
             RichEditor::make('text_content')

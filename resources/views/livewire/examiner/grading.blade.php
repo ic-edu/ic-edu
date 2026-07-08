@@ -33,6 +33,9 @@ new class extends Component
 
         $this->answers = AttemptAnswer::with(['question.questionGroup', 'question.options'])
             ->where('exam_attempt_id', $this->attempt->id)
+            ->whereHas('question', function ($query) {
+                $query->where('type', '!=', 'multiple_choice');
+            })
             ->get();
 
         foreach ($this->answers as $ans) {

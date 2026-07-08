@@ -37,13 +37,13 @@ class CourseForm
                 ->default(false)
                 ->helperText('Only published courses are visible to students.'),
 
-            TextInput::make('price')
-                ->label('Price (Rp)')
+            TextInput::make('tokens_required')
+                ->label('Tokens Required')
                 ->numeric()
                 ->required()
-                ->prefix('Rp')
-                ->default(149000)
-                ->placeholder('e.g., 149000'),
+                ->default(10)
+                ->placeholder('e.g., 10')
+                ->helperText('Number of tokens a student must spend to enroll in this course.'),
 
             FileUpload::make('thumbnail_path')
                 ->label('Thumbnail Image')

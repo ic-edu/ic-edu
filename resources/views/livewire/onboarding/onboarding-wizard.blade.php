@@ -20,7 +20,7 @@
 
         {{-- Logo + copy --}}
         <div class="relative z-10 pt-10 px-10">
-            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="IC.EDU"
+            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="iC.Edu"
                  class="object-contain"
                  style="height:52px; filter:brightness(0) invert(1);">
 
@@ -50,7 +50,7 @@
                         Ready to<br>ace your<br><span style="color:#6FAFB5;">exam!</span>
                     </h1>
                     <p class="mt-4 text-sm leading-relaxed" style="color:rgba(255,255,255,0.45); max-width:210px;">
-                        Your IC.EDU profile is all set. Time to get to work.
+                        Your iC.Edu profile is all set. Time to get to work.
                     </p>
                 @endif
             </div>
@@ -98,7 +98,7 @@
         {{-- Mobile top bar --}}
         <div class="lg:hidden flex items-center justify-between px-5 py-4"
              style="background:linear-gradient(135deg,#0b2740,#1A456C); border-bottom:1px solid rgba(255,255,255,0.07);">
-            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="IC.EDU"
+            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="iC.Edu"
                  class="h-7 object-contain" style="filter:brightness(0) invert(1);">
             <div class="flex items-center gap-2">
                 @for($i = 1; $i <= $totalSteps; $i++)
@@ -455,7 +455,7 @@
                             Welcome, {{ Auth::user()->name }}!
                         </h2>
                         <p class="text-base mb-6" style="color:#64748b; max-width:300px; line-height:1.6;">
-                            Your IC.EDU profile is ready. Let's start building toward your goal.
+                            Your iC.Edu profile is ready. Let's start building toward your goal.
                         </p>
 
                         {{-- Summary --}}

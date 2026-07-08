@@ -65,15 +65,45 @@ class ExamController extends Controller
             return redirect()->route('test_taker.exam.attempt', ['attempt' => $existingAttempt->id]);
         }
 
-        // Create new attempt
-        $newAttempt = \App\Models\ExamAttempt::create([
-            'user_id'  => $userId,
-            'exam_id'  => $exam->id,
-            'started_at' => now(),
-            'status'   => ExamAttemptStatus::ONGOING->value,
-        ]);
+        // Create new attempt within transaction to safely deduct tokens
+        try {
+            $newAttempt = \Illuminate\Support\Facades\DB::transaction(function () use ($userId, $exam) {
+                if ($exam->tokens_required > 0) {
+                    $user = \App\Models\User::lockForUpdate()->find($userId);
+                    
+                    if ($user->tokens < $exam->tokens_required) {
+                        throw new \Exception('INSUFFICIENT_TOKENS');
+                    }
+                    
+                    $user->decrement('tokens', $exam->tokens_required);
+                    
+                    \App\Models\TokenTransaction::create([
+                        'user_id' => $user->id,
+                        'type' => 'deduction',
+                        'amount' => -$exam->tokens_required,
+                        'description' => "Mulai ujian: {$exam->title}",
+                        'reference_id' => 'EXM-' . strtoupper(\Illuminate\Support\Str::random(8)),
+                        'status' => 'completed',
+                    ]);
+                }
 
-        return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id]);
+                return \App\Models\ExamAttempt::create([
+                    'user_id'  => $userId,
+                    'exam_id'  => $exam->id,
+                    'started_at' => now(),
+                    'status'   => ExamAttemptStatus::ONGOING->value,
+                ]);
+            });
+            
+            return redirect()->route('test_taker.exam.attempt', ['attempt' => $newAttempt->id]);
+            
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'INSUFFICIENT_TOKENS') {
+                return redirect()->route('test_taker.exam.my_exams')->with('error', 'Token tidak cukup untuk mengikuti ujian ini. Silakan top up token Anda.');
+            }
+            \Illuminate\Support\Facades\Log::error('Exam start failed', ['error' => $e->getMessage()]);
+            return redirect()->route('test_taker.exam.my_exams')->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi nanti.');
+        }
     }
 
     public function showResult(\App\Models\ExamAttempt $attempt)

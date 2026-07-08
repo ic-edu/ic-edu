@@ -19,10 +19,15 @@ class VoucherResource extends Resource
     protected static ?string $model = Voucher::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
-    protected static string|\UnitEnum|null $navigationGroup = 'Management';
+    protected static string|\UnitEnum|null $navigationGroup = 'Financial & Revenue';
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'code';
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->isSuperAdmin();
+    }
 
     public static function form(Schema $schema): Schema
     {
