@@ -24,102 +24,47 @@
             </div>
         </div>
 
-        <div class="w-full lg:w-[55%] text-white" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200" x-data="{ tab: 'icedu' }">
-            <div class="mb-6 flex justify-center lg:justify-start gap-3">
-                <button @click="tab = 'icedu'" 
-                        :class="tab === 'icedu' ? 'bg-white text-[#1a395b]' : 'bg-white/20 text-white hover:bg-white/30'" 
-                        class="inline-block text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide transition-all duration-300">
-                    Who We Are
-                </button>
-                <button @click="tab = 'partnership'" 
-                        :class="tab === 'partnership' ? 'bg-white text-[#1a395b]' : 'bg-white/20 text-white hover:bg-white/30'" 
-                        class="inline-block text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide transition-all duration-300">
-                    Our Partnership
-                </button>
+        <div class="w-full lg:w-[55%] text-white" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+            <div class="mb-6 flex justify-center lg:justify-start">
+                <span class="inline-block bg-white text-[#1a395b] text-xs font-semibold px-4 py-1.5 rounded-full tracking-wide">
+                    Who we are
+                </span>
             </div>
-            
-            <!-- Tab 1: About IC Edu -->
-            <div x-show="tab === 'icedu'" 
-                 x-transition:enter="transition ease-out duration-300" 
-                 x-transition:enter-start="opacity-0 translate-y-4" 
-                 x-transition:enter-end="opacity-100 translate-y-0">
-                
-                <h2 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight mb-6 tracking-tight text-center lg:text-left !text-white">
-                    Your Trusted Platform for English Learning<br class="hidden sm:block">
-                    and Test Preparation
-                </h2>
-                
-                <p class="text-sm lg:text-base !text-white leading-relaxed mb-8 max-w-[580px] text-center lg:text-left">
-                    IC Edu is an English education platform operated by <strong class="!text-white">PT Edukasi Persada Indonesia</strong>, providing tailored language training programs for students, professionals, universities, and companies.
-                </p>
-                
-                <div class="space-y-6 max-w-[500px] mx-auto lg:mx-0">
-                    {{-- Point 1 --}}
-                    <div class="flex items-start gap-4">
-                        <span class="!text-white text-2xl leading-none mt-0.5">•</span>
-                        <div>
-                            <h4 class="text-base font-bold !text-white leading-tight mb-1">Interactive Practice</h4>
-                            <p class="text-sm !text-white/90">Engaging modules and real test simulations</p>
-                        </div>
-                    </div>
 
-                    {{-- Point 2 --}}
-                    <div class="flex items-start gap-4">
-                        <span class="!text-white text-2xl leading-none mt-0.5">•</span>
-                        <div>
-                            <h4 class="text-base font-bold !text-white leading-tight mb-1">International Preparation</h4>
-                            <p class="text-sm !text-white/90">Programs for IELTS, TOEFL, and TOEIC success.</p>
-                        </div>
-                    </div>
+            <h2 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight mb-6 tracking-tight text-center lg:text-left !text-white">
+                Your Trusted Platform for English Learning<br class="hidden sm:block">
+                and Test Preparation
+            </h2>
 
-                    {{-- Point 3 --}}
-                    <div class="flex items-start gap-4">
-                        <span class="!text-white text-2xl leading-none mt-0.5">•</span>
-                        <div>
-                            <h4 class="text-base font-bold !text-white leading-tight mb-1">Flexible Learning</h4>
-                            <p class="text-sm !text-white/90">Study anytime through our digital platform.</p>
-                        </div>
+            <p class="text-sm lg:text-base !text-white leading-relaxed mb-8 max-w-[580px] text-center lg:text-left">
+                IC Edu is an English education platform operated by <strong class="!text-white">PT Edukasi Persada Indonesia</strong>, providing tailored language training programs for students, professionals, universities, and companies.
+            </p>
+
+            <div class="space-y-6 max-w-[500px] mx-auto lg:mx-0">
+                {{-- Point 1 --}}
+                <div class="flex items-start gap-4">
+                    <span class="!text-white text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold !text-white leading-tight mb-1">Interactive Practice</h4>
+                        <p class="text-sm !text-white/90">Engaging modules and real test simulations</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tab 2: Our Partnership -->
-            <div x-show="tab === 'partnership'" 
-                 style="display: none;"
-                 x-transition:enter="transition ease-out duration-300" 
-                 x-transition:enter-start="opacity-0 translate-y-4" 
-                 x-transition:enter-end="opacity-100 translate-y-0">
-                 
-                <h2 class="text-3xl sm:text-4xl lg:text-[40px] font-extrabold leading-tight mb-6 tracking-tight text-center lg:text-left !text-white">
-                    Built Through Academic &<br class="hidden sm:block">
-                    Industry Collaboration
-                </h2>
-                
-                <p class="text-sm lg:text-base !text-white leading-relaxed mb-8 max-w-[580px] text-center lg:text-left">
-                    This platform is the result of a meaningful collaboration between <strong class="!text-white">Institut Teknologi Nasional (Itenas)</strong>, Information Systems Study Program, and <strong class="!text-white">PT Edukasi Persada Indonesia</strong>, an established English education institution. Together, they bridge academia and industry to deliver a world-class English learning experience.
-                </p>
-
-                <div class="flex flex-col gap-4 max-w-[500px] mx-auto lg:mx-0">
-                    {{-- Itenas --}}
-                    <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/10 transition-transform hover:-translate-y-1">
-                        <div class="w-16 h-16 rounded-xl flex items-center justify-center p-2 shrink-0 overflow-hidden">
-                            <img src="{{ asset('assets/logo-itenas.png') }}" alt="Itenas Logo" class="w-full h-full object-contain">
-                        </div>
-                        <div>
-                            <h4 class="text-base font-bold !text-white leading-tight mb-1">Institut Teknologi Nasional (Itenas)</h4>
-                            <p class="text-sm !text-white/80">Information Systems Study Program, Academic Partner</p>
-                        </div>
+                {{-- Point 2 --}}
+                <div class="flex items-start gap-4">
+                    <span class="!text-white text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold !text-white leading-tight mb-1">International Preparation</h4>
+                        <p class="text-sm !text-white/90">Programs for IELTS, TOEFL, and TOEIC success.</p>
                     </div>
+                </div>
 
-                    {{-- PT Edukasi Persada Indonesia --}}
-                    <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl backdrop-blur-sm border border-white/10 transition-transform hover:-translate-y-1">
-                        <div class="w-16 h-16 rounded-xl flex items-center justify-center p-2 shrink-0 overflow-hidden">
-                            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="PT Edukasi Persada Indonesia" class="w-full h-full object-contain">
-                        </div>
-                        <div>
-                            <h4 class="text-base font-bold !text-white leading-tight mb-1">PT Edukasi Persada Indonesia</h4>
-                            <p class="text-sm !text-white/80">English Education Institution, Industry Partner</p>
-                        </div>
+                {{-- Point 3 --}}
+                <div class="flex items-start gap-4">
+                    <span class="!text-white text-2xl leading-none mt-0.5">•</span>
+                    <div>
+                        <h4 class="text-base font-bold !text-white leading-tight mb-1">Flexible Learning</h4>
+                        <p class="text-sm !text-white/90">Study anytime through our digital platform.</p>
                     </div>
                 </div>
             </div>
