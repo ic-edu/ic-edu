@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    /* Menggunakan Poppins sesuai permintaan */
+    background: #fff;
+}
+
+.auth-form-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-content-wrapper {
+    width: 100%;
+    max-width: 360px;
+    /* Diperkecil agar konsisten */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Logo, judul, form sejajar kiri */
+}
+
+.main-logo {
+    width: 130px;
+    /* Ukuran diperkecil agar sejajar manis dengan judul */
+    height: auto;
+    margin-bottom: 15px;
+    margin-left: -4px;
+    /* Offset halus agar visual icon sejajar dengan teks */
+}
+
+.welcome-text h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a3a5a;
+    line-height: 1.2;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.main-auth-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    /* Margin diperkecil */
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.input-error {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+.input-error:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-msg {
+    display: block;
+    color: #ef4444;
+    font-size: 11px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.divider {
+    width: 100%;
+    text-align: center;
+    margin: 15px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.divider span {
+    background: #fff;
+    padding: 0 10px;
+    color: #a0aec0;
+    font-size: 11px;
+    position: relative;
+    z-index: 2;
+}
+
+.google-login-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+/* Link Footer dengan Garis Bawah */
+.footer-auth-text {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.auth-link {
+    color: #007bff;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px solid #007bff;
+    /* Garis bawah biru tebal */
+    padding-bottom: 1px;
+}
+
+/* Sisi Visual */
+.auth-visual-section {
+    flex: 1;
+    background-color: #1a3a5a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.speech-bubble {
+    background: white;
+    padding: 15px 35px;
+    border-radius: 20px;
+    font-size: 36px;
+    font-weight: 900;
+    color: #1a3a5a;
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 20%;
+    border-width: 15px 15px 0 0;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+}
+
+.mascot-img {
+    width: 70%;
+    max-width: 500px;
+}
+
+@media (max-width: 768px) {
+    .auth-visual-section {
+        display: none;
+    }
+}

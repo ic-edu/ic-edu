@@ -15,11 +15,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->create([
+            'name' => 'Super Administrator',
+            'email' => 'ic.edu.bdg@gmail.com',
+            'password' => bcrypt('superadmin2026'),
+            'role' => 'superadmin',
+            'tokens' => 999,
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Administrator',
+            'email' => 'ic.edu.bdg@gmail.com',
+            'password' => bcrypt('admin2026'),
+            'role' => 'admin',
+            'tokens' => 999,
         ]);
+        $this->call(ExamTypesTableSeeder::class);
+        $this->call(SubsectionsTableSeeder::class);
+        $this->call(ExamTypesContentSeeder::class);
+        $this->call(SettingsSeeder::class);
     }
 }
