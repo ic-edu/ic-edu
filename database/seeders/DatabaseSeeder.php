@@ -16,33 +16,23 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Test Taker',
-            'email' => 'testaker@example.com',
-            'password' => bcrypt('password'),
-            'tokens' => 5,
+            'name' => 'Super Administrator',
+            'email' => 'ic.edu.bdg@gmail.com',
+            'password' => bcrypt('superadmin2026'),
+            'role' => 'superadmin',
+            'tokens' => 999,
         ]);
 
         User::factory()->create([
-            'name' => 'Examiner User',
-            'email' => 'examiner@example.com',
-            'password' => bcrypt('password'),
-            'tokens' => 5,
-        ]);
-
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
-            'tokens' => 5,
+            'name' => 'Administrator',
+            'email' => 'ic.edu.bdg@gmail.com',
+            'password' => bcrypt('admin2026'),
+            'role' => 'admin',
+            'tokens' => 999,
         ]);
         $this->call(ExamTypesTableSeeder::class);
-        $this->call(ExamsTableSeeder::class);
-        $this->call(SectionsTableSeeder::class);
         $this->call(SubsectionsTableSeeder::class);
-        $this->call(QuestionGroupsTableSeeder::class);
-        $this->call(QuestionsTableSeeder::class);
-        $this->call(QuestionOptionsTableSeeder::class);
         $this->call(ExamTypesContentSeeder::class);
-        $this->call(SettingsTableSeeder::class);
+        $this->call(SettingsSeeder::class);
     }
 }

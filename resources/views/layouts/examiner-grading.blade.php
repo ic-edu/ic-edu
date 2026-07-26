@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset(config('tenant.active.favicon')) }}">
 
-    <title>Grading Workspace - IC EDU</title>
+    <title>Grading Workspace - {{ config('tenant.active.app_name') }}</title>
 
     @vite([
         'resources/css/app.css',

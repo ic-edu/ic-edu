@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/png" href="{{ asset('assets/icidu_logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset(config('tenant.active.favicon')) }}">
 
-    <title>Examiner Portal - {{ config('app.name', 'iC.Edu') }}</title>
+    <title>Examiner Portal - {{ config('tenant.active.app_name') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

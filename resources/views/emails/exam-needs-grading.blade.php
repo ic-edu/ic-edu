@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IC EDU - New Submission</title>
+    <title>{{ config('tenant.active.app_name') }} - New Submission</title>
 </head>
 
 <body style="
@@ -33,14 +33,13 @@
             background:#ffffff;
         ">
 
-            <img
-                src="{{ $message->embed(public_path('assets/icidu_logo.png')) }}"
-                alt="IC EDU"
-                style="
-                height:60px;
-                width:auto;
-                display:block;
-            ">
+            <div style="background:#ffffff;padding:25px;border-bottom:1px solid #d8e2ef;text-align:center;">
+                <img
+                    src="{{ $message->embed(public_path(config('tenant.active.logo_light'))) }}"
+                    alt="{{ config('tenant.active.app_name') }} Logo"
+                    style="max-width:140px;height:auto;"
+                >
+            </div>
 
             <span style="
                 font-size:14px;

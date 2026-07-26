@@ -27,7 +27,7 @@
             <div style="background:#1A456C;padding:34px 34px 38px;text-align:center;position:relative;">
 
                 <div style="font-size:11px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:#98d7e4;margin-bottom:20px;">
-                    IC EDU
+                    {{ config('tenant.active.app_name') }}
                 </div>
 
                 <img
@@ -149,7 +149,7 @@
 
             <div style="background:#f5f8fc;border-top:1px solid #dde7f2;padding:22px 30px;text-align:center;">
                 <p style="margin:0;font-size:12px;line-height:1.7;color:#8b9ab0;">
-                    This is an automated notification from <strong>{{ config('app.name', 'IC EDU') }}</strong>.<br>
+                    This is an automated notification from <strong>{{ config('tenant.active.app_name') }}</strong>.<br>
                     Please do not reply to this email.
                 </p>
             </div>

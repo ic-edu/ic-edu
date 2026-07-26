@@ -2,9 +2,9 @@
     <div class="sidebar-header flex items-center justify-between px-4 mb-4 transition-all duration-300">
 
         <div class="py-2 ml-5 flex-shrink-0 brand-logo">
-            <img src="/assets/ic_edu_logo.png"
+            <img src="{{ asset(config('tenant.active.logo_sidebar')) }}"
                 alt="Edu Logo"
-                class="h-20 w-auto object-contain drop-shadow-sm" />
+                class="max-h-14 max-w-[180px] object-contain drop-shadow-sm" />
         </div>
 
         <button id="toggleSidebarBtn"

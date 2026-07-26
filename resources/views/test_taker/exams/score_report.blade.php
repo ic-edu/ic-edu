@@ -8,7 +8,7 @@
 <body>
 
 @php
-    $logoPath   = public_path('assets/ic_edu_logo.png');
+    $logoPath   = public_path(config('tenant.active.logo_dark'));
     $logoB64    = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : null;
     $percentage = $percentage ?? 0;
     $isPassing  = $percentage >= 60;
@@ -39,7 +39,7 @@
 
             {{-- Brand --}}
             <td style="vertical-align:middle; padding-left:14px; border-left:1px solid rgba(255,255,255,0.15);">
-                <div class="header-brand">{{ config('app.name', 'iC.Edu') }}</div>
+                <div class="header-brand">{{ config('tenant.active.app_name') }}</div>
                 <div class="header-brand-sub">English Proficiency Assessment</div>
             </td>
 

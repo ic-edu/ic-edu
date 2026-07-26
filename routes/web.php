@@ -22,8 +22,12 @@ use App\Mail\ExamNeedsGradingMail;
 
 // Landing Page Route
 Route::get('/', function () {
+    if (config('tenant.active_id') === 'toeic') {
+        return view('landing-toeic');
+    }
     return view('landing');
 })->name('landing');
+
 
 Route::get('/courses', function () {
     if (auth()->check()) {

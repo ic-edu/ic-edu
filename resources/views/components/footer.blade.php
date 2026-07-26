@@ -10,7 +10,7 @@
 
             {{-- Brand Section --}}
             <div class="flex flex-col gap-4">
-                <img src="{{ asset('assets/icidu_logo.png') }}" 
+                <img src="{{ asset(config('tenant.active.logo_auth')) }}" 
                      alt="IC.edu" 
                      class="h-[40px] w-auto object-contain self-start">
                 <p class="text-sm leading-relaxed max-w-[280px] !text-slate-300 font-medium">

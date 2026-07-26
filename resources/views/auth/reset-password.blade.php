@@ -4,7 +4,7 @@
     <div class="auth-container">
         <div class="auth-form-section">
             <div class="auth-content-wrapper">
-                <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU Logo" class="main-logo">
+                <img src="{{ asset(config('tenant.active.logo_auth')) }}" alt="IC EDU Logo" class="main-logo">
 
                 <div class="welcome-text">
                     <h1>Reset Password</h1>

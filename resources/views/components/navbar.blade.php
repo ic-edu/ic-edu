@@ -208,7 +208,7 @@
 <nav id="navbar" class="fixed z-50">
     <div class="max-w-[1300px] mx-auto flex items-center justify-between px-[5%] py-4">
         <a href="{{ url('/') }}" class="flex-shrink-0">
-            <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 sm:h-12 lg:h-14 w-auto object-contain">
+            <img src="{{ asset(config('tenant.active.logo_auth')) }}" alt="IC EDU" class="h-10 sm:h-12 lg:h-14 w-auto object-contain">
         </a>
         <div class="hidden md:flex items-center gap-7">
             <a href="{{ url('/') }}" class="nav-link nav-pill text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors">Home</a>
@@ -311,7 +311,7 @@
         <!-- Header (Logo & Close Button) -->
         <div class="flex items-center justify-between pb-6 border-b border-white/10">
             <a href="{{ url('/') }}" class="flex-shrink-0">
-                <img src="{{ asset('assets/icidu_logo.png') }}" alt="IC EDU" class="h-10 w-auto object-contain">
+                <img src="{{ asset(config('tenant.active.logo_auth')) }}" alt="IC EDU" class="h-10 w-auto object-contain">
             </a>
             <button id="mobile-menu-close" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 text-white hover:bg-white/20 active:scale-95 transition-all" aria-label="Close menu">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

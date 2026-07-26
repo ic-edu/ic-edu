@@ -20,7 +20,7 @@
 
         {{-- Logo + copy --}}
         <div class="relative z-10 pt-10 px-10">
-            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="iC.Edu"
+            <img src="{{ asset(config('tenant.active.logo_light')) }}" alt="iC.Edu"
                  class="object-contain"
                  style="height:52px; filter:brightness(0) invert(1);">
 
@@ -98,7 +98,7 @@
         {{-- Mobile top bar --}}
         <div class="lg:hidden flex items-center justify-between px-5 py-4"
              style="background:linear-gradient(135deg,#0b2740,#1A456C); border-bottom:1px solid rgba(255,255,255,0.07);">
-            <img src="{{ asset('assets/ic_edu_logo.png') }}" alt="iC.Edu"
+            <img src="{{ asset(config('tenant.active.logo_light')) }}" alt="iC.Edu"
                  class="h-7 object-contain" style="filter:brightness(0) invert(1);">
             <div class="flex items-center gap-2">
                 @for($i = 1; $i <= $totalSteps; $i++)
