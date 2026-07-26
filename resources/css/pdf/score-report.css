@@ -1,0 +1,429 @@
+@page {
+    size: A4;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    color: #1a2a3a;
+    background: #ffffff;
+    font-size: 11px;
+}
+
+/* ── Watermark ── */
+.watermark {
+    position: fixed;
+    top: 350px;
+    left: 147px;
+    width: 500px;
+    height: 373px;
+    opacity: 0.28;
+    z-index: -1000;
+}
+
+/* ════════════════════════════
+   HEADER
+════════════════════════════ */
+.header-main {
+    background: #1A456C;
+    padding: 20px 44px 18px;
+}
+
+.header-logo-img {
+    width: 60px;
+    height: 45px;
+    object-fit: contain;
+    display: block;
+}
+
+.header-brand {
+    font-size: 17px;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+}
+
+.header-brand-sub {
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+.header-report-label {
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #C9A84C;
+    margin-bottom: 3px;
+    text-align: right;
+}
+
+.header-report-date {
+    font-size: 10px;
+    font-weight: bold;
+    color: rgba(255,255,255,0.70);
+    text-align: right;
+}
+
+.header-qr-img {
+    width: 66px;
+    height: 66px;
+    display: block;
+    margin-left: auto;
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+}
+
+.header-qr-label {
+    font-size: 6px;
+    color: rgba(255,255,255,0.35);
+    text-align: right;
+    margin-top: 4px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+/* Teal accent strip */
+.accent-teal {
+    height: 5px;
+    background: #6FAFB5;
+}
+
+/* Gold accent strip */
+.accent-gold {
+    height: 3px;
+    background: #C9A84C;
+}
+
+/* ════════════════════════════
+   CANDIDATE INFO BAR
+════════════════════════════ */
+.info-bar {
+    background: #f0f7f8;
+    border-bottom: 1px solid #cde4e6;
+    padding: 13px 44px;
+}
+
+.info-bar-label {
+    font-size: 6.5px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #6FAFB5;
+    margin-bottom: 3px;
+}
+
+.info-bar-value {
+    font-size: 10px;
+    font-weight: bold;
+    color: #1A456C;
+}
+
+.info-bar-divider {
+    width: 1px;
+    background: #cde4e6;
+    padding: 0;
+}
+
+/* ════════════════════════════
+   PAGE BODY
+════════════════════════════ */
+.page-body {
+    padding: 24px 44px 40px;
+}
+
+/* ── Score cards ── */
+.score-cards-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 8px 0;
+    margin-bottom: 18px;
+}
+
+.score-card {
+    border-radius: 6px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 12px 10px;
+    border: 1px solid #e2eaf0;
+}
+
+.score-card-blue {
+    background: #1A456C;
+}
+
+.score-card-teal {
+    background: #6FAFB5;
+}
+
+.score-card-white {
+    background: #ffffff;
+    border: 2px solid #e2eaf0;
+    border-top: 4px solid #C9A84C;
+}
+
+.card-label-light {
+    font-size: 6.5px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 6px;
+}
+
+.card-label-dark {
+    font-size: 6.5px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8a94a8;
+    margin-bottom: 6px;
+}
+
+.score-big-white {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.score-big-dark {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 32px;
+    font-weight: bold;
+    color: #1A456C;
+    line-height: 1;
+}
+
+.score-sub-light {
+    font-size: 8px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.score-sub-dark {
+    font-size: 8px;
+    color: #6FAFB5;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.cefr-level {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.cefr-rule {
+    height: 2px;
+    background: rgba(255,255,255,0.35);
+    width: 28px;
+    margin: 6px auto;
+    font-size: 1px;
+    line-height: 0;
+}
+
+.cefr-desc {
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.60);
+}
+
+.badge-pass {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.30);
+    border-radius: 20px;
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.badge-fail {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    background: rgba(255,80,80,0.22);
+    border: 1px solid rgba(255,120,120,0.40);
+    border-radius: 20px;
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+/* ════════════════════════════
+   SCORE BREAKDOWN
+════════════════════════════ */
+.breakdown-label {
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1A456C;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1A456C;
+    margin-bottom: 14px;
+}
+
+.section-block {
+    margin-bottom: 14px;
+    background: #ffffff;
+    border: 1px solid #e2eaf0;
+    border-left: 4px solid #1A456C;
+    border-radius: 4px;
+    padding: 12px 14px;
+}
+
+.section-block.color-teal {
+    border-left: 4px solid #6FAFB5;
+}
+
+.section-block.color-gold {
+    border-left: 4px solid #C9A84C;
+}
+
+.section-block.color-red {
+    border-left: 4px solid #e05252;
+}
+
+.section-name {
+    font-size: 10px;
+    font-weight: bold;
+    color: #1A456C;
+}
+
+.section-score-text {
+    font-size: 10px;
+    font-weight: bold;
+    color: #1a2a3a;
+    text-align: right;
+}
+
+.section-pct-text {
+    font-size: 8px;
+    color: #6FAFB5;
+    font-weight: normal;
+}
+
+/* Progress bar */
+.progress-track {
+    background: #e8edf4;
+    border-radius: 4px;
+    height: 8px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.progress-fill-blue {
+    height: 8px;
+    border-radius: 4px;
+    background: #1A456C;
+}
+
+.progress-fill-teal {
+    height: 8px;
+    border-radius: 4px;
+    background: #6FAFB5;
+}
+
+.progress-fill-gold {
+    height: 8px;
+    border-radius: 4px;
+    background: #C9A84C;
+}
+
+.progress-fill-red {
+    height: 8px;
+    border-radius: 4px;
+    background: #e05252;
+}
+
+/* Sub-section */
+.sub-block {
+    padding: 7px 0 7px 14px;
+    border-top: 1px solid #f0f4f8;
+    margin-top: 8px;
+}
+
+.sub-name {
+    font-size: 9px;
+    color: #5a6678;
+}
+
+.sub-score {
+    font-size: 9px;
+    font-weight: bold;
+    color: #1a2a3a;
+    text-align: right;
+}
+
+.sub-pct {
+    font-size: 7.5px;
+    color: #8a94a8;
+    font-weight: normal;
+}
+
+.progress-track-sm {
+    background: #edf2f7;
+    border-radius: 3px;
+    height: 5px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.progress-fill-sm {
+    height: 5px;
+    border-radius: 3px;
+}
+
+/* ════════════════════════════
+   FOOTER
+════════════════════════════ */
+.doc-footer {
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid #e2eaf0;
+    text-align: center;
+}
+
+.doc-footer p {
+    font-size: 7.5px;
+    color: #9aa4b6;
+    line-height: 1.85;
+}
+
+.footer-stamp {
+    display: inline-block;
+    margin-top: 9px;
+    padding: 4px 16px;
+    background: #f0f7f8;
+    border: 1px solid #cde4e6;
+    border-radius: 20px;
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #6FAFB5;
+}
